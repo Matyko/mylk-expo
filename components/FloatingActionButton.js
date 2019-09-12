@@ -8,7 +8,8 @@ export default function FloatingActionButton({iconName, pressFunction}) {
     const icon = iconName ? prefix + iconName : `${prefix}add`;
 
     return (
-        <View style={styling}>
+        <View style={styling}
+              onPress={() => pressFunction()}>
             <Ionicons
                 name={icon}
                 size={25}

@@ -57,7 +57,6 @@ export default class Tasks extends Component {
     } catch {
       Alert.alert('Could not save your tasks')
     }
-
   }
 
   render() {
@@ -82,6 +81,7 @@ export default class Tasks extends Component {
             {this.state.tasks.map(task => {
               if (task.checked) {
                 return <TaskElement
+                    style={{opacity: 0.6}}
                     key={task.id}
                     task={task}
                     setChecked={() => this.setChecked(task)}/>

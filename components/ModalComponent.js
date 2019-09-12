@@ -11,7 +11,8 @@ export default class ModalComponent extends Component {
                 animationType="slide"
                 transparent={false}
                 visible={this.props.modalVisible}>
-                <View style={styling}>
+                <View style={styling}
+                      onPress={() => this.props.closeModal()}>
                     <Ionicons
                         name={Platform.OS === 'ios' ? 'ios-add' : 'md-add'}
                         size={20}

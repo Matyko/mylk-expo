@@ -38,11 +38,11 @@ export default class TaskForm extends Component {
         return (
             <View style={styles.container}>
                 <View style={styles.formElement}>
-                    <Text>Create new task</Text>
+                    <Text style={styles.fontStyling}>Create new task</Text>
                 </View>
                 <View style={styles.formElement}>
                     <DatePicker
-                        style={{backgroundColor: 'black'}}
+                        style={styles.datePicker}
                         date={'2016-06-06'}
                         mode={this.state.mode}
                         placeholder="select date"
@@ -96,11 +96,19 @@ export default class TaskForm extends Component {
 const styles = StyleSheet.create({
     container: {
         paddingTop: 50,
-        paddingLeft: 20,
-        paddingRight: 20,
+        paddingVertical: 20,
     },
     formElement: {
         margin: 20
-    }
+    },
+    datePicker: {
+        width: 200,
+        height: 30
+    },
+    fontStyling: {
+        fontWeight: 'bold',
+        fontSize: 20,
+        textTransform: 'uppercase',
+        letterSpacing: 1}
 });
 
