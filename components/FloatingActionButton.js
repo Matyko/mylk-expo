@@ -5,23 +5,29 @@ import React from "react";
 
 export default function FloatingActionButton({iconName, pressFunction}) {
     const prefix = Platform.OS === 'ios' ? 'ios-' : 'md-';
-    const icon = iconName ? prefix + iconName : `${prefix}add-circle`;
+    const icon = iconName ? prefix + iconName : `${prefix}add`;
 
     return (
-        <View style={styling} onPress={() => pressFunction()}>
+        <View style={styling}>
             <Ionicons
                 name={icon}
-                size={40}
-                color={Colors.tabIconDefault}
+                size={25}
+                color={Colors.accentText}
+                onPress={() => pressFunction()}
             />
         </View>
     )
 }
 
 const styling = {
-    width: 40,
-    height: 40,
-    // position: 'absolute',
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.accentBackground,
+    borderRadius: 60,
+    width: 50,
+    height: 50,
+    position: 'absolute',
     bottom: 10,
-    right: 10,
-}
+    right: 10
+};

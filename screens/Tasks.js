@@ -1,66 +1,103 @@
 import React, {Component} from 'react';
 import {
+  AsyncStorage,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import ModalComponent from "../components/ModalComponent";
 import TaskElement from "../components/TaskElement";
 import FloatingActionButton from "../components/FloatingActionButton";
+import TaskForm from "../components/TaskForm";
 
 export default class Tasks extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tasks: []
+      tasks: [],
+      modalVisible: false
     }
   }
 
-  setChecked(task) {
-    this.setState({tasks: this.state.tasks.map(e => {
-        if (e === task) {
-          e.checked = !e.checked
-        }
-        return e;
+  componentWillMount() {
+    try {
+      AsyncStorage.getItem('tasks').then(result => {
+        const tasks = result ? JSON.parse(result) : [];
+        this.setState({tasks, modalVisible: false})
       })
-    })
+    } catch {
+      Alert.alert('Could not load your tasks')
+    }
   }
 
-  addTask() {
+  async setChecked(task) {
+    const newTasks = this.state.tasks.map(e => {
+      if (e === task) {
+        e.checked = !e.checked
+      }
+      return e
+    });
+    try {
+      await AsyncStorage.setItem('tasks', JSON.stringify(newTasks));
+      this.setState({tasks: newTasks, modalVisible: false});
+    } catch {
+      Alert.alert('Could not save your tasks')
+    }
+
+  }
+
+  async createTask(task) {
     const newTasks = this.state.tasks.slice();
-    newTasks.concat([{id: newTasks.length, title: `Task #${newTasks.length}`, due: new Date()}]);
-    this.setState({tasks: newTasks});
+    task.id = newTasks.length;
+    newTasks.push(task);
+    try {
+      await AsyncStorage.setItem('tasks', JSON.stringify(newTasks));
+      this.setState({tasks: newTasks, modalVisible: false});
+    } catch {
+      Alert.alert('Could not save your tasks')
+    }
+
   }
 
   render() {
     return (
-        <ScrollView style={styles.container}>
-          {this.state.tasks.map(task => {
-            if (!task.checked) {
-              return <TaskElement
-                  key={task.id}
-                  task={task}
-                  setChecked={() => this.setChecked(task)}/>
-            } else {
-              return null;
-            }
-          })}
-          <View>
-            <Text>Checked items</Text>
-            <View style={styles.separator}/>
-          </View>
-          {this.state.tasks.map(task => {
-            if (task.checked) {
-              return <TaskElement
-                  key={task.id}
-                  task={task}
-                  setChecked={() => this.setChecked(task)}/>
-            } else {
-              return null;
-            }
-          })}
-          <FloatingActionButton pressFunction={() => this.addTask()}/>
-        </ScrollView>
+        <View style={{flex: 1}}>
+          <ScrollView style={styles.container}>
+            {this.state.tasks.map(task => {
+              if (!task.checked) {
+                return <TaskElement
+                    key={task.id}
+                    task={task}
+                    setChecked={() => this.setChecked(task)}/>
+              } else {
+                return null;
+              }
+            })}
+            {!!this.state.tasks.filter(e => e.checked).length &&
+              <View>
+              <Text>Checked items</Text>
+              <View style={styles.separator}/>
+            </View>}
+            {this.state.tasks.map(task => {
+              if (task.checked) {
+                return <TaskElement
+                    key={task.id}
+                    task={task}
+                    setChecked={() => this.setChecked(task)}/>
+              } else {
+                return null;
+              }
+            })}
+          </ScrollView>
+          <FloatingActionButton pressFunction={() => this.setState({modalVisible: true})}/>
+          <ModalComponent
+              closeModal={() => this.setState({modalVisible: false})}
+              modalVisible={this.state.modalVisible}
+          >
+            <TaskForm createTask={task => this.createTask(task)}/>
+          </ModalComponent>
+        </View>
     );
   }
 }

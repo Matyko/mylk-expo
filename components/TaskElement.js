@@ -7,8 +7,7 @@ import {CheckBox} from "react-native-elements";
 export default function TaskElement({task, setChecked}) {
 
     const prefix = Platform.OS === 'ios' ? 'ios-' : 'md-';
-
-    const icon = new Date().getTime() < task.due.getTime() ? `${prefix}radio-button-off` : `${prefix}alert`;
+    const icon = new Date().getTime() < Date.parse(task.due) ? `${prefix}radio-button-off` : `${prefix}alert`;
 
     return (
         <View style={styles.taskElement}>
@@ -21,7 +20,7 @@ export default function TaskElement({task, setChecked}) {
                 />
             </View>
             }
-            <Text style={styles.taskElementTitle}>{task.title}</Text>
+            <Text style={styles.taskElementTitle}>{task.due} - {task.title}</Text>
             <View style={styles.checkBoxContainer}>
                 <CheckBox
                     checked={task.checked}
