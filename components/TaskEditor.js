@@ -128,10 +128,10 @@ const styles = StyleSheet.create({
     },
     addonEmoji: {
         flexGrow: 0,
-        fontSize: 25
+        fontSize: 25,
+        marginLeft: 5
     },
     hasAddonEmoji: {
-        flexGrow: 1,
         marginLeft: 10
     },
     datePicker: {
