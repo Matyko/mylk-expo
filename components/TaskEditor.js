@@ -4,13 +4,15 @@ import {View, Text, StyleSheet} from "react-native";
 import DatePicker from "react-native-datepicker";
 import formatDate from "../util/formatDate";
 import Colors from "../constants/Colors";
+import mLogger from "../util/mLogger";
+import Emoji from "react-native-emoji";
 
-export default class TaskForm extends Component {
+export default class TaskEditor extends Component {
     constructor(props) {
         super(props);
         this.state = {
             mode: 'date',
-            date: new Date,
+            date: formatDate(new Date),
             title: '',
             errors: {
                 desc: ''
@@ -24,12 +26,21 @@ export default class TaskForm extends Component {
         this.setState(copy);
     }
 
+    setDate(date) {
+        this.setState({...this.state, ...{date: date}});
+    }
+
+    setText(text) {
+        this.setState({...this.state, ...{title: text}})
+    }
+
     createTask() {
         const task = {
             title: this.state.title,
-            due: this.state.date,
+            date: this.state.date,
             created_at: new Date()
         };
+        mLogger(`saving task: ${task}`);
         this.props.createTask(task);
     }
 
@@ -43,7 +54,7 @@ export default class TaskForm extends Component {
                 <View style={styles.formElement}>
                     <DatePicker
                         style={styles.datePicker}
-                        date={'2016-06-06'}
+                        date={this.state.date}
                         mode={this.state.mode}
                         placeholder="select date"
                         format={`YYYY-MM-DD${this.state.mode === 'datetime' ? ' HH:mm' : ''}`}
@@ -60,28 +71,32 @@ export default class TaskForm extends Component {
                             dateInput: {
                                 marginLeft: 36,
                                 flexGrow: 1,
-                                borderColor: 'transparent',
+                                borderColor: Colors.transparent,
                                 borderBottomColor: Colors.light
                             }
                         }}
-                        onDateChange={date => this.setState({...this.state, ...{date: date}})}
+                        onDateChange={date => this.setDate(date)}
                     />
                 </View>
-                <View style={styles.formElement}>
+                <View style={styles.addonEmojiHolder}>
+                    <Emoji name="pencil" style={styles.addonEmoji}/>
                     <Input
+                        style={styles.hasAddonEmoji}
                         placeholder='Enter task description'
                         errorMessage={this.state.errors.desc}
-                        onChangeText={text => this.setState({...this.state, ...{title: text}})}
+                        onChangeText={text => this.setText(text)}
                     />
                 </View>
                 <View style={styles.formElement}>
                     <CheckBox
                         checked={this.state.mode === 'date'}
+                        containerStyle={{backgroundColor: Colors.transparent, borderColor: Colors.transparent}}
+                        checkedColor={Colors.primaryBackground}
                         onPress={() => this.changeMode()}
                         title="All day"
                     />
                 </View>
-                <View style={styles.formElement}>
+                <View style={styles.lastElement}>
                     <Button
                         title="Save"
                         type="outline"
@@ -93,22 +108,51 @@ export default class TaskForm extends Component {
     }
 }
 
+
+
+
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 50,
-        paddingVertical: 20,
+        flex: 1,
+        flexDirection: 'column',
+        paddingTop: 10,
     },
     formElement: {
-        margin: 20
+      flexGrow: 0,
+      margin: 20
+    },
+    addonEmojiHolder: {
+      margin: 20,
+      flexGrow: 0,
+      flexDirection: 'row'
+    },
+    addonEmoji: {
+        flexGrow: 0,
+        fontSize: 25
+    },
+    hasAddonEmoji: {
+        flexGrow: 1,
+        marginLeft: 10
     },
     datePicker: {
-        width: 200,
+        flexGrow: 0,
         height: 30
     },
     fontStyling: {
         fontWeight: 'bold',
         fontSize: 20,
         textTransform: 'uppercase',
-        letterSpacing: 1}
+        letterSpacing: 1
+    },
+    lastElement: {
+        flexGrow: 1,
+        justifyContent: 'flex-end',
+        margin: 20
+    },
+    button: {
+        borderColor: Colors.primaryBackground,
+        color: Colors.primaryBackground,
+        backgroundColor: Colors.transparent
+    }
 });
 

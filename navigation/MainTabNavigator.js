@@ -4,8 +4,10 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import Tasks from '../screens/Tasks';
+import TasksScreen from '../screens/TasksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import JournalScreen from '../screens/JournalScreen';
+import Colors from "../constants/Colors";
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
@@ -21,6 +23,9 @@ const HomeStack = createStackNavigator(
 
 HomeStack.navigationOptions = {
   tabBarLabel: 'Home',
+    tabBarOptions: {
+        activeTintColor: Colors.primaryBackground,
+    },
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -33,13 +38,16 @@ HomeStack.path = '';
 
 const LinksStack = createStackNavigator(
   {
-    Links: Tasks,
+    Tasks: TasksScreen,
   },
   config
 );
 
 LinksStack.navigationOptions = {
   tabBarLabel: 'Tasks',
+    tabBarOptions: {
+        activeTintColor: Colors.primaryBackground,
+    },
   tabBarIcon: ({ focused }) => (
     <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-clipboard' : 'md-clipboard'} />
   ),
@@ -49,13 +57,16 @@ LinksStack.path = '';
 
 const JournalStack = createStackNavigator(
     {
-        Home: HomeScreen,
+        Journal: JournalScreen,
     },
     config
 );
 
 JournalStack.navigationOptions = {
   tabBarLabel: 'Journal',
+    tabBarOptions: {
+        activeTintColor: Colors.primaryBackground,
+    },
   tabBarIcon: ({ focused }) => (
     <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-book' : 'md-book'} />
   ),
@@ -72,6 +83,9 @@ const SettingsStack = createStackNavigator(
 
 SettingsStack.navigationOptions = {
     tabBarLabel: 'Settings',
+    tabBarOptions: {
+        activeTintColor: Colors.primaryBackground,
+    },
     tabBarIcon: ({ focused }) => (
         <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'} />
     ),

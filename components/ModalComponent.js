@@ -14,13 +14,13 @@ export default class ModalComponent extends Component {
                 <View style={styling}
                       onPress={() => this.props.closeModal()}>
                     <Ionicons
-                        name={Platform.OS === 'ios' ? 'ios-add' : 'md-add'}
-                        size={20}
-                        color={Colors.lighter}
+                        name={Platform.OS === 'ios' ? 'ios-close-circle' : 'md-close-circle'}
+                        size={35}
+                        color={Colors.light}
                         onPress={() => this.props.closeModal()}
                     />
                 </View>
-                <View style={{marginTop: 22}}>
+                <View style={{marginTop: 22, flex: 1}}>
                     {this.props.children}
                 </View>
             </Modal>
@@ -32,12 +32,9 @@ const styling = {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.light,
-    borderRadius: 60,
     width: 35,
     height: 35,
     position: 'absolute',
     top: 10,
     right: 10,
-    transform: [{ rotate: '45deg'}]
 };

@@ -2,12 +2,10 @@ const tintColor = '#2f95dc';
 
 export default {
   tintColor,
-  primaryBackground: '#37d18e',
+  primaryBackground: '#ff3d6c',
   primaryText: '#fff',
-  accentBackground: '#ff3d6c',
-  accentText: '#fff',
   tabIconDefault: '#ccc',
-  tabIconSelected: tintColor,
+  tabIconSelected: this.primaryBackground,
   tabBar: '#fefefe',
   successBackground: '#91d66f',
   successText: '#fff',
@@ -20,5 +18,8 @@ export default {
   darker: '#333',
   dark: '#888',
   light: '#bbb',
-  lighter: '#ddd'
+  lighter: '#ddd',
+  white: '#fff',
+  black: '#444',
+  transparent: 'transparent'
 };

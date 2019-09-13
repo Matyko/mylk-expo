@@ -13,7 +13,7 @@ export default function FloatingActionButton({iconName, pressFunction}) {
             <Ionicons
                 name={icon}
                 size={25}
-                color={Colors.accentText}
+                color={Colors.primaryText}
                 onPress={() => pressFunction()}
             />
         </View>
@@ -24,7 +24,7 @@ const styling = {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.accentBackground,
+    backgroundColor: Colors.primaryBackground,
     borderRadius: 60,
     width: 50,
     height: 50,
