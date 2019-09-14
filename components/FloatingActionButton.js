@@ -21,6 +21,20 @@ export default function FloatingActionButton({iconName, pressFunction}) {
 }
 
 const styling = {
+    flexDirection: "row",
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 0,
+        height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+    padding: 10,
+    marginTop: 8,
+    marginBottom: 8,
+    marginLeft: 15,
+    marginRight: 15,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',

@@ -5,7 +5,7 @@ import {Ionicons} from "@expo/vector-icons";
 import {CheckBox} from "react-native-elements";
 import parseDate from "../util/parseDate";
 
-export default function TaskElement({task, setChecked, deleteTask}) {
+export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
 
     const handleLongPress = () => {
         if (deleteVisible) {
@@ -35,7 +35,10 @@ export default function TaskElement({task, setChecked, deleteTask}) {
     let deleteVisible = false;
 
     return (
-        <TouchableWithoutFeedback onLongPress={() => handleLongPress()}>
+        <TouchableWithoutFeedback
+            onLongPress={() => handleLongPress()}
+            onPress={() => toEdit()}
+        >
             <View style={{...styles.taskElement, ...{opacity: task.checked ? 0.6 : 1}}}>
                 <View style={styles.checkBoxContainer}>
                     <CheckBox

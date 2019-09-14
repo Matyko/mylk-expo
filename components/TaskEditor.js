@@ -10,14 +10,25 @@ import Emoji from "react-native-emoji";
 export default class TaskEditor extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            mode: 'date',
-            date: formatDate(new Date),
-            title: '',
-            errors: {
-                desc: ''
-            },
-        };
+        if (props.task) {
+            this.state = {
+                mode: props.task.isFullDay ? 'date' : 'dateTime',
+                date: props.task.date || formatDate(new Date),
+                title: props.task.title || '',
+                errors: {
+                    desc: ''
+                },
+            };
+        } else {
+            this.state = {
+                mode: 'date',
+                date: formatDate(new Date),
+                title: '',
+                errors: {
+                    desc: ''
+                },
+            };
+        }
     }
 
     changeMode() {
@@ -34,14 +45,20 @@ export default class TaskEditor extends Component {
         this.setState({...this.state, ...{title: text}})
     }
 
-    createTask() {
-        const task = {
+    saveTask() {
+        let task = {
             title: this.state.title,
             date: this.state.date,
-            created_at: new Date()
+            created_at: new Date(),
+            isFullDay: this.state.mode === 'date'
         };
+        if (this.props.task) {
+           task = {...this.props.task, ...task}
+           console.log(this.props.task);
+           console.log(task);
+        }
         mLogger(`saving task: ${task}`);
-        this.props.createTask(task);
+        this.props.saveTask(task);
     }
 
     render() {
@@ -84,6 +101,7 @@ export default class TaskEditor extends Component {
                         style={styles.hasAddonEmoji}
                         placeholder='Enter task description'
                         errorMessage={this.state.errors.desc}
+                        value={this.state.title}
                         onChangeText={text => this.setText(text)}
                     />
                 </View>
@@ -100,7 +118,7 @@ export default class TaskEditor extends Component {
                     <Button
                         title="Save"
                         type="outline"
-                        onPress={() => this.createTask()}
+                        onPress={() => this.saveTask()}
                     />
                 </View>
             </View>
