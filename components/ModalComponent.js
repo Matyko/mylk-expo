@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Modal, Platform, Text, TouchableHighlight, View} from 'react-native';
+import {Modal, Platform, View} from 'react-native';
 import {Ionicons} from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 
@@ -35,6 +35,6 @@ const styling = {
     width: 35,
     height: 35,
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 22,
+    right: 22,
 };

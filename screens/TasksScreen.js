@@ -22,7 +22,6 @@ export default class TasksScreen extends Component {
   }
 
   async componentWillMount() {
-    await AsyncStorage.setItem('tasks', JSON.stringify([]));
     try {
       mLogger('Loading tasks');
       AsyncStorage.getItem('tasks').then(result => {
@@ -162,7 +161,7 @@ export default class TasksScreen extends Component {
 }
 
 TasksScreen.navigationOptions = {
-  title: 'TasksScreen',
+  title: 'Tasks',
 };
 
 

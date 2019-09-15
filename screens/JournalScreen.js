@@ -6,6 +6,7 @@ import sortByDate from "../util/sortByDate";
 import Colors from "../constants/Colors";
 import PageElement from "../components/PageElement";
 import PageEditor from "../components/PageEditor";
+import TasksScreen from "./TasksScreen";
 
 export default class JournalScreen extends Component {
     constructor(props) {
@@ -37,6 +38,10 @@ export default class JournalScreen extends Component {
         );
     }
 }
+
+TasksScreen.navigationOptions = {
+    title: 'Journal',
+};
 
 const styles = StyleSheet.create({
     container: {

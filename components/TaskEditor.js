@@ -6,6 +6,7 @@ import formatDate from "../util/formatDate";
 import Colors from "../constants/Colors";
 import mLogger from "../util/mLogger";
 import Emoji from "react-native-emoji";
+import FancyButton from "./FancyButton";
 
 export default class TaskEditor extends Component {
     constructor(props) {
@@ -115,10 +116,9 @@ export default class TaskEditor extends Component {
                     />
                 </View>
                 <View style={styles.lastElement}>
-                    <Button
+                    <FancyButton
                         title="Save"
-                        type="outline"
-                        onPress={() => this.saveTask()}
+                        pressFn={() => this.saveTask()}
                     />
                 </View>
             </View>
@@ -166,11 +166,6 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         justifyContent: 'flex-end',
         margin: 20
-    },
-    button: {
-        borderColor: Colors.primaryBackground,
-        color: Colors.primaryBackground,
-        backgroundColor: Colors.transparent
     }
 });
 
