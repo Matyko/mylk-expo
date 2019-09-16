@@ -6,7 +6,6 @@ import sortByDate from "../util/sortByDate";
 import Colors from "../constants/Colors";
 import PageElement from "../components/PageElement";
 import PageEditor from "../components/PageEditor";
-import TasksScreen from "./TasksScreen";
 
 export default class JournalScreen extends Component {
     constructor(props) {
@@ -31,6 +30,7 @@ export default class JournalScreen extends Component {
                 <ModalComponent
                     closeModal={() => this.setState({modalVisible: false})}
                     modalVisible={this.state.modalVisible}
+                    title="Create a page"
                 >
                     <PageEditor></PageEditor>
                 </ModalComponent>
@@ -39,8 +39,17 @@ export default class JournalScreen extends Component {
     }
 }
 
-TasksScreen.navigationOptions = {
+JournalScreen.navigationOptions = {
     title: 'Journal',
+    headerStyle: {
+        backgroundColor: Colors.primaryBackground,
+        height: 79,
+    },
+    headerTitleStyle: {
+        color: Colors.primaryText,
+        lineHeight: 79,
+        fontWeight: 'bold',
+    },
 };
 
 const styles = StyleSheet.create({

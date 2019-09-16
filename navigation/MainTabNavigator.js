@@ -1,6 +1,6 @@
 import React from 'react';
-import { Platform } from 'react-native';
-import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import {Platform} from 'react-native';
+import {createStackNavigator, createBottomTabNavigator} from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
@@ -10,50 +10,50 @@ import JournalScreen from '../screens/JournalScreen';
 import Colors from "../constants/Colors";
 
 const config = Platform.select({
-  web: { headerMode: 'screen' },
-  default: {},
+    web: {headerMode: 'screen'},
+    default: {},
 });
 
 const HomeStack = createStackNavigator(
-  {
-    Home: HomeScreen,
-  },
-  config
+    {
+        Home: HomeScreen,
+    },
+    config
 );
 
 HomeStack.navigationOptions = {
-  tabBarLabel: 'Home',
+    tabBarLabel: 'Home',
     tabBarOptions: {
         activeTintColor: Colors.primaryBackground,
     },
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? `ios-hand` : 'md-hand'}
-    />
-  ),
+    tabBarIcon: ({focused}) => (
+        <TabBarIcon
+            focused={focused}
+            name={Platform.OS === 'ios' ? `ios-hand` : 'md-hand'}
+        />
+    ),
 };
 
 HomeStack.path = '';
 
-const LinksStack = createStackNavigator(
-  {
-    Tasks: TasksScreen,
-  },
-  config
+const TaskStack = createStackNavigator(
+    {
+        Tasks: TasksScreen,
+    },
+    config
 );
 
-LinksStack.navigationOptions = {
-  tabBarLabel: 'Tasks',
+TaskStack.navigationOptions = {
+    tabBarLabel: 'Tasks',
     tabBarOptions: {
         activeTintColor: Colors.primaryBackground,
     },
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-clipboard' : 'md-clipboard'} />
-  ),
+    tabBarIcon: ({focused}) => (
+        <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-clipboard' : 'md-clipboard'}/>
+    ),
 };
 
-LinksStack.path = '';
+TaskStack.path = '';
 
 const JournalStack = createStackNavigator(
     {
@@ -63,13 +63,13 @@ const JournalStack = createStackNavigator(
 );
 
 JournalStack.navigationOptions = {
-  tabBarLabel: 'Journal',
+    tabBarLabel: 'Journal',
     tabBarOptions: {
         activeTintColor: Colors.primaryBackground,
     },
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-book' : 'md-book'} />
-  ),
+    tabBarIcon: ({focused}) => (
+        <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-book' : 'md-book'}/>
+    ),
 };
 
 JournalStack.path = '';
@@ -86,18 +86,18 @@ SettingsStack.navigationOptions = {
     tabBarOptions: {
         activeTintColor: Colors.primaryBackground,
     },
-    tabBarIcon: ({ focused }) => (
-        <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'} />
+    tabBarIcon: ({focused}) => (
+        <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}/>
     ),
 };
 
 SettingsStack.path = '';
 
 const tabNavigator = createBottomTabNavigator({
-  HomeStack,
-  LinksStack,
-  JournalStack,
-  SettingsStack,
+    HomeStack,
+    LinksStack: TaskStack,
+    JournalStack,
+    SettingsStack,
 });
 
 tabNavigator.path = '';

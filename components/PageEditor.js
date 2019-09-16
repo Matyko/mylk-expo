@@ -48,9 +48,6 @@ export default class PageEditor extends Component {
         const currentDate = formatDate(new Date());
         return (
             <View style={styles.container}>
-                <View style={styles.formElement}>
-                    <Text style={styles.fontStyling}>Add new page</Text>
-                </View>
                 <ImagePickerComponent/>
                 <View style={styles.formElement}>
                     <DatePicker

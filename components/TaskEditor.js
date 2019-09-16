@@ -5,8 +5,8 @@ import DatePicker from "react-native-datepicker";
 import formatDate from "../util/formatDate";
 import Colors from "../constants/Colors";
 import mLogger from "../util/mLogger";
-import Emoji from "react-native-emoji";
 import FancyButton from "./FancyButton";
+import EmojiAddon from "./EmojiAddon";
 
 export default class TaskEditor extends Component {
     constructor(props) {
@@ -67,9 +67,6 @@ export default class TaskEditor extends Component {
         return (
             <View style={styles.container}>
                 <View style={styles.formElement}>
-                    <Text style={styles.fontStyling}>Create new task</Text>
-                </View>
-                <View style={styles.formElement}>
                     <DatePicker
                         style={styles.datePicker}
                         date={this.state.date}
@@ -87,7 +84,7 @@ export default class TaskEditor extends Component {
                                 marginLeft: 0
                             },
                             dateInput: {
-                                marginLeft: 36,
+                                marginLeft: 40,
                                 flexGrow: 1,
                                 borderColor: Colors.transparent,
                                 borderBottomColor: Colors.light
@@ -96,15 +93,16 @@ export default class TaskEditor extends Component {
                         onDateChange={date => this.setDate(date)}
                     />
                 </View>
-                <View style={styles.addonEmojiHolder}>
-                    <Emoji name="pencil" style={styles.addonEmoji}/>
-                    <Input
-                        style={styles.hasAddonEmoji}
-                        placeholder='Enter task description'
-                        errorMessage={this.state.errors.desc}
-                        value={this.state.title}
-                        onChangeText={text => this.setText(text)}
-                    />
+                <View style={styles.formElement}>
+                    <EmojiAddon
+                        name="pencil">
+                        <Input
+                            placeholder='Enter task description'
+                            errorMessage={this.state.errors.desc}
+                            value={this.state.title}
+                            onChangeText={text => this.setText(text)}
+                        />
+                    </EmojiAddon>
                 </View>
                 <View style={styles.formElement}>
                     <CheckBox
@@ -126,9 +124,6 @@ export default class TaskEditor extends Component {
     }
 }
 
-
-
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -136,31 +131,17 @@ const styles = StyleSheet.create({
         paddingTop: 10,
     },
     formElement: {
+      justifyContent: 'center',
+      flexBasis: 1,
+      flexShrink: 0,
       flexGrow: 0,
-      margin: 20
-    },
-    addonEmojiHolder: {
-      margin: 20,
-      flexGrow: 0,
-      flexDirection: 'row'
-    },
-    addonEmoji: {
-        flexGrow: 0,
-        fontSize: 25,
-        marginLeft: 5
-    },
-    hasAddonEmoji: {
-        marginLeft: 10
+      marginHorizontal: 20,
+      marginVertical: 50
     },
     datePicker: {
-        flexGrow: 0,
-        height: 30
-    },
-    fontStyling: {
-        fontWeight: 'bold',
-        fontSize: 20,
-        textTransform: 'uppercase',
-        letterSpacing: 1
+        flexGrow: 1,
+        height: 30,
+        width: 200,
     },
     lastElement: {
         flexGrow: 1,
