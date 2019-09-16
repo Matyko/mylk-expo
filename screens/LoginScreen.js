@@ -63,18 +63,29 @@ export default class LoginScreen extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Video
-                    source={{ uri: "https://s3-eu-west-1.amazonaws.com/video.gallereplay.com/artistarea/Lighthouse%20stands%20in%20Istanbul%E2%80%99s%20harbour_0554659b-5dc1-43d6-8a93-b31ec6b67f63/Cinemagraph_plain/1920x1080/cinemagraph.mp4"}}
-                    style={styles.backgroundVideo}
-                    rate={1}
-                    shouldPlay={true}
-                    isLooping={true}
-                    volume={1}
-                    muted={true}
-                    resizeMode="cover"
+                {/*<Video*/}
+                {/*    source={{ uri: "https://s3-eu-west-1.amazonaws.com/video.gallereplay.com/artistarea/Lighthouse%20stands%20in%20Istanbul%E2%80%99s%20harbour_0554659b-5dc1-43d6-8a93-b31ec6b67f63/Cinemagraph_plain/1920x1080/cinemagraph.mp4"}}*/}
+                {/*    style={styles.backgroundVideo}*/}
+                {/*    rate={1}*/}
+                {/*    shouldPlay={true}*/}
+                {/*    isLooping={true}*/}
+                {/*    volume={1}*/}
+                {/*    muted={true}*/}
+                {/*    resizeMode="cover"*/}
+                {/*/>*/}
+                <LinearGradient
+                    start={[0, 1]}
+                    end={[1, 0]}
+                    colors={[Colors.primaryText, Colors.primaryBackground]}
+                    style={[styles.backgroundVideo, {opacity: 0.6}]}
                 />
                 <KeyboardAvoidingView behavior='padding' style={styles.container}>
                     <View style={styles.loginContainer}>
+                        <View style={styles.logo}>
+                            <Text style={styles.logoText}>
+                                MYLK
+                            </Text>
+                        </View>
                         <View style={styles.form}>
                             <View style={styles.formElement}>
                                 <Input
@@ -82,7 +93,7 @@ export default class LoginScreen extends Component {
                                     placeholder='Enter email'
                                     errorMessage={this.state.errors.desc}
                                     placeholderTextColor={Colors.white}
-                                    inputStyle={{borderColor: Colors.white}}
+                                    inputStyle={{borderColor: Colors.white, color: Colors.white}}
                                     value={this.state.email}
                                     onChangeText={email => this.setState({...this.state, ...{email}})}
                                 />
@@ -93,7 +104,7 @@ export default class LoginScreen extends Component {
                                     placeholder='Enter password'
                                     errorMessage={this.state.errors.desc}
                                     placeholderTextColor={Colors.white}
-                                    inputStyle={{borderColor: Colors.white}}
+                                    inputStyle={{borderColor: Colors.white, color: Colors.white}}
                                     secureTextEntry={true}
                                     value={this.state.password}
                                     onChangeText={password => this.setState({...this.state, ...{password}})}
@@ -157,12 +168,13 @@ const styles = StyleSheet.create({
     },
     logo: {
       flexGrow: 1,
-        justifyContent: 'center'
+        justifyContent: 'flex-end'
     },
     logoText: {
        color: Colors.white,
-        fontSize: 70,
-        textAlign: 'center'
+        fontSize: 50,
+        textAlign: 'center',
+        fontWeight: 'bold'
     },
 
 });
