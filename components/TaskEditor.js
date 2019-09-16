@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import {CheckBox, Input, Button} from 'react-native-elements';
-import {View, Text, StyleSheet} from "react-native";
+import {CheckBox, Input} from 'react-native-elements';
+import {View, StyleSheet} from "react-native";
 import DatePicker from "react-native-datepicker";
 import formatDate from "../util/formatDate";
 import Colors from "../constants/Colors";
@@ -54,7 +54,7 @@ export default class TaskEditor extends Component {
             isFullDay: this.state.mode === 'date'
         };
         if (this.props.task) {
-           task = {...this.props.task, ...task}
+           task = {...this.props.task, ...task};
            console.log(this.props.task);
            console.log(task);
         }
@@ -97,7 +97,7 @@ export default class TaskEditor extends Component {
                     <EmojiAddon
                         name="pencil">
                         <Input
-                            placeholder='Enter task description'
+                            placeholder='Enter task description...'
                             errorMessage={this.state.errors.desc}
                             value={this.state.title}
                             onChangeText={text => this.setText(text)}

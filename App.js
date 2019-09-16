@@ -6,6 +6,29 @@ import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import AppNavigator from './navigation/AppNavigator';
+import firebase from 'firebase'
+import '@firebase/firestore';
+import LoginScreen from "./screens/LoginScreen";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB7hQ1BKUnW77ZbVf3Wh1vxd1luqhOfSlU",
+  authDomain: "mylk-3110c.firebaseapp.com",
+  databaseURL: "https://mylk-3110c.firebaseio.com",
+  projectId: "mylk-3110c",
+  storageBucket: "",
+  messagingSenderId: "884642600594",
+  appId: "1:884642600594:web:d10cd17a9e4ef90065384b"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = {loggedIn: false};
+
+firebase.auth().onAuthStateChanged((user) => {
+  if (user != null) {
+    auth.loggedIn = true
+  }
+});
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = useState(false);

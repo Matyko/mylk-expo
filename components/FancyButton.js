@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Text, View, StyleSheet, TouchableOpacity} from "react-native";
+import {Text, View, StyleSheet, TouchableOpacity, ActivityIndicator} from "react-native";
 import Colors from "../constants/Colors";
 
 export default class FancyButton extends Component {
@@ -17,18 +17,32 @@ export default class FancyButton extends Component {
     }
 
     render() {
+        const loaderColor = this.props.filled ? Colors.primaryText : Colors.primaryBackground;
         return (
             <TouchableOpacity
                 onLongPress={() => this.longPress()}
                 onPress={() => this.press()}>
                 <View
-                    style={this.props.filled ?
+                    style={{...(this.props.filled ?
                         styles.containerFilled :
-                        styles.container}>
+                        styles.container),
+                    ...(this.props.backgroundColor ?
+                        {backgroundColor: this.props.backgroundColor} :
+                        {}),
+                    ...(this.props.borderColor ?
+                        {borderColor: this.props.borderColor} :
+                        {})}}>
+                    {!this.props.loading &&
                     <Text
-                        style={this.props.filled ?
+                        style={{...(this.props.filled ?
                             styles.textFilled :
-                            styles.text}>{this.props.title}</Text>
+                            styles.text),
+                            ...(this.props.textColor ?
+                        {color: this.props.textColor} :
+                        {})}}>{this.props.title}</Text>}
+                    {this.props.loading &&
+                        <ActivityIndicator color={this.props.textColor ? this.props.textColor : loaderColor}/>
+                    }
                 </View>
             </TouchableOpacity>
         )

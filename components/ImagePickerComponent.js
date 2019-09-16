@@ -1,12 +1,11 @@
 import React from 'react';
-import {Button, Image, Platform, View} from 'react-native';
+import {Image, Platform, View} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
 import mLogger from "../util/mLogger";
 import Colors from "../constants/Colors";
 import {Ionicons} from "@expo/vector-icons";
-import TouchableHighlight from "react-native-web/dist/exports/TouchableHighlight";
 
 export default class ImagePickerComponent extends React.Component {
     state = {
@@ -17,7 +16,7 @@ export default class ImagePickerComponent extends React.Component {
         let { image } = this.state;
 
         return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons
                     name={Platform.OS === 'ios' ? 'ios-photos' : 'md-photos'}
                     size={35}
