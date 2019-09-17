@@ -1,12 +1,16 @@
 import React, {Component} from "react";
 import {AsyncStorage, KeyboardAvoidingView, StyleSheet, Text, View} from "react-native";
-import {Input} from "react-native-elements";
+import {CheckBox, Input} from "react-native-elements";
 import FancyButton from "../components/FancyButton";
 import mLogger from "../util/mLogger";
 import * as firebase from "firebase";
 import {LinearGradient} from "expo-linear-gradient";
 import Colors from '../constants/Colors'
 import {Video} from "expo-av";
+import * as SecureStore from "expo-secure-store";
+import PageEditor from "../components/PageEditor";
+import ModalComponent from "../components/ModalComponent";
+import PassCode from "../components/PassCode";
 
 export default class LoginScreen extends Component {
     constructor(props) {
@@ -15,34 +19,57 @@ export default class LoginScreen extends Component {
             email: '',
             password: '',
             loading: false,
+            rememberMe: false,
             errors: {
                 desc: ''
-            }
+            },
+            passCodeCheck: false
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         try {
-            AsyncStorage.getItem('email').then(email => {
-                if (email) {
-                    this.setState({...this.state, ...{email}})
+            const passCode = await SecureStore('passCode');
+            const password = await SecureStore.getItemAsync('pwd');
+            const email = await AsyncStorage.getItem('email');
+            const rememberMe = JSON.parse(await AsyncStorage.getItem('rememberMe'));
+
+            if (email) this.setState({...this.state, ...{email}});
+            if (password) this.setState({...this.state, ...{password}});
+            if (rememberMe) this.setState({...this.state, ...{rememberMe}});
+
+            if (rememberMe) {
+                if (passCode) {
+                    this.setState({...this.state, ...{passCodeCheck: true}})
+                } else {
+                    this.login();
                 }
-            })
+            }
         } catch {
-            mLogger('did not find saved email')
+            mLogger('did not find saved data')
         }
+    }
+
+    componentWillUnmount() {
+
+    }
+
+    rememberMe() {
+        this.setState({...this.state, ...{rememberMe: !this.state.rememberMe}});
+        AsyncStorage.setItem('rememberMe', JSON.stringify(this.state.rememberMe));
     }
 
     login() {
         this.setState({...this.state, ...{loading: true}});
-        firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
-            AsyncStorage.setItem('email', this.state.email);
+        firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(async response => {
+            if (this.state.rememberMe) {
+                await SecureStore.setItemAsync('pwd', this.state.password);
+                await AsyncStorage.setItem('email', this.state.email);
+            }
             this.props.navigation.navigate('Main')
         })
             .catch(e => {
-                console.log(e)
-            })
-            .finally(() => {
+                console.log(e);
                 this.setState({...this.state, ...{loading: false}});
             })
     }
@@ -53,10 +80,8 @@ export default class LoginScreen extends Component {
             this.login();
         })
             .catch(e => {
-                console.log(e)
-            })
-            .finally(() => {
-                this.setState({...this.state, ...{loading: true}});
+                console.log(e);
+                this.setState({...this.state, ...{loading: false}});
             })
     }
 
@@ -94,6 +119,7 @@ export default class LoginScreen extends Component {
                                     errorMessage={this.state.errors.desc}
                                     placeholderTextColor={Colors.white}
                                     inputStyle={{borderColor: Colors.white, color: Colors.white}}
+                                    inputContainerStyle={{borderColor: Colors.white}}
                                     value={this.state.email}
                                     onChangeText={email => this.setState({...this.state, ...{email}})}
                                 />
@@ -105,9 +131,21 @@ export default class LoginScreen extends Component {
                                     errorMessage={this.state.errors.desc}
                                     placeholderTextColor={Colors.white}
                                     inputStyle={{borderColor: Colors.white, color: Colors.white}}
+                                    inputContainerStyle={{borderColor: Colors.white}}
                                     secureTextEntry={true}
                                     value={this.state.password}
                                     onChangeText={password => this.setState({...this.state, ...{password}})}
+                                />
+                            </View>
+                            <View style={styles.formElement}>
+                                <CheckBox
+                                    checked={this.state.rememberMe}
+                                    containerStyle={{backgroundColor: Colors.transparent, borderColor: Colors.transparent}}
+                                    textStyle={{color: Colors.white}}
+                                    checkedColor={Colors.white}
+                                    uncheckedColor={Colors.white}
+                                    onPress={() => this.rememberMe()}
+                                    title="Remember me"
                                 />
                             </View>
                         </View>
@@ -125,6 +163,13 @@ export default class LoginScreen extends Component {
                         </View>
                     </View>
                 </KeyboardAvoidingView>
+                <ModalComponent
+                    closeModal={() => this.setState({passCodeCheck: false})}
+                    modalVisible={this.state.passCodeCheck}
+                    title="Enter passcode"
+                >
+                    <PassCode/>
+                </ModalComponent>
             </View>
         );
     }
