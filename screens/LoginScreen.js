@@ -19,6 +19,7 @@ export default class LoginScreen extends Component {
             password: '',
             loading: false,
             rememberMe: false,
+            passCode: '',
             errors: {
                 desc: ''
             },
@@ -36,6 +37,7 @@ export default class LoginScreen extends Component {
             if (email) this.setState({...this.state, ...{email}});
             if (password) this.setState({...this.state, ...{password}});
             if (rememberMe) this.setState({...this.state, ...{rememberMe}});
+            if (passCode) this.setState({...this.state, ...{passCode}});
 
             if (rememberMe) {
                 if (passCode) {
@@ -49,8 +51,10 @@ export default class LoginScreen extends Component {
         }
     }
 
-    componentWillUnmount() {
-
+    checkPassCode(code) {
+        if (this.state.passCode === code) {
+            this.login();
+        }
     }
 
     rememberMe() {
@@ -167,12 +171,18 @@ export default class LoginScreen extends Component {
                     modalVisible={this.state.passCodeCheck}
                     title="Enter passcode"
                 >
-                    <PassCode/>
+                    <PassCode codeEntered={code => this.checkPassCode(code)}/>
                 </ModalComponent>
             </View>
         );
     }
 }
+
+
+
+
+
+
 
 LoginScreen.navigationOptions = {
     header: null

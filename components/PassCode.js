@@ -33,9 +33,10 @@ export default class PassCode extends Component {
         )
     }
 
-    handlePress(num) {
-        this.setState({...this.state, ...{code: this.state.code + num}});
-        if (this.state.code.length === this.state.codeLength) {
+    async handlePress(num) {
+        const code = this.state.code + num;
+        await this.setState({...this.state, ...{code}});
+        if (code.length === this.state.codeLength) {
             this.codeEntered()
         }
     }
@@ -44,6 +45,11 @@ export default class PassCode extends Component {
         if (this.props.confirmNeeded) {
             const code1 = this.state.code;
             const code2 = this.state.confirmation;
+            if (!code2) {
+                console.log(code1, code2);
+                this.setState({...this.state, ...{code: '', confirmation: this.state.code}});
+                return;
+            }
             if (code1.length !== this.state.codeLength ||
                 code2.length !== this.state.codeLength ||
                 code1 !== code2) {

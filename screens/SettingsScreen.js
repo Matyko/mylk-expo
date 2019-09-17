@@ -15,14 +15,24 @@ export default class SettingsScreen extends Component {
   }
 
   async componentWillUnmount() {
-    const hasPassCode = !!await SecureStore.getItemAsync('passcode');
+    const hasPassCode = await SecureStore.getItemAsync('passCode');
     this.setState({...this.state, ...{hasPassCode}});
   }
 
   setPassCode(setPasscode) {
     if (setPasscode) {
-      this.setState({...this.state, ...{showPassCodeModal: true}})
+      this.setState({...this.state, ...{showPassCodeModal: true}});
+    } else {
+      SecureStore.deleteItemAsync('passCode').then(() => {
+        this.setState({...this.state, ...{hasPassCode: false}});
+      })
     }
+  }
+
+  savePassCode(code) {
+    SecureStore.setItemAsync('passCode', code).then(() => {
+      this.setState({...this.state, ...{hasPassCode: true, showPassCodeModal: false}});
+    })
   }
 
   render() {
@@ -52,7 +62,9 @@ export default class SettingsScreen extends Component {
               modalVisible={this.state.showPassCodeModal}
               title="Enter passcode"
           >
-            <PassCode/>
+            <PassCode
+                confirmNeeded={true}
+                codeEntered={code => this.savePassCode(code)}/>
           </ModalComponent>
         </View>
     )
