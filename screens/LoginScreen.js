@@ -8,7 +8,6 @@ import {LinearGradient} from "expo-linear-gradient";
 import Colors from '../constants/Colors'
 import {Video} from "expo-av";
 import * as SecureStore from "expo-secure-store";
-import PageEditor from "../components/PageEditor";
 import ModalComponent from "../components/ModalComponent";
 import PassCode from "../components/PassCode";
 
@@ -29,7 +28,7 @@ export default class LoginScreen extends Component {
 
     async componentDidMount() {
         try {
-            const passCode = await SecureStore('passCode');
+            const passCode = await SecureStore.getItemAsync('passCode');
             const password = await SecureStore.getItemAsync('pwd');
             const email = await AsyncStorage.getItem('email');
             const rememberMe = JSON.parse(await AsyncStorage.getItem('rememberMe'));

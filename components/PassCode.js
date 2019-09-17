@@ -14,21 +14,23 @@ export default class PassCode extends Component {
         this.numbers = [];
         for (let i = 0; i < 9; i++) {
             this.numbers.push(
-                <TouchableOpacity onPress={() => this.handlePress(i+1)}>
+                <TouchableOpacity key={i + 1}
+                                  onPress={() => this.handlePress(i+1)}>
                     <View style={styles.button}>
                         <Text style={styles.buttonText}>{i+1}</Text>
                     </View>
                 </TouchableOpacity>
             );
-            this.numbers.push(
-                <TouchableOpacity style={styles.buttonContainer}
-                                  onPress={() => this.handlePress(0)}>
-                    <View style={styles.button}>
-                        <Text style={styles.buttonText}>0</Text>
-                    </View>
-                </TouchableOpacity>
-            )
         }
+        this.numbers.push(
+            <TouchableOpacity key={0}
+                              style={styles.buttonContainer}
+                              onPress={() => this.handlePress(0)}>
+                <View style={styles.button}>
+                    <Text style={styles.buttonText}>0</Text>
+                </View>
+            </TouchableOpacity>
+        )
     }
 
     handlePress(num) {
@@ -76,10 +78,11 @@ const styles = StyleSheet.create({
    },
     buttonHolder: {
         flexDirection: 'row',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        width: 240
     },
     buttonContainer: {
-       width: '32%'
+       margin: 5
     },
     button: {
         borderRadius: 100,
@@ -87,8 +90,8 @@ const styles = StyleSheet.create({
         borderColor: Colors.white,
         alignItems: 'center',
         justifyContent: 'center',
-        width: 20,
-        height: 20
+        width: 70,
+        height: 70
     },
     buttonText: {
        color: Colors.white
