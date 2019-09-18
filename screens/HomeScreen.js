@@ -10,6 +10,7 @@ import NotificationManager from "../util/NotificationManager";
 import mLogger from "../util/mLogger";
 import Colors from "../constants/Colors";
 import HomeScreenPill from "../components/HomeScreenPill";
+import ImagePickerComponent from "../components/ImagePickerComponent";
 
 export default class HomeScreen extends Component {
     constructor(props) {

@@ -1,13 +1,15 @@
 import React, {Component} from 'react';
-import {Text, View, StyleSheet, Image, TouchableOpacity} from "react-native";
+import {Text, View, StyleSheet, Image, TouchableOpacity, Platform} from "react-native";
 import Colors from "../constants/Colors";
 import {LinearGradient} from "expo-linear-gradient";
+import {Ionicons} from "@expo/vector-icons";
 
 export default class PageElement extends Component{
     constructor(props) {
         super(props);
         this.state = {
-            open: false
+            open: false,
+            editable: false
         }
     }
 
@@ -15,24 +17,45 @@ export default class PageElement extends Component{
         return (
             <TouchableOpacity
                 onPress={() => this.setState({...this.state, ...{open: !this.state.open}})}
+                onLongPress={() => this.setState({...this.state, ...{editable: !this.state.editable}})}
                 style={[styles.container, {maxHeight: this.state.open ? 10000 : 150}]}>
                 <View style={styles.topDataContainer}>
                     {this.props.page.mood && <Text style={styles.topData}>Mood</Text>}
                     <Text style={styles.topData}>{this.props.page.date}</Text>
                 </View>
-                <View style={styles.images}>
+                <TouchableOpacity
+                    style={styles.images}
+                    onPress={() => this.props.openImages()}>
                     {this.props.page.images && this.props.page.images.map(path => {
-                        return <Image source={{ uri: path }} style={styles.image} />
+                        return <Image key={path} source={{ uri: path }} style={styles.image} />
                     })}
-                </View>
+                </TouchableOpacity>
                 <View style={styles.textContainer}>
                     <Text>{this.props.page.text}</Text>
                 </View>
+                {this.state.editable &&
+                <View style={styles.bottom}>
+                    <Ionicons
+                        name={Platform.OS === 'ios' ? 'ios-close-circle' : 'md-close-circle'}
+                        size={35}
+                        color={Colors.primaryBackground}
+                        style={styles.icon}
+                        onPress={() => this.props.deletePage()}
+                    />
+                    <Ionicons
+                        name={Platform.OS === 'ios' ? 'ios-create' : 'md-create'}
+                        size={35}
+                        color={Colors.primaryBackground}
+                        style={styles.icon}
+                        onPress={() => this.props.toEdit()}
+                    />
+                </View>
+                }
                 {!this.state.open &&
                     <LinearGradient
                         start={[0.5, 1]}
                         end={[0.5, 0]}
-                        colors={['white', 'transparent']}
+                        colors={[Colors.white, Colors.transparent]}
                         style={{
                             position: 'absolute',
                             left: 0,
@@ -82,13 +105,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     },
     image: {
-        width: 20,
-        height: 20
+        width: 35,
+        height: 35,
+        marginLeft: 5
     },
     textContainer: {
         marginTop: 10
     },
     text: {
 
+    },
+    bottom: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    icon: {
+        margin: 5
     }
 });

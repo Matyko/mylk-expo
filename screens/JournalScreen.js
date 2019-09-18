@@ -1,41 +1,103 @@
 import React, { Component } from "react";
-import {ScrollView, StyleSheet, View} from "react-native";
+import {AsyncStorage, ScrollView, StyleSheet, View} from "react-native";
 import FloatingActionButton from "../components/FloatingActionButton";
 import ModalComponent from "../components/ModalComponent";
 import sortByDate from "../util/sortByDate";
 import Colors from "../constants/Colors";
 import PageElement from "../components/PageElement";
 import PageEditor from "../components/PageEditor";
+import ImageViewer from "react-native-image-zoom-viewer";
 
 export default class JournalScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            pages: [{id: 1, date: '2019-10-31', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'}],
+            pages: [],
             modalVisible: false,
-            editedPage: null
+            editedPage: null,
+            visibleImages: [],
+            imageModalVisible: false
         }
+    }
+
+    openImages(page) {
+        const visibleImages = page.images.map(e => {
+            return { url: e }
+        });
+        this.setState({...this.state, ...{visibleImages, imageModalVisible: true}})
+    }
+
+    async componentWillMount() {
+        AsyncStorage.getItem('pages').then(result => {
+            const pages = result ? JSON.parse(result) : [];
+            this.setState({...this.state, ...{pages}});
+        })
+
+    }
+
+    async savePage(task) {
+        if (task.hasOwnProperty('id')) {
+            await this.updatePage(task)
+        } else {
+            await this.createPage(task)
+        }
+    }
+
+    async createPage(page) {
+        const pages = this.state.pages.slice();
+        page._id = new Date().getTime().toString() + pages.length;
+        pages.push(page);
+        this.updatePages(pages)
+    }
+
+    async updatePage(page) {
+        const pages = this.state.pages.map(e => {
+            if (e._id === page._id) {
+                return page;
+            }
+            return e;
+        });
+        this.updatePages(pages);
+    }
+
+    async updatePages(pages) {
+        await AsyncStorage.setItem('pages', JSON.stringify(pages));
+        this.setState({...this.state, ...{pages, modalVisible: false}});
+    }
+
+    deletePage(page) {
+        const pages = this.state.pages.filter(e => e !== page)
+        this.updatePages(pages);
     }
 
     render() {
         return (
             <View style={{flex: 1}}>
                 <ScrollView style={styles.container}>
-                    {this.state.pages.sort(sortByDate).map(e => {
+                    {this.state.pages.sort(sortByDate).map(page => {
                         return <PageElement
-                            key={e.id}
-                            page={e}/>
+                            key={page._id}
+                            page={page}
+                            toEdit={() => this.setState({...this.state, ...{editedPage: page, modalVisible: true}})}
+                            deletePage={() => this.deletePage(page)}
+                            openImages={() => this.openImages(page)}/>
                     })}
                 </ScrollView>
-                <FloatingActionButton pressFunction={() => this.setState({modalVisible: true})}/>
+                <FloatingActionButton pressFunction={() => this.setState({...this.state, ...{modalVisible: true}})}/>
                 <ModalComponent
-                    closeModal={() => this.setState({modalVisible: false})}
+                    closeModal={() => this.setState({...this.state, ...{modalVisible: false, editedPage: false}})}
                     modalVisible={this.state.modalVisible}
                     title="Create a page"
                 >
                     <PageEditor
-
+                        savePage={page => this.savePage(page)}
+                        page={this.state.editedPage}
                     />
+                </ModalComponent>
+                <ModalComponent
+                    closeModal={() => this.setState({...this.state, ...{visibleImages: [], imageModalVisible: false}})}
+                    modalVisible={this.state.imageModalVisible}>
+                    <ImageViewer imageUrls={this.state.visibleImages}/>
                 </ModalComponent>
             </View>
         );

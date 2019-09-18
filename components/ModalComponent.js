@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Modal, Platform, Text, View} from 'react-native';
+import {Modal, Platform, Text, View, TouchableOpacity} from 'react-native';
 import {Ionicons} from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 
@@ -28,7 +28,7 @@ export default class ModalComponent extends Component {
                         {this.props.title}
                     </Text>
                 </View>
-                <View style={styling}
+                <TouchableOpacity style={styling}
                       onPress={() => this.props.closeModal()}>
                     <Ionicons
                         name={Platform.OS === 'ios' ? 'ios-close-circle' : 'md-close-circle'}
@@ -36,8 +36,8 @@ export default class ModalComponent extends Component {
                         color={Colors.primaryText}
                         onPress={() => this.props.closeModal()}
                     />
-                </View>
-                <View style={{marginTop: 22, flex: 1}}>
+                </TouchableOpacity>
+                <View style={{flex: 1}}>
                     {this.props.children}
                 </View>
             </Modal>

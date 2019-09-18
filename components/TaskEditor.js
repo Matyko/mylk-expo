@@ -55,8 +55,6 @@ export default class TaskEditor extends Component {
         };
         if (this.props.task) {
            task = {...this.props.task, ...task};
-           console.log(this.props.task);
-           console.log(task);
         }
         mLogger(`saving task: ${task}`);
         this.props.saveTask(task);

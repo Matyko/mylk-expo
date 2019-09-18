@@ -67,9 +67,9 @@ export default class TasksScreen extends Component {
 
     async createTask(task) {
         const tasks = this.state.tasks.slice();
-        task.id = tasks.length;
+        task._id = new Date().getTime().toString() + tasks.length;
         task._notificationId = await this.notificationManager.createNotification({
-            title: 'Task alert',
+            title: 'Mylk alert',
             body: task.title,
             time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0)
         });
@@ -80,12 +80,12 @@ export default class TasksScreen extends Component {
     async updateTask(task) {
         await this.notificationManager.cancelNotification(task._notificationId);
         task._notificationId = await this.notificationManager.createNotification({
-            title: 'Task alert',
+            title: 'Mylk alert',
             body: task.title,
             time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0)
         });
         const tasks = this.state.tasks.map(e => {
-            if (e.id === task.id) {
+            if (e._id === task._id) {
                 return task;
             }
             return e;
@@ -119,7 +119,7 @@ export default class TasksScreen extends Component {
                     {this.state.tasks.sort(sortByDate).map(task => {
                         if (!task.checked) {
                             return <TaskElement
-                                key={task.id}
+                                key={task._id}
                                 task={task}
                                 setChecked={() => this.setChecked(task)}
                                 deleteTask={() => this.deleteTask(task)}
@@ -136,10 +136,11 @@ export default class TasksScreen extends Component {
                     {this.state.tasks.sort(sortByDate).map(task => {
                         if (task.checked) {
                             return <TaskElement
-                                key={task.id}
+                                key={task._id}
                                 task={task}
                                 setChecked={() => this.setChecked(task)}
-                                deleteTask={() => this.deleteTask(task)}/>
+                                deleteTask={() => this.deleteTask(task)}
+                                toEdit={() => this.editTask(task)}/>
                         } else {
                             return null;
                         }

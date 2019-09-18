@@ -13,8 +13,9 @@ export default class PageEditor extends Component {
         super(props);
         this.state = {
             mode: props.page ? props.page.isFullDay : 'date',
-            date: props.page ? formatDate(props.page.date) : formatDate(new Date),
+            date: props.page ? props.page.date : formatDate(new Date),
             text: props.page ? props.page.text : '',
+            images: props.page ? props.page.images : [],
             errors: {
                 desc: ''
             },
@@ -30,57 +31,64 @@ export default class PageEditor extends Component {
     }
 
     savePage() {
-        const page = {
+        let page = {
             text: this.state.text,
             date: this.state.date,
+            images: this.state.images,
             created_at: new Date()
         };
-        mLogger(`saving task: ${page}`);
+        if (this.props.page) {
+            page = {...this.props.page, ...page};
+        }
+        mLogger(`saving page: ${page}`);
         this.props.savePage(page);
     }
 
     render() {
-        const currentDate = formatDate(new Date());
         return (
             <View style={styles.container}>
-                <View style={styles.formElement}>
-                    <ImagePickerComponent/>
-                </View>
-                <View style={styles.formElement}>
-                    <DatePicker
-                        style={styles.datePicker}
-                        date={this.state.date}
-                        mode={this.state.mode}
-                        placeholder="select date"
-                        format={`YYYY-MM-DD${this.state.mode === 'datetime' ? ' HH:mm' : ''}`}
-                        minDate={currentDate}
-                        confirmBtnText="Confirm"
-                        cancelBtnText="Cancel"
-                        customStyles={{
-                            dateIcon: {
-                                position: 'absolute',
-                                left: 0,
-                                top: 4,
-                                marginLeft: 0
-                            },
-                            dateInput: {
-                                marginLeft: 36,
-                                flexGrow: 1,
-                                borderColor: 'transparent',
-                                borderBottomColor: Colors.light
-                            }
-                        }}
-                        onDateChange={date => this.setDate(date)}
-                    />
-                </View>
-                <View style={styles.formElement}>
-                    <Input
-                        placeholder='How was your day...'
-                        errorMessage={this.state.errors.desc}
-                        multiline={true}
-                        numberOfLines={8}
-                        onChangeText={text => this.setText(text)}
-                    />
+                <View style={styles.form}>
+                    <View style={styles.formElement}>
+                        <ImagePickerComponent
+                            images={this.state.images}
+                            imageAdded={images => this.setState({...this.state, ...{images}})}/>
+                    </View>
+                    <View style={styles.formElement}>
+                        <DatePicker
+                            style={styles.datePicker}
+                            date={this.state.date}
+                            mode={this.state.mode}
+                            placeholder="select date"
+                            format={`YYYY-MM-DD${this.state.mode === 'datetime' ? ' HH:mm' : ''}`}
+                            confirmBtnText="Confirm"
+                            cancelBtnText="Cancel"
+                            customStyles={{
+                                dateIcon: {
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: 4,
+                                    marginLeft: 0
+                                },
+                                dateInput: {
+                                    marginLeft: 36,
+                                    flexGrow: 1,
+                                    borderColor: 'transparent',
+                                    borderBottomColor: Colors.light
+                                }
+                            }}
+                            onDateChange={date => this.setDate(date)}
+                        />
+                    </View>
+                    <View style={styles.formElement}>
+                        <Input
+                            placeholder='How was your day...'
+                            errorMessage={this.state.errors.desc}
+                            multiline={true}
+                            numberOfLines={8}
+                            value={this.state.text}
+                            onChangeText={text => this.setText(text)}
+                        />
+                    </View>
                 </View>
                 <View style={styles.lastElement}>
                     <FancyButton
@@ -101,19 +109,17 @@ const styles = StyleSheet.create({
     },
     formElement: {
         justifyContent: 'center',
-        flexBasis: 1,
-        flexShrink: 0,
-        flexGrow: 0,
         marginHorizontal: 20,
         marginVertical: 50
     },
+    form: {
+      flexGrow: 1
+    },
     datePicker: {
-        flexGrow: 1,
         height: 30,
         width: 200,
     },
     lastElement: {
-        flexGrow: 1,
         justifyContent: 'flex-end',
         margin: 20
     }
