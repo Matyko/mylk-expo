@@ -5,13 +5,13 @@ import Colors from "../constants/Colors";
 export default class FancyButton extends Component {
 
     press() {
-        if (this.props.pressFn) {
+        if (this.props.pressFn && !this.props.loading) {
             this.props.pressFn()
         }
     }
 
     longPress() {
-        if (this.props.longPressFn) {
+        if (this.props.longPressFn && !this.props.loading) {
             this.props.longPressFn()
         }
     }

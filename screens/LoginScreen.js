@@ -57,9 +57,9 @@ export default class LoginScreen extends Component {
         }
     }
 
-    rememberMe() {
-        this.setState({...this.state, ...{rememberMe: !this.state.rememberMe}});
-        AsyncStorage.setItem('rememberMe', JSON.stringify(this.state.rememberMe));
+    async rememberMe() {
+        await this.setState({...this.state, ...{rememberMe: !this.state.rememberMe}});
+        await AsyncStorage.setItem('rememberMe', JSON.stringify(this.state.rememberMe));
     }
 
     login() {
@@ -114,7 +114,7 @@ export default class LoginScreen extends Component {
                                 MYLK
                             </Text>
                         </View>
-                        <View style={styles.form}>
+                        {!this.state.passCodeCheck && <View style={styles.form}>
                             <View style={styles.formElement}>
                                 <Input
                                     style={styles.input}
@@ -151,8 +151,8 @@ export default class LoginScreen extends Component {
                                     title="Remember me"
                                 />
                             </View>
-                        </View>
-                        <View style={styles.lastElement}>
+                        </View>}
+                        {!this.state.passCodeCheck && <View style={styles.lastElement}>
                             <FancyButton
                                 title="Login"
                                 loading={this.state.loading}
@@ -163,26 +163,17 @@ export default class LoginScreen extends Component {
                                 loading={this.state.loading}
                                 pressFn={() => this.register()}
                             />
-                        </View>
+                        </View>}
+                        {this.state.passCodeCheck && <PassCode
+                            backgroundColor={Colors.transparent}
+                            passCode={this.state.passCode}
+                            codeEntered={code => this.checkPassCode(code)}/>}
                     </View>
                 </KeyboardAvoidingView>
-                <ModalComponent
-                    closeModal={() => this.setState({passCodeCheck: false})}
-                    modalVisible={this.state.passCodeCheck}
-                    title="Enter passcode"
-                >
-                    <PassCode codeEntered={code => this.checkPassCode(code)}/>
-                </ModalComponent>
             </View>
         );
     }
 }
-
-
-
-
-
-
 
 LoginScreen.navigationOptions = {
     header: null
@@ -221,8 +212,7 @@ const styles = StyleSheet.create({
         margin: 20
     },
     logo: {
-      flexGrow: 1,
-        justifyContent: 'flex-end'
+        paddingTop: 100
     },
     logoText: {
        color: Colors.white,

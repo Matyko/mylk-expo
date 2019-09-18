@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {View, StyleSheet, Text, Switch, AsyncStorage} from "react-native";
+import {View, StyleSheet, Text, Switch, AsyncStorage, ScrollView} from "react-native";
 import Colors from "../constants/Colors";
 import * as SecureStore from "expo-secure-store";
 import PassCode from "../components/PassCode";
@@ -14,9 +14,9 @@ export default class SettingsScreen extends Component {
     }
   }
 
-  async componentWillUnmount() {
-    const hasPassCode = await SecureStore.getItemAsync('passCode');
-    this.setState({...this.state, ...{hasPassCode}});
+  async componentWillMount() {
+    const passCode = await SecureStore.getItemAsync('passCode');
+    this.setState({...this.state, ...{hasPassCode: !!passCode}});
   }
 
   setPassCode(setPasscode) {
@@ -38,25 +38,24 @@ export default class SettingsScreen extends Component {
   render() {
     return (
         <View style={styles.container}>
-          <View style={styles.settingsContent}>
-            <View style={styles.settingsSection}>
-              <Text style={styles.settingsSectionTitle}>Security</Text>
-              <View style={styles.settingsElement}>
-                <Text style={styles.settingsTitle}>
-                  Set passcode for login
-                </Text>
-                <View style={styles.functionality}>
-                  <Switch
-                    value={this.state.hasPassCode}
-                    onValueChange={e => this.setPassCode(e)}
-                  />
+          <ScrollView style={styles.container}>
+            <View style={styles.settingsContent}>
+              <View style={styles.settingsSection}>
+                <Text style={styles.settingsSectionTitle}>Security</Text>
+                <View style={styles.settingsElement}>
+                  <Text style={styles.settingsTitle}>
+                    Set passcode for login
+                  </Text>
+                  <View style={styles.functionality}>
+                    <Switch
+                        value={this.state.hasPassCode}
+                        onValueChange={e => this.setPassCode(e)}
+                    />
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-          <View style={styles.settingsFooter}>
-            <Text style={styles.footerText}>Mylk by Matyi</Text>
-          </View>
+          </ScrollView>
           <ModalComponent
               closeModal={() => this.setState({showPassCodeModal: false})}
               modalVisible={this.state.showPassCodeModal}
@@ -73,6 +72,15 @@ export default class SettingsScreen extends Component {
 
 SettingsScreen.navigationOptions = {
   title: 'Settings',
+  headerStyle: {
+    backgroundColor: Colors.primaryBackground,
+    height: 79,
+  },
+  headerTitleStyle: {
+    color: Colors.primaryText,
+    lineHeight: 79,
+    fontWeight: 'bold',
+  },
 };
 
 const styles = StyleSheet.create({
@@ -94,10 +102,17 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   settingsSection: {
-
+    flexGrow: 1,
   },
   settingsSectionTitle: {
-
+    margin: 22,
+    textTransform: 'uppercase',
+    fontSize: 12,
+    letterSpacing: 1,
+    color: Colors.light,
+    borderBottomColor: Colors.light,
+    borderBottomWidth: 1,
+    paddingBottom: 10
   },
   functionality: {
     flexGrow: 0,
@@ -107,6 +122,7 @@ const styles = StyleSheet.create({
     flexGrow: 1
   },
   footerText: {
+    flexGrow: 0,
     lineHeight: 79,
     color: Colors.white
   }
