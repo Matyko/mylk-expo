@@ -1,47 +1,37 @@
-import React from 'react';
-import {View, StyleSheet, ActivityIndicator, Animated} from "react-native";
+import React, {Component} from 'react';
+import {View, StyleSheet, ActivityIndicator, Animated, Easing} from "react-native";
 import Colors from "../constants/Colors";
 
-export default function Dots(props) {
-    let animatedValue = new Animated.Value(0.2);
-    const dots = [];
-
-    for (let i = 0; i < props.maxNum; i++) {
-        if (i < props.num) {
-            dots.push(
-                <View key={`filled-${i}`} style={{...styles.dot, ...styles.filledDot}}/>
-            )
-        } else {
-            dots.push(
-                <View key={i} style={styles.dot}/>
-            )
-        }
+export default class Dots extends Component {
+    constructor(props) {
+        super(props);
+        this.dots = []
     }
 
-    const handleAnimation = () => {
-        Animated.sequence([
-            Animated.timing(animatedValue, {toValue: 1.0, duration: 150, easing: Easing.linear, useNativeDriver: true}),
-            Animated.timing(animatedValue, {toValue: -1.0, duration: 300, easing: Easing.linear, useNativeDriver: true}),
-            Animated.timing(animatedValue, {toValue: 0.0, duration: 150, easing: Easing.linear, useNativeDriver: true})
-        ]).start();
-    };
+    render() {
+        this.dots = [];
+        for (let i = 0; i < this.props.maxNum; i++) {
+            if (i < this.props.num) {
+                this.dots.push(
+                    <View key={`filled-${i}`} style={{...styles.dot, ...styles.filledDot}}/>
+                )
+            } else {
+                this.dots.push(
+                    <View key={i} style={styles.dot}/>
+                )
+            }
+        }
 
-    return (
-        <View style={{...styles.dotHolder, ...{
-                transform: [{
-                    translateX: 0
-                    // TODO shake animation
-                    //     animatedValue.interpolate({
-                    //     inputRange: [-1, 1],
-                    //     outputRange: [-10, 10]
-                    // })
-                }]}}}>
-            {!props.codeEntered && dots}
-            {props.codeEntered &&
-            <ActivityIndicator
-                color={Colors.white}/>}
-        </View>
-    )
+        return (
+            <View
+                style={styles.dotHolder}>
+                {!this.props.codeEntered && this.dots}
+                {this.props.codeEntered &&
+                <ActivityIndicator
+                    color={Colors.white}/>}
+            </View>
+        )
+    }
 }
 
 const styles = StyleSheet.create({

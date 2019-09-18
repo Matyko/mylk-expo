@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, TouchableOpacity, Text, ActivityIndicator} from "react-native";
+import {View, StyleSheet, TouchableOpacity, Text, ActivityIndicator, Animated, Easing} from "react-native";
 import Colors from "../constants/Colors";
 import Dots from "./Dots";
 
@@ -13,6 +13,7 @@ export default class PassCode extends Component {
             codeEntered: false,
             hasError: false
         };
+        this.animatedValue = new Animated.Value(0);
         this.numbers = [];
         this.setup();
     }
@@ -46,6 +47,14 @@ export default class PassCode extends Component {
         }
     }
 
+    errorAnimation = () => {
+        Animated.sequence([
+            Animated.timing(this.animatedValue, {toValue: 1.0, duration: 50, easing: Easing.linear, useNativeDriver: true}),
+            Animated.timing(this.animatedValue, {toValue: -1.0, duration: 100, easing: Easing.linear, useNativeDriver: true}),
+            Animated.timing(this.animatedValue, {toValue: 0.0, duration: 50, easing: Easing.linear, useNativeDriver: true})
+        ]).start(() => this.props.animationEnd);
+    };
+
     codeEntered() {
         if (this.props.confirmNeeded) {
             const code1 = this.state.code;
@@ -56,22 +65,19 @@ export default class PassCode extends Component {
                 code2.length !== this.state.codeLength ||
                 code1 !== code2) {
                 this.setState({...this.state, ...{code: '', confirmation: ''}});
-                this.hasError(true);
+                console.log(1);
+                this.errorAnimation();
             } else {
                 this.setState({...this.state, ...{codeEntered: true}});
                 this.props.codeEntered(this.state.code);
             }
         } else if (this.props.passCode && this.props.passCode !== this.state.code) {
-            setTimeout(() => this.setState({...this.state, ...{code: '', confirmation: ''}}), 300)
-            this.hasError(true);
+            setTimeout(() => this.setState({...this.state, ...{code: '', confirmation: ''}}), 300);
+            this.errorAnimation();
         } else {
             this.setState({...this.state, ...{codeEntered: true}});
             this.props.codeEntered(this.state.code);
         }
-    }
-
-    hasError(hasError) {
-        this.setState({...this.state, ...{hasError}});
     }
 
     render() {
@@ -82,12 +88,17 @@ export default class PassCode extends Component {
                 ...(this.props.backgroundColor ?
                     {backgroundColor: this.props.backgroundColor} :
                     {})}}>
-                <Dots
-                    num={this.state.code.length}
-                    maxNum={this.state.codeLength}
-                    codeEntered={this.state.codeEntered}
-                    hasError={this.state.hasError}
-                    endError={() => this.hasError(false)}/>
+                <Animated.View style={{
+                    transform: [{
+                    translateX: this.animatedValue.interpolate({
+                    inputRange: [-1, 1],
+                    outputRange: [-25, 25]
+                })}]}}>
+                    <Dots
+                        num={this.state.code.length}
+                        maxNum={this.state.codeLength}
+                        codeEntered={this.state.codeEntered}/>
+                </Animated.View>
                 <View style={styles.buttonHolder}>
                     {this.numbers}
                 </View>
