@@ -16,6 +16,7 @@ export default class JournalScreen extends Component {
             modalVisible: false,
             editedPage: null,
             visibleImages: [],
+            accomplishments: [],
             imageModalVisible: false
         }
     }
@@ -28,11 +29,16 @@ export default class JournalScreen extends Component {
     }
 
     async componentWillMount() {
-        AsyncStorage.getItem('pages').then(result => {
-            const pages = result ? JSON.parse(result) : [];
-            this.setState({...this.state, ...{pages}});
-        })
+        const result = await AsyncStorage.getItem('pages');
+        const pages = result ? JSON.parse(result) : [];
+        await this.getAccomplishments();
+        this.setState({...this.state, ...{pages}});
+        this.props.navigation.addListener('willFocus', () => this.getAccomplishments());
+    }
 
+    async getAccomplishments() {
+        const accomplishments = await AsyncStorage.getItem('accomplishments') || [];
+        await this.setState({...this.state, ...{accomplishments}});
     }
 
     async savePage(task) {
@@ -74,7 +80,7 @@ export default class JournalScreen extends Component {
         return (
             <View style={{flex: 1}}>
                 <ScrollView style={styles.container}>
-                    {this.state.pages.sort(sortByDate).map(page => {
+                    {this.state.pages.concat(this.state.accomplishments).sort(sortByDate).map(page => {
                         return <PageElement
                             key={page._id}
                             page={page}

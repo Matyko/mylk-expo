@@ -13,7 +13,7 @@ export default class TaskEditor extends Component {
         super(props);
         if (props.task) {
             this.state = {
-                mode: props.task.isFullDay ? 'date' : 'dateTime',
+                mode: props.task.isFullDay ? 'date' : 'datetime',
                 date: props.task.date || formatDate(new Date),
                 title: props.task.title || '',
                 errors: {

@@ -94,6 +94,7 @@ export default class PassCode extends Component {
                     inputRange: [-1, 1],
                     outputRange: [-25, 25]
                 })}]}}>
+                    {!!this.state.confirmation && <Text style={{position: 'absolute', color: Colors.white, transform: [{translateY: -20}]}}>Confirm code</Text>}
                     <Dots
                         num={this.state.code.length}
                         maxNum={this.state.codeLength}

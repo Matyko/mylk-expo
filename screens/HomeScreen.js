@@ -10,7 +10,7 @@ import NotificationManager from "../util/NotificationManager";
 import mLogger from "../util/mLogger";
 import Colors from "../constants/Colors";
 import HomeScreenPill from "../components/HomeScreenPill";
-import ImagePickerComponent from "../components/ImagePickerComponent";
+import formatDate from "../util/formatDate";
 
 export default class HomeScreen extends Component {
     constructor(props) {
@@ -26,7 +26,11 @@ export default class HomeScreen extends Component {
         try {
             mLogger('Loading tasks');
             AsyncStorage.getItem('tasks').then(result => {
-                const tasks = result ? JSON.parse(result) : [];
+                let tasks = result ? JSON.parse(result) : [];
+                const today = formatDate(new Date());
+                tasks = tasks.filter(t => {
+                    return !t.checked && today === t.date.split(' ')[0]
+                });
                 this.setState({...this.state, ...{tasks}})
             })
         } catch {

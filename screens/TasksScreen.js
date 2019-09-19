@@ -9,6 +9,7 @@ import sortByDate from "../util/sortByDate";
 import mLogger from "../util/mLogger";
 import NotificationManager from "../util/NotificationManager"
 import parseDate from "../util/parseDate";
+import formatDate from "../util/formatDate";
 
 export default class TasksScreen extends Component {
     constructor(props) {
@@ -28,6 +29,7 @@ export default class TasksScreen extends Component {
                 const tasks = result ? JSON.parse(result) : [];
                 this.setState({...this.state, ...{tasks}})
             })
+            await AsyncStorage.setItem('tasks', JSON.stringify([]));
         } catch {
             Alert.alert('Could not load your tasks');
             mLogger('could not load tasks')
@@ -36,13 +38,19 @@ export default class TasksScreen extends Component {
 
     async setChecked(task) {
         if (task.checked) {
-            task._notificationId = await this.notificationManager.createNotification({
-                title: 'Task alert',
-                body: task.title,
-                time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0)
-            });
+            const currentTime = new Date().getTime();
+            const dueTime = parseDate(task.date);
+            if (currentTime < dueTime) {
+                task._notificationId = await this.notificationManager.createNotification({
+                    title: 'Mylk alert',
+                    body: task.title,
+                    time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0)
+                });
+            }
+            await this.removeAccomplishment(task)
         } else {
             await this.notificationManager.cancelNotification(task._notificationId);
+            await this.setAccomplishment(task);
         }
         const tasks = this.state.tasks.map(e => {
             if (e === task) {
@@ -51,6 +59,48 @@ export default class TasksScreen extends Component {
             return e
         });
         await this.updateTasks(tasks);
+    }
+
+    async setAccomplishment(task) {
+        const result = await AsyncStorage.getItem('accomplishments');
+        const accomplishments = result ? JSON.parse(result) : [];
+        const today = formatDate(new Date());
+
+        let accomplishment = accomplishments.find(a => a.date === today);
+
+        if (accomplishment) {
+            accomplishments.tasks.push(task._id)
+        } else {
+            accomplishment = {date: task.date, _id: task.date, tasks: [task]};
+            accomplishments.push(accomplishment);
+        }
+        accomplishment.noEdit = true;
+        accomplishment.text = this.getAccomplishmentText(accomplishment);
+        await AsyncStorage.setItem('accomplishments', JSON.parse(accomplishments));
+    }
+
+    getAccomplishmentText(acc) {
+        let text = 'Today I accomplished this: ';
+        const titles = acc.tasks.map(t => {
+            return this.state.tasks.find(task => task._id === t._id && t.title).title
+        });
+        titles.forEach(t => {
+            text += `
+${t}`
+        });
+        return text;
+    }
+
+    async removeAccomplishment(task) {
+        const result = await AsyncStorage.getItem('accomplishments');
+        let accomplishments = result ? JSON.parse(result) : [];
+        accomplishments = accomplishments.map(a => {
+            const i = a.tasks.indexOf(task._id);
+            if (i > -1) {
+                accomplishments.splice(i, 1);
+            }
+        }).filter(e => !e.tasks.length);
+        await AsyncStorage.setItem('accomplishments', JSON.parse(accomplishments));
     }
 
     editTask(task) {
@@ -68,11 +118,15 @@ export default class TasksScreen extends Component {
     async createTask(task) {
         const tasks = this.state.tasks.slice();
         task._id = new Date().getTime().toString() + tasks.length;
-        task._notificationId = await this.notificationManager.createNotification({
-            title: 'Mylk alert',
-            body: task.title,
-            time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0)
-        });
+        const currentTime = new Date().getTime();
+        const dueTime = parseDate(task.date);
+        if (currentTime < dueTime) {
+            task._notificationId = await this.notificationManager.createNotification({
+                title: 'Mylk alert',
+                body: task.title,
+                time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0)
+            });
+        }
         tasks.push(task);
         await this.updateTasks(tasks);
     }

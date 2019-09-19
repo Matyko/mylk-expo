@@ -1,9 +1,20 @@
 import React, {Component} from 'react';
-import {Modal, Platform, Text, View, TouchableOpacity} from 'react-native';
+import {Modal, Platform, Text, View, TouchableOpacity, BackHandler} from 'react-native';
 import {Ionicons} from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 
 export default class ModalComponent extends Component {
+
+    componentDidMount() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            this.props.closeModal();
+            return true;
+        });
+    }
+
+    componentWillUnmount() {
+        this.backHandler.remove();
+    }
 
     render() {
         return (

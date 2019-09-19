@@ -4,35 +4,49 @@ import Colors from "../constants/Colors";
 import * as SecureStore from "expo-secure-store";
 import PassCode from "../components/PassCode";
 import ModalComponent from "../components/ModalComponent";
+import firebase from "firebase";
 
 export default class SettingsScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
       hasPassCode: false,
-      showPassCodeModal: false
+      showPassCodeModal: false,
+      passCode: null
     }
   }
 
   async componentWillMount() {
     const passCode = await SecureStore.getItemAsync('passCode');
-    this.setState({...this.state, ...{hasPassCode: !!passCode}});
+    this.setState({...this.state, ...{hasPassCode: !!passCode, passCode}});
   }
 
   setPassCode(setPasscode) {
     if (setPasscode) {
       this.setState({...this.state, ...{showPassCodeModal: true}});
     } else {
-      SecureStore.deleteItemAsync('passCode').then(() => {
-        this.setState({...this.state, ...{hasPassCode: false}});
-      })
+      this.setState({...this.state, ...{showPassCodeModal: true, removingPassCode: true}});
     }
   }
 
-  savePassCode(code) {
-    SecureStore.setItemAsync('passCode', code).then(() => {
-      this.setState({...this.state, ...{hasPassCode: true, showPassCodeModal: false}});
-    })
+  handlePassCodeEntry(code) {
+    if (this.state.passCode) {
+        SecureStore.deleteItemAsync('passCode').then(() => {
+            this.setState({...this.state, ...{hasPassCode: false, passCode: null, showPassCodeModal: false}});
+        })
+    } else {
+        SecureStore.setItemAsync('passCode', code).then(() => {
+            this.setState({...this.state, ...{hasPassCode: true, showPassCodeModal: false, passCode: code}});
+        })
+    }
+  }
+
+  async logOut() {
+    await firebase.auth().signOut();
+    if (!this.state.hasPassCode) {
+        await AsyncStorage.setItem('rememberMe', JSON.stringify(false));
+    }
+    this.props.navigation.navigate('Login');
   }
 
   render() {
@@ -54,6 +68,14 @@ export default class SettingsScreen extends Component {
                   </View>
                 </View>
               </View>
+              <View style={styles.settingsSection}>
+                <Text style={styles.settingsSectionTitle}>Profile</Text>
+                <View style={styles.settingsElement}>
+                  <Text style={styles.settingsTitle} onPress={() => this.logOut()}>
+                    Logout
+                  </Text>
+                </View>
+              </View>
             </View>
           </ScrollView>
           <ModalComponent
@@ -62,8 +84,9 @@ export default class SettingsScreen extends Component {
               title="Enter passcode"
           >
             <PassCode
-                confirmNeeded={true}
-                codeEntered={code => this.savePassCode(code)}/>
+                confirmNeeded={!this.state.passCode}
+                passCode={this.state.passCode}
+                codeEntered={code => this.handlePassCodeEntry(code)}/>
           </ModalComponent>
         </View>
     )

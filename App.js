@@ -8,7 +8,6 @@ import { Ionicons } from '@expo/vector-icons';
 import AppNavigator from './navigation/AppNavigator';
 import firebase from 'firebase'
 import '@firebase/firestore';
-import LoginScreen from "./screens/LoginScreen";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB7hQ1BKUnW77ZbVf3Wh1vxd1luqhOfSlU",

@@ -35,11 +35,11 @@ export default class LoginScreen extends Component {
             const rememberMe = JSON.parse(await AsyncStorage.getItem('rememberMe'));
 
             if (email) this.setState({...this.state, ...{email}});
-            if (password) this.setState({...this.state, ...{password}});
             if (rememberMe) this.setState({...this.state, ...{rememberMe}});
             if (passCode) this.setState({...this.state, ...{passCode}});
 
-            if (rememberMe) {
+            if (rememberMe && password && email) {
+                if (password) this.setState({...this.state, ...{password}});
                 if (passCode) {
                     this.setState({...this.state, ...{passCodeCheck: true}})
                 } else {

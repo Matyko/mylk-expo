@@ -34,6 +34,7 @@ export default class PageElement extends Component{
                     <Text>{this.props.page.text}</Text>
                 </View>
                 {this.state.editable &&
+                !this.props.page.noEdit &&
                 <View style={styles.bottom}>
                     <Ionicons
                         name={Platform.OS === 'ios' ? 'ios-close-circle' : 'md-close-circle'}
