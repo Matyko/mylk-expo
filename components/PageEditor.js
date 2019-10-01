@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Input, Button} from 'react-native-elements';
+import {Input} from 'react-native-elements';
 import {View, StyleSheet} from "react-native";
 import DatePicker from "react-native-datepicker";
 import formatDate from "../util/formatDate";
