@@ -29,16 +29,16 @@ export default class JournalScreen extends Component {
     }
 
     async componentWillMount() {
-        const result = await AsyncStorage.getItem('pages');
-        const pages = result ? JSON.parse(result) : [];
-        await this.getAccomplishments();
-        this.setState({...this.state, ...{pages}});
-        this.props.navigation.addListener('willFocus', () => this.getAccomplishments());
+        // TODO ONLY FOR DEBUGGING REMOVE LATER
+        // await AsyncStorage.setItem('pages', JSON.stringify([]));
+        await this.getPages();
+        this.props.navigation.addListener('willFocus', () => this.getPages());
     }
 
-    async getAccomplishments() {
-        const accomplishments = await AsyncStorage.getItem('accomplishments') || [];
-        await this.setState({...this.state, ...{accomplishments}});
+    async getPages() {
+        const result = await AsyncStorage.getItem('pages');
+        const pages = result ? JSON.parse(result) : [];
+        this.setState({...this.state, ...{pages}});
     }
 
     async savePage(task) {

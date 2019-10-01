@@ -73,7 +73,6 @@ export default class DateTimePicker extends Component {
 
     startSelect() {
         const isIOS = Platform.OS === 'ios';
-        console.log(isIOS);
         if (isIOS) {
             this.selectIos()
         } else {

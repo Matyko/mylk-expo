@@ -10,6 +10,7 @@ import mLogger from "../util/mLogger";
 import NotificationManager from "../util/NotificationManager"
 import parseDate from "../util/parseDate";
 import formatDate from "../util/formatDate";
+import PageAutomator from "../util/PageAutomator";
 
 export default class TasksScreen extends Component {
     constructor(props) {
@@ -20,6 +21,7 @@ export default class TasksScreen extends Component {
             editedTask: null
         };
         this.notificationManager = new NotificationManager;
+        this.pageAutomator = new PageAutomator;
     }
 
     async componentWillMount() {
@@ -29,7 +31,6 @@ export default class TasksScreen extends Component {
                 const tasks = result ? JSON.parse(result) : [];
                 this.setState({...this.state, ...{tasks}})
             })
-            await AsyncStorage.setItem('tasks', JSON.stringify([]));
         } catch {
             Alert.alert('Could not load your tasks');
             mLogger('could not load tasks')
@@ -47,60 +48,23 @@ export default class TasksScreen extends Component {
                     time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0)
                 });
             }
-            await this.removeAccomplishment(task)
+            await this.pageAutomator.taskUnChecked(task);
         } else {
-            await this.notificationManager.cancelNotification(task._notificationId);
-            await this.setAccomplishment(task);
+            task.finishedDay = new Date(new Date().toDateString()).getTime();
+            await this.pageAutomator.taskChecked(task);
+            if (task._notificationId) {
+                await this.notificationManager.cancelNotification(task._notificationId);
+                delete task._notificationId
+            }
         }
         const tasks = this.state.tasks.map(e => {
             if (e === task) {
-                e.checked = !e.checked
+                e.finishedDay = !e.checked ? new Date(new Date().toDateString()).getTime() : null;
+                e.checked = !e.checked;
             }
             return e
         });
         await this.updateTasks(tasks);
-    }
-
-    async setAccomplishment(task) {
-        const result = await AsyncStorage.getItem('accomplishments');
-        const accomplishments = result ? JSON.parse(result) : [];
-        const today = formatDate(new Date());
-
-        let accomplishment = accomplishments.find(a => a.date === today);
-
-        if (accomplishment) {
-            accomplishments.tasks.push(task._id)
-        } else {
-            accomplishment = {date: task.date, _id: task.date, tasks: [task]};
-            accomplishments.push(accomplishment);
-        }
-        accomplishment.noEdit = true;
-        accomplishment.text = this.getAccomplishmentText(accomplishment);
-        await AsyncStorage.setItem('accomplishments', JSON.parse(accomplishments));
-    }
-
-    getAccomplishmentText(acc) {
-        let text = 'Today I accomplished this: ';
-        const titles = acc.tasks.map(t => {
-            return this.state.tasks.find(task => task._id === t._id && t.title).title
-        });
-        titles.forEach(t => {
-            text += `
-${t}`
-        });
-        return text;
-    }
-
-    async removeAccomplishment(task) {
-        const result = await AsyncStorage.getItem('accomplishments');
-        let accomplishments = result ? JSON.parse(result) : [];
-        accomplishments = accomplishments.map(a => {
-            const i = a.tasks.indexOf(task._id);
-            if (i > -1) {
-                accomplishments.splice(i, 1);
-            }
-        }).filter(e => !e.tasks.length);
-        await AsyncStorage.setItem('accomplishments', JSON.parse(accomplishments));
     }
 
     editTask(task) {
@@ -148,15 +112,18 @@ ${t}`
     }
 
     async deleteTask(task) {
+        if (task.checked) {
+            await this.setChecked(task);
+        }
         const tasks = this.state.tasks.filter(e => e !== task);
-        await this.notificationManager.cancelNotification(task._notificationId);
+        if (task._notificationId) {
+            await this.notificationManager.cancelNotification(task._notificationId);
+        }
         await this.updateTasks(tasks)
     }
 
     async updateTasks(tasks) {
-        console.log(tasks);
         const state = {...this.state, ...{tasks, modalVisible: false}};
-        console.log(state);
         try {
             await AsyncStorage.setItem('tasks', JSON.stringify(tasks));
             this.setState(state);
@@ -209,6 +176,7 @@ ${t}`
                     <TaskEditor task={this.state.editedTask}
                                 saveTask={task => this.saveTask(task)}/>
                 </ModalComponent>
+                <PageAutomator/>
             </View>
         );
     }

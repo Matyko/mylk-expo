@@ -65,7 +65,6 @@ export default class PassCode extends Component {
                 code2.length !== this.state.codeLength ||
                 code1 !== code2) {
                 this.setState({...this.state, ...{code: '', confirmation: ''}});
-                console.log(1);
                 this.errorAnimation();
             } else {
                 this.setState({...this.state, ...{codeEntered: true}});

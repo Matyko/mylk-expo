@@ -32,9 +32,14 @@ export default class PageElement extends Component{
                 </TouchableOpacity>
                 <View style={styles.textContainer}>
                     <Text>{this.props.page.text}</Text>
+                    {this.props.page._tasks &&
+                        this.props.page._tasks.map(t => {
+                            return <Text key={t._id}>{t.title}</Text>
+                        })
+                    }
                 </View>
                 {this.state.editable &&
-                !this.props.page.noEdit &&
+                !this.props.page._tasks &&
                 <View style={styles.bottom}>
                     <Ionicons
                         name={Platform.OS === 'ios' ? 'ios-close-circle' : 'md-close-circle'}
