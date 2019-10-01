@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {AsyncStorage, ScrollView, StyleSheet, Text, View,} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import ModalComponent from "../components/ModalComponent";
 import TaskElement from "../components/TaskElement";
 import FloatingActionButton from "../components/FloatingActionButton";
@@ -10,6 +10,8 @@ import mLogger from "../util/mLogger";
 import NotificationManager from "../util/NotificationManager"
 import parseDate from "../util/parseDate";
 import PageAutomator from "../util/PageAutomator";
+import * as Storage from '../util/storage';
+import STORAGE_CONSTS from '../util/storageConsts';
 
 export default class TasksScreen extends Component {
     constructor(props) {
@@ -26,7 +28,7 @@ export default class TasksScreen extends Component {
     async componentWillMount() {
         try {
             mLogger('Loading tasks');
-            AsyncStorage.getItem('tasks').then(result => {
+            Storage.getItem(STORAGE_CONSTS.TASKS).then(result => {
                 const tasks = result ? JSON.parse(result) : [];
                 this.setState({...this.state, ...{tasks}})
             })
@@ -128,7 +130,7 @@ export default class TasksScreen extends Component {
     async updateTasks(tasks) {
         const state = {...this.state, ...{tasks, modalVisible: false}};
         try {
-            await AsyncStorage.setItem('tasks', JSON.stringify(tasks));
+            await Storage.setItem(STORAGE_CONSTS.TASKS, JSON.stringify(tasks));
             this.setState(state);
         } catch {
             Alert.alert('Could not delete your task');

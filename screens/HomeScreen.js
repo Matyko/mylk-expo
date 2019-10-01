@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {
-    AsyncStorage,
     ScrollView,
     StyleSheet,
     View,
@@ -11,6 +10,8 @@ import mLogger from "../util/mLogger";
 import Colors from "../constants/Colors";
 import HomeScreenPill from "../components/HomeScreenPill";
 import formatDate from "../util/formatDate";
+import * as Storage from '../util/storage';
+import STORAGE_CONSTS from '../util/storageConsts';
 
 export default class HomeScreen extends Component {
     constructor(props) {
@@ -25,14 +26,14 @@ export default class HomeScreen extends Component {
     getTasks() {
         try {
             mLogger('Loading tasks');
-            AsyncStorage.getItem('tasks').then(async result => {
+            Storage.getItem(STORAGE_CONSTS.TASKS).then(async result => {
                 let tasks = result ? JSON.parse(result) : [];
                 tasks.map(t => {
                    if (t.repeats) {
                        t = this.handleRepeat(t)
                    }
                 });
-                await AsyncStorage.setItem('tasks', JSON.stringify(tasks));
+                await Storage.setItem(STORAGE_CONSTS.TASKS, JSON.stringify(tasks));
                 const today = formatDate(new Date());
                 tasks = tasks.filter(t => {
                     return !t.checked && today === t.date.split(' ')[0]
@@ -102,7 +103,7 @@ export default class HomeScreen extends Component {
                         style={style}>
                         <HomeScreenPill
                             handlePress={() => navigate("Tasks")}
-                            text={`You have ${this.state.tasks.length ? this.state.tasks.length : 'no'} task${this.state.tasks.length !== 1 && 's'} for today.`}/>
+                            text={`You have ${this.state.tasks.length ? this.state.tasks.length : 'no'} task${this.state.tasks.length !== 1 ? 's' : ''} for today.`}/>
                     </Animated.View>
                     <Animated.View
                         style={style}>

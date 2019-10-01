@@ -1,11 +1,12 @@
 import React from "react";
-import {AsyncStorage} from "react-native";
 import formatDate from "./formatDate";
+import * as Storage from '../util/storage';
+import STORAGE_CONSTS from '../util/storageConsts';
 
 export default class PageAutomator extends React.Component {
 
     async taskChecked({_id, title, finishedDay}) {
-        const result = await AsyncStorage.getItem('pages');
+        const result = await Storage.getItem(STORAGE_CONSTS.PAGES);
         const pages = result ? JSON.parse(result) : [];
         const page = pages.find(e => e.finishedDay === finishedDay);
         if (page) {
@@ -21,11 +22,11 @@ export default class PageAutomator extends React.Component {
             };
             pages.push(newPage);
         }
-        await AsyncStorage.setItem('pages', JSON.stringify(pages));
+        await Storage.setItem(STORAGE_CONSTS.PAGES, JSON.stringify(pages));
     }
 
     async taskUnChecked({_id, finishedDay}) {
-        const result = await AsyncStorage.getItem('pages');
+        const result = await Storage.getItem(STORAGE_CONSTS.PAGES);
         let pages = result ? JSON.parse(result) : [];
         const page = pages.find(e => e.finishedDay === finishedDay);
         if (page) {
@@ -34,7 +35,7 @@ export default class PageAutomator extends React.Component {
                 pages = pages.filter(e => e !== page);
             }
         }
-        await AsyncStorage.setItem('pages', JSON.stringify(pages));
+        await Storage.setItem(STORAGE_CONSTS.PAGES, JSON.stringify(pages));
     }
 
     render() {

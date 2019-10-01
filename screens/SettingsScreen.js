@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import {View, StyleSheet, Text, Switch, AsyncStorage, ScrollView} from "react-native";
+import {View, StyleSheet, Text, Switch, ScrollView} from "react-native";
 import Colors from "../constants/Colors";
-import * as SecureStore from "expo-secure-store";
 import PassCode from "../components/PassCode";
 import ModalComponent from "../components/ModalComponent";
 import firebase from "firebase";
+import * as Storage from '../util/storage';
+import STORAGE_CONSTS from '../util/storageConsts';
 
 export default class SettingsScreen extends Component {
   constructor(props) {
@@ -17,7 +18,7 @@ export default class SettingsScreen extends Component {
   }
 
   async componentWillMount() {
-    const passCode = await SecureStore.getItemAsync('passCode');
+    const passCode = await Storage.secureGetItem(STORAGE_CONSTS.PASSCODE);
     this.setState({...this.state, ...{hasPassCode: !!passCode, passCode}});
   }
 
@@ -31,11 +32,11 @@ export default class SettingsScreen extends Component {
 
   handlePassCodeEntry(code) {
     if (this.state.passCode) {
-        SecureStore.deleteItemAsync('passCode').then(() => {
+        Storage.secureDeleteItem(STORAGE_CONSTS.PASSCODE).then(() => {
             this.setState({...this.state, ...{hasPassCode: false, passCode: null, showPassCodeModal: false}});
         })
     } else {
-        SecureStore.setItemAsync('passCode', code).then(() => {
+        Storage.secureSetItem(STORAGE_CONSTS.PASSCODE, code).then(() => {
             this.setState({...this.state, ...{hasPassCode: true, showPassCodeModal: false, passCode: code}});
         })
     }
@@ -44,7 +45,7 @@ export default class SettingsScreen extends Component {
   async logOut() {
     await firebase.auth().signOut();
     if (!this.state.hasPassCode) {
-        await AsyncStorage.setItem('rememberMe', JSON.stringify(false));
+        await Storage.setItem(STORAGE_CONSTS.REMEMBER_ME, JSON.stringify(false));
     }
     this.props.navigation.navigate('Login');
   }

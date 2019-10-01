@@ -5,11 +5,10 @@ import FancyButton from "../components/FancyButton";
 import mLogger from "../util/mLogger";
 import * as firebase from "firebase";
 import {LinearGradient} from "expo-linear-gradient";
-import Colors from '../constants/Colors'
-import {Video} from "expo-av";
-import * as SecureStore from "expo-secure-store";
-import ModalComponent from "../components/ModalComponent";
+import Colors from '../constants/Colors';
 import PassCode from "../components/PassCode";
+import * as Storage from '../util/storage';
+import STORAGE_CONSTS from '../util/storageConsts';
 
 export default class LoginScreen extends Component {
     constructor(props) {
@@ -29,10 +28,13 @@ export default class LoginScreen extends Component {
 
     async componentDidMount() {
         try {
-            const passCode = await SecureStore.getItemAsync('passCode');
-            const password = await SecureStore.getItemAsync('pwd');
-            const email = await AsyncStorage.getItem('email');
-            const rememberMe = JSON.parse(await AsyncStorage.getItem('rememberMe'));
+            const user_id = await AsyncStorage.getItem(STORAGE_CONSTS.USER_ID);
+            await Storage.setUID(user_id);
+
+            const passCode = await Storage.secureGetItem(STORAGE_CONSTS.PASSCODE);
+            const password = await Storage.secureGetItem(STORAGE_CONSTS.PASSWORD);
+            const email = await Storage.getItem(STORAGE_CONSTS.EMAIL);
+            const rememberMe = JSON.parse(await Storage.getItem(STORAGE_CONSTS.REMEMBER_ME));
 
             if (email) this.setState({...this.state, ...{email}});
             if (rememberMe) this.setState({...this.state, ...{rememberMe}});
@@ -59,15 +61,16 @@ export default class LoginScreen extends Component {
 
     async rememberMe() {
         await this.setState({...this.state, ...{rememberMe: !this.state.rememberMe}});
-        await AsyncStorage.setItem('rememberMe', JSON.stringify(this.state.rememberMe));
+        await Storage.setItem(STORAGE_CONSTS.REMEMBER_ME, JSON.stringify(this.state.rememberMe));
     }
 
     login() {
         this.setState({...this.state, ...{loading: true}});
-        firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(async response => {
+        firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(async ({ user }) => {
             if (this.state.rememberMe) {
-                await SecureStore.setItemAsync('pwd', this.state.password);
-                await AsyncStorage.setItem('email', this.state.email);
+                await AsyncStorage.setItem(STORAGE_CONSTS.USER_ID, user.uid);
+                await Storage.secureSetItem(STORAGE_CONSTS.PASSWORD, this.state.password);
+                await Storage.setItem(STORAGE_CONSTS.EMAIL, this.state.email);
             }
             this.props.navigation.navigate('Main')
         })

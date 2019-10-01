@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {AsyncStorage, ScrollView, StyleSheet, View} from "react-native";
+import {ScrollView, StyleSheet, View} from "react-native";
 import FloatingActionButton from "../components/FloatingActionButton";
 import ModalComponent from "../components/ModalComponent";
 import sortByDate from "../util/sortByDate";
@@ -7,6 +7,8 @@ import Colors from "../constants/Colors";
 import PageElement from "../components/PageElement";
 import PageEditor from "../components/PageEditor";
 import ImageViewer from "react-native-image-zoom-viewer";
+import * as Storage from '../util/storage';
+import STORAGE_CONSTS from '../util/storageConsts';
 
 export default class JournalScreen extends Component {
     constructor(props) {
@@ -30,13 +32,13 @@ export default class JournalScreen extends Component {
 
     async componentWillMount() {
         // TODO ONLY FOR DEBUGGING REMOVE LATER
-        // await AsyncStorage.setItem('pages', JSON.stringify([]));
+        // await Storage.setItem(STORAGE_CONSTS.PAGES, JSON.stringify([]));
         await this.getPages();
         this.props.navigation.addListener('willFocus', () => this.getPages());
     }
 
     async getPages() {
-        const result = await AsyncStorage.getItem('pages');
+        const result = await Storage.getItem(STORAGE_CONSTS.PAGES);
         const pages = result ? JSON.parse(result) : [];
         this.setState({...this.state, ...{pages}});
     }
@@ -67,7 +69,7 @@ export default class JournalScreen extends Component {
     }
 
     async updatePages(pages) {
-        await AsyncStorage.setItem('pages', JSON.stringify(pages));
+        await Storage.setItem(STORAGE_CONSTS.PAGES, JSON.stringify(pages));
         this.setState({...this.state, ...{pages, modalVisible: false}});
     }
 
