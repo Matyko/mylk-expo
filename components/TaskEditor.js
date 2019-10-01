@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {CheckBox, Input} from 'react-native-elements';
-import {View, StyleSheet} from "react-native";
+import {View, StyleSheet, Picker} from "react-native";
 import DatePicker from "react-native-datepicker";
 import formatDate from "../util/formatDate";
 import Colors from "../constants/Colors";
@@ -16,6 +16,7 @@ export default class TaskEditor extends Component {
                 mode: props.task.isFullDay ? 'date' : 'datetime',
                 date: props.task.date || formatDate(new Date),
                 title: props.task.title || '',
+                repeats: props.task.repeats || false,
                 errors: {
                     desc: ''
                 },
@@ -25,6 +26,7 @@ export default class TaskEditor extends Component {
                 mode: 'date',
                 date: formatDate(new Date),
                 title: '',
+                repeats: false,
                 errors: {
                     desc: ''
                 },
@@ -40,6 +42,11 @@ export default class TaskEditor extends Component {
 
     setDate(date) {
         this.setState({...this.state, ...{date: date}});
+    }
+
+    setRepeats() {
+        const repeats = this.state.repeats ? false : 'day';
+        this.setState({...this.state, ...{repeats}})
     }
 
     setText(text) {
@@ -66,7 +73,7 @@ export default class TaskEditor extends Component {
             <View style={styles.container}>
                 <View style={styles.formElement}>
                     <DatePicker
-                        style={styles.datePicker}
+                        style={{width: '50%'}}
                         date={this.state.date}
                         mode={this.state.mode}
                         placeholder="select date"
@@ -111,6 +118,27 @@ export default class TaskEditor extends Component {
                         title="All day"
                     />
                 </View>
+                <View style={{...styles.formElement, ...{flexDirection: 'row', justifyContent: 'space-between'}}}>
+                    <CheckBox
+                        style={{width: '50%'}}
+                        checked={!!this.state.repeats}
+                        containerStyle={{backgroundColor: Colors.transparent, borderColor: Colors.transparent}}
+                        checkedColor={Colors.primaryBackground}
+                        onPress={() => this.setRepeats()}
+                        title="Repeats"
+                    />
+                    {this.state.repeats &&
+                    <Picker
+                        style={{width: '50%'}}
+                        selectedValue={this.state.repeats}
+                        onValueChange={repeats => this.setState({...this.state, ...{repeats}})}>
+                        <Picker.Item label="Daily" value="day" />
+                        <Picker.Item label="Weekly" value="week" />
+                        <Picker.Item label="Monthly" value="month" />
+                        <Picker.Item label="Yearly" value="year" />
+                    </Picker>
+                    }
+                </View>
                 <View style={styles.lastElement}>
                     <FancyButton
                         title="Save"
@@ -127,19 +155,15 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         paddingTop: 10,
+        paddingHorizontal: 20
     },
     formElement: {
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
       flexBasis: 1,
       flexShrink: 0,
       flexGrow: 0,
-      marginHorizontal: 20,
-      marginVertical: 50
-    },
-    datePicker: {
-        flexGrow: 1,
-        height: 30,
-        width: 200,
+      marginVertical: 30,
+      width: '100%'
     },
     lastElement: {
         flexGrow: 1,
@@ -147,4 +171,3 @@ const styles = StyleSheet.create({
         margin: 20
     }
 });
-

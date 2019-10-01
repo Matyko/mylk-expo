@@ -9,7 +9,6 @@ import sortByDate from "../util/sortByDate";
 import mLogger from "../util/mLogger";
 import NotificationManager from "../util/NotificationManager"
 import parseDate from "../util/parseDate";
-import formatDate from "../util/formatDate";
 import PageAutomator from "../util/PageAutomator";
 
 export default class TasksScreen extends Component {
@@ -43,7 +42,7 @@ export default class TasksScreen extends Component {
             const dueTime = parseDate(task.date);
             if (currentTime < dueTime) {
                 task._notificationId = await this.notificationManager.createNotification({
-                    title: 'Mylk alert',
+                    title: 'Mylk task reminder',
                     body: task.title,
                     time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0)
                 });
@@ -52,7 +51,7 @@ export default class TasksScreen extends Component {
         } else {
             task.finishedDay = new Date(new Date().toDateString()).getTime();
             await this.pageAutomator.taskChecked(task);
-            if (task._notificationId) {
+            if (task._notificationId && !task.repeats) {
                 await this.notificationManager.cancelNotification(task._notificationId);
                 delete task._notificationId
             }
@@ -86,9 +85,10 @@ export default class TasksScreen extends Component {
         const dueTime = parseDate(task.date);
         if (currentTime < dueTime) {
             task._notificationId = await this.notificationManager.createNotification({
-                title: 'Mylk alert',
+                title: 'Mylk task reminder',
                 body: task.title,
-                time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0)
+                time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0),
+                repeats: task.repeats
             });
         }
         tasks.push(task);

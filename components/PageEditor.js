@@ -79,12 +79,14 @@ export default class PageEditor extends Component {
                             onDateChange={date => this.setDate(date)}
                         />
                     </View>
-                    <View style={styles.formElement}>
+                    <View style={styles.textInputContainer}>
                         <Input
+                            containerStyle={styles.textInput}
+                            inputContainerStyle={{borderBottomWidth: 0}}
                             placeholder='How was your day...'
                             errorMessage={this.state.errors.desc}
                             multiline={true}
-                            numberOfLines={8}
+                            numberOfLines={10}
                             value={this.state.text}
                             onChangeText={text => this.setText(text)}
                         />
@@ -105,12 +107,24 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
-        paddingTop: 10,
+        paddingTop: 10
     },
     formElement: {
         justifyContent: 'center',
         marginHorizontal: 20,
-        marginVertical: 50
+        marginVertical: 20
+    },
+    textInputContainer: {
+        justifyContent: 'center',
+        marginHorizontal: 20,
+        marginVertical: 20,
+        flexGrow: 1,
+    },
+    textInput: {
+        borderWidth: 1,
+        borderRadius: 6,
+        borderColor: Colors.primaryBackground,
+        justifyContent: 'flex-start'
     },
     form: {
       flexGrow: 1
@@ -124,4 +138,3 @@ const styles = StyleSheet.create({
         margin: 20
     }
 });
-

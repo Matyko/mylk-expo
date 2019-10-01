@@ -16,7 +16,7 @@ export default class NotificationManager extends React.Component {
         }
     };
 
-    scheduleNotification = async ({title, body, time}) => {
+    scheduleNotification = async ({title, body, time, repeat = undefined}) => {
         const hasPermissions = await this.askPermissions();
         if (hasPermissions) {
             return Notifications.scheduleLocalNotificationAsync(
@@ -25,7 +25,7 @@ export default class NotificationManager extends React.Component {
                     body
                 },
                 {
-                    // repeat: "minute",
+                    repeat,
                     time
                 }
             )

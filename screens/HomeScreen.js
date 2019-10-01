@@ -25,8 +25,14 @@ export default class HomeScreen extends Component {
     getTasks() {
         try {
             mLogger('Loading tasks');
-            AsyncStorage.getItem('tasks').then(result => {
+            AsyncStorage.getItem('tasks').then(async result => {
                 let tasks = result ? JSON.parse(result) : [];
+                tasks.map(t => {
+                   if (t.repeats) {
+                       t = this.handleRepeat(t)
+                   }
+                });
+                await AsyncStorage.setItem('tasks', JSON.stringify(tasks));
                 const today = formatDate(new Date());
                 tasks = tasks.filter(t => {
                     return !t.checked && today === t.date.split(' ')[0]
@@ -37,6 +43,28 @@ export default class HomeScreen extends Component {
             Alert.alert('Could not load your tasks');
             mLogger('could not load tasks')
         }
+    }
+
+    handleRepeat(task) {
+        const dates = task.date.split(' ');
+        const date = new Date(dates[0]);
+        const today = new Date(new Date().toDateString());
+        if (date.getTime() < today.getTime()) {
+            switch(task.repeats) {
+                case "day":
+                    date.setDate(today.getDate());
+                    break;
+                case "week":
+                    date.setDate(date.getDate() + 7);
+                    break;
+                case "month":
+                    date.setMonth(date.getMonth() + 1);
+                    break;
+                case "year":
+                    date.setFullYear(date.getFullYear() + 1);
+            }
+        }
+        return task;
     }
 
     componentWillMount() {
