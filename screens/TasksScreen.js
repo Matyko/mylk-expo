@@ -40,7 +40,7 @@ export default class TasksScreen extends Component {
         if (task.checked) {
             const currentTime = new Date().getTime();
             const dueTime = parseDate(task.date);
-            if (currentTime < dueTime) {
+            if (currentTime < dueTime && !task.repeats) {
                 task._notificationId = await this.notificationManager.createNotification({
                     title: 'Mylk task reminder',
                     body: task.title,
@@ -96,11 +96,14 @@ export default class TasksScreen extends Component {
     }
 
     async updateTask(task) {
-        await this.notificationManager.cancelNotification(task._notificationId);
+        if (task._notificationId) {
+            await this.notificationManager.cancelNotification(task._notificationId);
+        }
         task._notificationId = await this.notificationManager.createNotification({
-            title: 'Mylk alert',
+            title: 'Mylk task reminder',
             body: task.title,
-            time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0)
+            time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0),
+            repeat: task.repeat
         });
         const tasks = this.state.tasks.map(e => {
             if (e._id === task._id) {

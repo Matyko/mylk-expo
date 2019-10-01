@@ -63,6 +63,7 @@ export default class HomeScreen extends Component {
                 case "year":
                     date.setFullYear(date.getFullYear() + 1);
             }
+            task.checked = false;
         }
         return task;
     }
