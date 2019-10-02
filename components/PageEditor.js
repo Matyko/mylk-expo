@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {Input} from 'react-native-elements';
-import {View, StyleSheet} from "react-native";
+import {View, StyleSheet, Text} from "react-native";
 import DatePicker from "react-native-datepicker";
 import formatDate from "../util/formatDate";
 import Colors from "../constants/Colors";
@@ -49,11 +49,7 @@ export default class PageEditor extends Component {
             <View style={styles.container}>
                 <View style={styles.form}>
                     <View style={styles.formElement}>
-                        <ImagePickerComponent
-                            images={this.state.images}
-                            imageAdded={images => this.setState({...this.state, ...{images}})}/>
-                    </View>
-                    <View style={styles.formElement}>
+                        <Text style={styles.label}>Date</Text>
                         <DatePicker
                             style={styles.datePicker}
                             date={this.state.date}
@@ -91,6 +87,12 @@ export default class PageEditor extends Component {
                             onChangeText={text => this.setText(text)}
                         />
                     </View>
+                    <View style={styles.formElement}>
+                        <Text style={{...styles.label, ...{marginBottom: 20}}}>Add images</Text>
+                        <ImagePickerComponent
+                            images={this.state.images}
+                            imageAdded={images => this.setState({...this.state, ...{images}})}/>
+                    </View>
                 </View>
                 <View style={styles.lastElement}>
                     <FancyButton
@@ -112,18 +114,18 @@ const styles = StyleSheet.create({
     formElement: {
         justifyContent: 'center',
         marginHorizontal: 20,
-        marginVertical: 20
+        marginVertical: 20,
+        minHeight: 40
     },
     textInputContainer: {
         justifyContent: 'center',
         marginHorizontal: 20,
         marginVertical: 20,
-        flexGrow: 1,
     },
     textInput: {
         borderWidth: 1,
         borderRadius: 6,
-        borderColor: Colors.primaryBackground,
+        borderColor: Colors.light,
         justifyContent: 'flex-start'
     },
     form: {
@@ -136,5 +138,8 @@ const styles = StyleSheet.create({
     lastElement: {
         justifyContent: 'flex-end',
         margin: 20
+    },
+    label: {
+        paddingVertical: 5,
     }
 });
