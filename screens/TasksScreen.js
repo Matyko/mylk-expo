@@ -73,7 +73,7 @@ export default class TasksScreen extends Component {
     }
 
     async saveTask(task) {
-        if (task.hasOwnProperty('id')) {
+        if (task.hasOwnProperty('_id')) {
             await this.updateTask(task)
         } else {
             await this.createTask(task)
@@ -109,6 +109,7 @@ export default class TasksScreen extends Component {
         });
         const tasks = this.state.tasks.map(e => {
             if (e._id === task._id) {
+                console.log(task)
                 return task;
             }
             return e;
@@ -139,7 +140,7 @@ export default class TasksScreen extends Component {
             await Storage.setItem(STORAGE_CONSTS.TASKS, tasks);
             this.setState(state);
         } catch {
-            Alert.alert('Could not delete your task');
+            Alert.alert('Could not update your task');
         }
     }
 

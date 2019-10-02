@@ -44,7 +44,7 @@ export default class JournalScreen extends Component {
     }
 
     async savePage(task) {
-        if (task.hasOwnProperty('id')) {
+        if (task.hasOwnProperty('_id')) {
             await this.updatePage(task)
         } else {
             await this.createPage(task)
@@ -61,6 +61,7 @@ export default class JournalScreen extends Component {
     async updatePage(page) {
         const pages = this.state.pages.map(e => {
             if (e._id === page._id) {
+                console.log(page)
                 return page;
             }
             return e;

@@ -161,8 +161,8 @@ const styles = StyleSheet.create({
       flexGrow: 0,
       marginVertical: 30,
       width: '100%',
-        minHeight: 30,
-        justifyContent: 'space-between'
+      minHeight: 30,
+      justifyContent: 'space-between'
     },
     lastElement: {
         flexGrow: 1,

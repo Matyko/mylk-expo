@@ -18,20 +18,24 @@ export default class HomeScreen extends Component {
         super(props);
         this.state = {
             tasks: [],
+            pages: [],
             animVal: new Animated.Value(0)
         };
-        this.props.navigation.addListener('willFocus', () => this.getTasks());
+        this.props.navigation.addListener('willFocus', () => {
+            this.getTasks();
+            this.getPages();
+        });
     }
 
     getTasks() {
         try {
-            mLogger('Loading tasks');
             Storage.getItem(STORAGE_CONSTS.TASKS).then(async result => {
                 let tasks = result ? JSON.parse(result) : [];
                 tasks.map(t => {
                    if (t.repeats) {
                        t = this.handleRepeat(t)
                    }
+                   return t;
                 });
                 await Storage.setItem(STORAGE_CONSTS.TASKS, tasks);
                 const today = formatDate(new Date());
@@ -42,7 +46,21 @@ export default class HomeScreen extends Component {
             })
         } catch {
             Alert.alert('Could not load your tasks');
-            mLogger('could not load tasks')
+        }
+    }
+
+    getPages() {
+        try {
+            Storage.getItem(STORAGE_CONSTS.PAGES).then(async result => {
+                let pages = result ? JSON.parse(result) : [];
+                const today = formatDate(new Date());
+                pages = pages.filter(t => {
+                    return today === t.date
+                });
+                this.setState({...this.state, ...{pages}})
+            })
+        } catch {
+            Alert.alert('Could not load your pages');
         }
     }
 
@@ -71,6 +89,7 @@ export default class HomeScreen extends Component {
 
     componentWillMount() {
         this.getTasks();
+        this.getPages();
     }
 
     componentDidMount() {
@@ -103,13 +122,17 @@ export default class HomeScreen extends Component {
                         style={style}>
                         <HomeScreenPill
                             handlePress={() => navigate("Tasks")}
-                            text={`You have ${this.state.tasks.length ? this.state.tasks.length : 'no'} task${this.state.tasks.length !== 1 ? 's' : ''} for today.`}/>
+                            text={`You have ${this.state.tasks.length ? this.state.tasks.length :
+                                'no'} task${this.state.tasks.length !== 1 ? 's' :
+                                ''} for today.`}/>
                     </Animated.View>
                     <Animated.View
                         style={style}>
                         <HomeScreenPill
                             handlePress={() => navigate("Journal")}
-                            text={`You did not add a new page for today to your Journal yet.`}/>
+                            text={`You have added ${this.state.pages.length ? this.state.pages.length :
+                                'no'} page${this.state.pages.length !== 1 ? 's' :
+                                ''} for today to your Journal.`}/>
                     </Animated.View>
                 </ScrollView>
             </View>
