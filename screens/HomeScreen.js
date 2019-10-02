@@ -6,12 +6,13 @@ import {
     Animated
 } from 'react-native';
 import NotificationManager from "../util/NotificationManager";
-import mLogger from "../util/mLogger";
 import Colors from "../constants/Colors";
 import HomeScreenPill from "../components/HomeScreenPill";
 import formatDate from "../util/formatDate";
 import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
+// import Canvas from 'react-native-canvas'
+import canvasAnimation from "../util/canvasAnimation";
 
 export default class HomeScreen extends Component {
     constructor(props) {
@@ -87,6 +88,10 @@ export default class HomeScreen extends Component {
         return task;
     }
 
+    handleCanvas = (canvas) => {
+        canvasAnimation(canvas)
+    };
+
     componentWillMount() {
         this.getTasks();
         this.getPages();
@@ -110,6 +115,7 @@ export default class HomeScreen extends Component {
             }];
         return (
             <View style={styles.container}>
+                {/*<Canvas style={styles.canvas} ref={this.handleCanvas}/>*/}
                 <ScrollView
                     style={styles.container}
                     contentContainerStyle={styles.contentContainer}>
@@ -161,5 +167,12 @@ const styles = StyleSheet.create({
     contentContainer: {
         paddingTop: 50,
         paddingHorizontal: 20
+    },
+    canvas: {
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        right: 0
     }
 });
