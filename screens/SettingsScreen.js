@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import {View, StyleSheet, Text, Switch, ScrollView} from "react-native";
+import {View, StyleSheet, Text, Switch, ScrollView, AsyncStorage} from "react-native";
 import Colors from "../constants/Colors";
 import PassCode from "../components/PassCode";
 import ModalComponent from "../components/ModalComponent";
 import firebase from "firebase";
-import * as Storage from '../util/storage';
+import * as Storage from "../util/storage";
 import STORAGE_CONSTS from '../util/storageConsts';
+import * as SecureStore from "expo-secure-store";
 
 export default class SettingsScreen extends Component {
   constructor(props) {
@@ -13,13 +14,15 @@ export default class SettingsScreen extends Component {
     this.state = {
       hasPassCode: false,
       showPassCodeModal: false,
-      passCode: null
+      passCode: null,
+      syncData: false,
     }
   }
 
   async componentWillMount() {
-    const passCode = await Storage.secureGetItem(STORAGE_CONSTS.PASSCODE);
-    this.setState({...this.state, ...{hasPassCode: !!passCode, passCode}});
+    const passCode = await SecureStore.getItemAsync(STORAGE_CONSTS.PASSCODE);
+    const syncData = await Storage.getItem(STORAGE_CONSTS.SYNC);
+    this.setState({...this.state, ...{hasPassCode: !!passCode, passCode, syncData}});
   }
 
   setPassCode(setPasscode) {
@@ -30,13 +33,18 @@ export default class SettingsScreen extends Component {
     }
   }
 
+  async syncData(syncData) {
+    await Storage.setItem(STORAGE_CONSTS.SYNC, syncData);
+    this.setState({...this.state, ...{syncData}})
+  }
+
   handlePassCodeEntry(code) {
     if (this.state.passCode) {
-        Storage.secureDeleteItem(STORAGE_CONSTS.PASSCODE).then(() => {
+        SecureStore.deleteItemAsync(STORAGE_CONSTS.PASSCODE).then(() => {
             this.setState({...this.state, ...{hasPassCode: false, passCode: null, showPassCodeModal: false}});
         })
     } else {
-        Storage.secureSetItem(STORAGE_CONSTS.PASSCODE, code).then(() => {
+        SecureStore.setItemAsync(STORAGE_CONSTS.PASSCODE, code).then(() => {
             this.setState({...this.state, ...{hasPassCode: true, showPassCodeModal: false, passCode: code}});
         })
     }
@@ -45,7 +53,7 @@ export default class SettingsScreen extends Component {
   async logOut() {
     await firebase.auth().signOut();
     if (!this.state.hasPassCode) {
-        await Storage.setItem(STORAGE_CONSTS.REMEMBER_ME, JSON.stringify(false));
+        await AsyncStorage.setItem(STORAGE_CONSTS.REMEMBER_ME, JSON.stringify(false));
     }
     this.props.navigation.navigate('Login');
   }
@@ -65,6 +73,17 @@ export default class SettingsScreen extends Component {
                     <Switch
                         value={this.state.hasPassCode}
                         onValueChange={e => this.setPassCode(e)}
+                    />
+                  </View>
+                </View>
+                <View style={styles.settingsElement}>
+                  <Text style={styles.settingsTitle}>
+                    Sync data to cloud
+                  </Text>
+                  <View style={styles.functionality}>
+                    <Switch
+                        value={this.state.syncData}
+                        onValueChange={e => this.syncData(e)}
                     />
                   </View>
                 </View>

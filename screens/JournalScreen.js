@@ -69,13 +69,14 @@ export default class JournalScreen extends Component {
     }
 
     async updatePages(pages) {
-        await Storage.setItem(STORAGE_CONSTS.PAGES, JSON.stringify(pages));
+        await Storage.setItem(STORAGE_CONSTS.PAGES, pages);
         this.setState({...this.state, ...{pages, modalVisible: false}});
     }
 
-    deletePage(page) {
-        const pages = this.state.pages.filter(e => e !== page)
-        this.updatePages(pages);
+    async deletePage(page) {
+        await Storage.deleteListItem(STORAGE_CONSTS.PAGES, this.state.pages, page);
+        const pages = this.state.pages.filter(e => e !== page);
+        this.setState({...this.state, ...{pages, modalVisible: false}});
     }
 
     render() {

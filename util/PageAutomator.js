@@ -22,7 +22,7 @@ export default class PageAutomator extends React.Component {
             };
             pages.push(newPage);
         }
-        await Storage.setItem(STORAGE_CONSTS.PAGES, JSON.stringify(pages));
+        await Storage.setItem(STORAGE_CONSTS.PAGES, pages);
     }
 
     async taskUnChecked({_id, finishedDay}) {
@@ -35,7 +35,7 @@ export default class PageAutomator extends React.Component {
                 pages = pages.filter(e => e !== page);
             }
         }
-        await Storage.setItem(STORAGE_CONSTS.PAGES, JSON.stringify(pages));
+        await Storage.setItem(STORAGE_CONSTS.PAGES, pages);
     }
 
     render() {

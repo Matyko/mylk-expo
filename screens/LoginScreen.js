@@ -7,8 +7,8 @@ import * as firebase from "firebase";
 import {LinearGradient} from "expo-linear-gradient";
 import Colors from '../constants/Colors';
 import PassCode from "../components/PassCode";
-import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
+import * as SecureStore from "expo-secure-store";
 
 export default class LoginScreen extends Component {
     constructor(props) {
@@ -28,13 +28,11 @@ export default class LoginScreen extends Component {
 
     async componentDidMount() {
         try {
-            const user_id = await AsyncStorage.getItem(STORAGE_CONSTS.USER_ID);
-            await Storage.setUID(user_id);
+            const passCode = await SecureStore.getItemAsync(STORAGE_CONSTS.PASSCODE);
+            const password = await SecureStore.getItemAsync(STORAGE_CONSTS.PASSWORD);
 
-            const passCode = await Storage.secureGetItem(STORAGE_CONSTS.PASSCODE);
-            const password = await Storage.secureGetItem(STORAGE_CONSTS.PASSWORD);
-            const email = await Storage.getItem(STORAGE_CONSTS.EMAIL);
-            const rememberMe = JSON.parse(await Storage.getItem(STORAGE_CONSTS.REMEMBER_ME));
+            const email = await AsyncStorage.getItem(STORAGE_CONSTS.EMAIL);
+            const rememberMe = JSON.parse(await AsyncStorage.getItem(STORAGE_CONSTS.REMEMBER_ME));
 
             if (email) this.setState({...this.state, ...{email}});
             if (rememberMe) this.setState({...this.state, ...{rememberMe}});
@@ -42,12 +40,14 @@ export default class LoginScreen extends Component {
 
             if (rememberMe && password && email) {
                 if (password) this.setState({...this.state, ...{password}});
+
                 if (passCode) {
                     this.setState({...this.state, ...{passCodeCheck: true}})
                 } else {
                     this.login();
                 }
             }
+
         } catch {
             mLogger('did not find saved data')
         }
@@ -61,7 +61,7 @@ export default class LoginScreen extends Component {
 
     async rememberMe() {
         await this.setState({...this.state, ...{rememberMe: !this.state.rememberMe}});
-        await Storage.setItem(STORAGE_CONSTS.REMEMBER_ME, JSON.stringify(this.state.rememberMe));
+        await AsyncStorage.setItem(STORAGE_CONSTS.REMEMBER_ME, JSON.stringify(this.state.rememberMe));
     }
 
     login() {
@@ -69,8 +69,8 @@ export default class LoginScreen extends Component {
         firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(async ({ user }) => {
             if (this.state.rememberMe) {
                 await AsyncStorage.setItem(STORAGE_CONSTS.USER_ID, user.uid);
-                await Storage.secureSetItem(STORAGE_CONSTS.PASSWORD, this.state.password);
-                await Storage.setItem(STORAGE_CONSTS.EMAIL, this.state.email);
+                await AsyncStorage.setItem(STORAGE_CONSTS.EMAIL, this.state.email);
+                await SecureStore.setItemAsync(STORAGE_CONSTS.PASSWORD, this.state.password);
             }
             this.props.navigation.navigate('Main')
         })

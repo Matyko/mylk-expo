@@ -33,7 +33,7 @@ export default class HomeScreen extends Component {
                        t = this.handleRepeat(t)
                    }
                 });
-                await Storage.setItem(STORAGE_CONSTS.TASKS, JSON.stringify(tasks));
+                await Storage.setItem(STORAGE_CONSTS.TASKS, tasks);
                 const today = formatDate(new Date());
                 tasks = tasks.filter(t => {
                     return !t.checked && today === t.date.split(' ')[0]

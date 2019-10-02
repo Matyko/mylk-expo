@@ -4,7 +4,7 @@ import * as Font from 'expo-font';
 import React, { useState } from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import timerFix from "./util/timerWarningFix";
 import AppNavigator from './navigation/AppNavigator';
 import firebase from 'firebase'
 import '@firebase/firestore';
@@ -20,6 +20,8 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
+timerFix();
 
 const auth = {loggedIn: false};
 

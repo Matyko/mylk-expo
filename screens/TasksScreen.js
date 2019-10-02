@@ -120,17 +120,23 @@ export default class TasksScreen extends Component {
         if (task.checked) {
             await this.setChecked(task);
         }
-        const tasks = this.state.tasks.filter(e => e !== task);
         if (task._notificationId) {
             await this.notificationManager.cancelNotification(task._notificationId);
         }
-        await this.updateTasks(tasks)
+        try {
+            await Storage.deleteListItem(STORAGE_CONSTS.TASKS, this.state.tasks, task);
+            const tasks = this.state.tasks.filter(e => e !== task);
+            const state = {...this.state, ...{tasks, modalVisible: false}};
+            this.setState(state);
+        } catch {
+            Alert.alert('Could not delete your task');
+        }
     }
 
     async updateTasks(tasks) {
         const state = {...this.state, ...{tasks, modalVisible: false}};
         try {
-            await Storage.setItem(STORAGE_CONSTS.TASKS, JSON.stringify(tasks));
+            await Storage.setItem(STORAGE_CONSTS.TASKS, tasks);
             this.setState(state);
         } catch {
             Alert.alert('Could not delete your task');

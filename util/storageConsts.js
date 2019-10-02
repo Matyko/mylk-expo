@@ -5,7 +5,8 @@ const STORAGE_CONSTS = {
     REMEMBER_ME : 'remember_me',
     PASSWORD : 'password',
     EMAIL : 'email',
-    USER_ID : 'user_id'
+    USER_ID : 'user_id',
+    SYNC: 'sync'
 };
 
 export default STORAGE_CONSTS;
