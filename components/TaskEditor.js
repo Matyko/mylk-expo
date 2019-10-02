@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {CheckBox, Input} from 'react-native-elements';
-import {View, StyleSheet, Picker} from "react-native";
+import {View, StyleSheet, Picker, Text} from "react-native";
 import DatePicker from "react-native-datepicker";
 import formatDate from "../util/formatDate";
 import Colors from "../constants/Colors";
@@ -16,7 +16,7 @@ export default class TaskEditor extends Component {
                 mode: props.task.isFullDay ? 'date' : 'datetime',
                 date: props.task.date || formatDate(new Date),
                 title: props.task.title || '',
-                repeats: props.task.repeats || false,
+                repeats: props.task.repeats || null,
                 errors: {
                     desc: ''
                 },
@@ -26,7 +26,7 @@ export default class TaskEditor extends Component {
                 mode: 'date',
                 date: formatDate(new Date),
                 title: '',
-                repeats: false,
+                repeats: null,
                 errors: {
                     desc: ''
                 },
@@ -58,7 +58,8 @@ export default class TaskEditor extends Component {
             title: this.state.title,
             date: this.state.date,
             created_at: new Date(),
-            isFullDay: this.state.mode === 'date'
+            isFullDay: this.state.mode === 'date',
+            repeats: this.state.repeats
         };
         if (this.props.task) {
            task = {...this.props.task, ...task};
@@ -72,33 +73,44 @@ export default class TaskEditor extends Component {
         return (
             <View style={styles.container}>
                 <View style={styles.formElement}>
-                    <DatePicker
-                        style={{width: '50%'}}
-                        date={this.state.date}
-                        mode={this.state.mode}
-                        placeholder="select date"
-                        format={`YYYY-MM-DD${this.state.mode === 'datetime' ? ' HH:mm' : ''}`}
-                        minDate={currentDate}
-                        confirmBtnText="Confirm"
-                        cancelBtnText="Cancel"
-                        customStyles={{
-                            dateIcon: {
-                                position: 'absolute',
-                                left: 0,
-                                top: 4,
-                                marginLeft: 0
-                            },
-                            dateInput: {
-                                marginLeft: 40,
-                                flexGrow: 1,
-                                borderColor: Colors.transparent,
-                                borderBottomColor: Colors.light
-                            }
-                        }}
-                        onDateChange={date => this.setDate(date)}
-                    />
+                    <Text style={styles.label}>Date</Text>
+                    <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
+                        <DatePicker
+                            style={{width: '50%'}}
+                            date={this.state.date}
+                            mode={this.state.mode}
+                            placeholder="select date"
+                            format={`YYYY-MM-DD${this.state.mode === 'datetime' ? ' HH:mm' : ''}`}
+                            minDate={currentDate}
+                            confirmBtnText="Confirm"
+                            cancelBtnText="Cancel"
+                            customStyles={{
+                                dateIcon: {
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: 4,
+                                    marginLeft: 0
+                                },
+                                dateInput: {
+                                    marginLeft: 40,
+                                    flexGrow: 1,
+                                    borderColor: Colors.transparent,
+                                    borderBottomColor: Colors.light
+                                }
+                            }}
+                            onDateChange={date => this.setDate(date)}
+                        />
+                        <CheckBox
+                            checked={this.state.mode === 'date'}
+                            containerStyle={{backgroundColor: Colors.transparent, borderColor: Colors.transparent}}
+                            checkedColor={Colors.primaryBackground}
+                            onPress={() => this.changeMode()}
+                            title="All day"
+                        />
+                    </View>
                 </View>
                 <View style={styles.formElement}>
+                    <Text style={styles.label}>Task description</Text>
                     <EmojiAddon
                         name="pencil">
                         <Input
@@ -110,34 +122,20 @@ export default class TaskEditor extends Component {
                     </EmojiAddon>
                 </View>
                 <View style={styles.formElement}>
-                    <CheckBox
-                        checked={this.state.mode === 'date'}
-                        containerStyle={{backgroundColor: Colors.transparent, borderColor: Colors.transparent}}
-                        checkedColor={Colors.primaryBackground}
-                        onPress={() => this.changeMode()}
-                        title="All day"
-                    />
-                </View>
-                <View style={{...styles.formElement, ...{flexDirection: 'row', justifyContent: 'space-between'}}}>
-                    <CheckBox
-                        style={{width: '50%'}}
-                        checked={!!this.state.repeats}
-                        containerStyle={{backgroundColor: Colors.transparent, borderColor: Colors.transparent}}
-                        checkedColor={Colors.primaryBackground}
-                        onPress={() => this.setRepeats()}
-                        title="Repeats"
-                    />
-                    {this.state.repeats &&
-                    <Picker
-                        style={{width: '50%'}}
-                        selectedValue={this.state.repeats}
-                        onValueChange={repeats => this.setState({...this.state, ...{repeats}})}>
-                        <Picker.Item label="Daily" value="day" />
-                        <Picker.Item label="Weekly" value="week" />
-                        <Picker.Item label="Monthly" value="month" />
-                        <Picker.Item label="Yearly" value="year" />
-                    </Picker>
-                    }
+                    <Text style={styles.label}>Repeats</Text>
+                    <EmojiAddon
+                        name="timer_clock">
+                        <Picker
+                            style={{flexGrow: 1}}
+                            selectedValue={this.state.repeats}
+                            onValueChange={repeats => this.setState({...this.state, ...{repeats}})}>
+                            <Picker.Item label="Never" value={null} />
+                            <Picker.Item label="Daily" value="day" />
+                            <Picker.Item label="Weekly" value="week" />
+                            <Picker.Item label="Monthly" value="month" />
+                            <Picker.Item label="Yearly" value="year" />
+                        </Picker>
+                    </EmojiAddon>
                 </View>
                 <View style={styles.lastElement}>
                     <FancyButton
@@ -158,16 +156,20 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20
     },
     formElement: {
-      justifyContent: 'flex-start',
       flexBasis: 1,
       flexShrink: 0,
       flexGrow: 0,
       marginVertical: 30,
-      width: '100%'
+      width: '100%',
+        minHeight: 30,
+        justifyContent: 'space-between'
     },
     lastElement: {
         flexGrow: 1,
         justifyContent: 'flex-end',
         margin: 20
+    },
+    label: {
+        paddingVertical: 5,
     }
 });

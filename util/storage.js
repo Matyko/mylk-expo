@@ -57,7 +57,7 @@ export async function secureDeleteItem(type) {
 }
 
 export async function removeSynced() {
-    // TODO MAYBE FIRBASE FUNCTIONS?
+    // TODO MAYBE FIREBASE FUNCTIONS?
 }
 
 export async function syncOld() {

@@ -45,7 +45,7 @@ export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
     const getIcon = () => {
         const currentTime = new Date().getTime();
         const dueTime = parseDate(task.date);
-        return currentTime < dueTime || task.checked ? null : `${prefix}alert`;
+        return currentTime < dueTime || task.checked ? task.repeats ? `${prefix}refresh` : null : `${prefix}alert`;
     };
 
 
