@@ -11,8 +11,8 @@ import HomeScreenPill from "../components/HomeScreenPill";
 import formatDate from "../util/formatDate";
 import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
+// import canvasAnimation from "../util/canvasAnimation";
 // import Canvas from 'react-native-canvas'
-import canvasAnimation from "../util/canvasAnimation";
 
 export default class HomeScreen extends Component {
     constructor(props) {
@@ -88,9 +88,9 @@ export default class HomeScreen extends Component {
         return task;
     }
 
-    handleCanvas = (canvas) => {
-        canvasAnimation(canvas)
-    };
+    // handleCanvas = (canvas) => {
+    //     canvasAnimation(canvas)
+    // };
 
     componentWillMount() {
         this.getTasks();
