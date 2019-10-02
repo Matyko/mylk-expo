@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {View, StyleSheet, Text, Switch, ScrollView, AsyncStorage} from "react-native";
+import {View, StyleSheet, Text, Switch, ScrollView, AsyncStorage, TouchableOpacity} from "react-native";
 import Colors from "../constants/Colors";
 import PassCode from "../components/PassCode";
 import ModalComponent from "../components/ModalComponent";
@@ -35,7 +35,14 @@ export default class SettingsScreen extends Component {
 
   async syncData(syncData) {
     await Storage.setItem(STORAGE_CONSTS.SYNC, syncData);
+    if (syncData) {
+      await Storage.syncOld();
+    }
     this.setState({...this.state, ...{syncData}})
+  }
+
+  async removeSyncedData() {
+    await Storage.removeSynced()
   }
 
   handlePassCodeEntry(code) {
@@ -87,14 +94,20 @@ export default class SettingsScreen extends Component {
                     />
                   </View>
                 </View>
+                {/*TODO MAYBE FIREBASE FUNCTIONS*/}
+                {/*<TouchableOpacity style={{...styles.settingsElement, ...styles.touchableSetting}} onPress={() => this.removeSyncedData()}>*/}
+                {/*  <Text style={{...styles.settingsTitle, ...{color: Colors.primaryBackground}}}>*/}
+                {/*    Remove data from cloud*/}
+                {/*  </Text>*/}
+                {/*</TouchableOpacity>*/}
               </View>
               <View style={styles.settingsSection}>
                 <Text style={styles.settingsSectionTitle}>Profile</Text>
-                <View style={styles.settingsElement}>
-                  <Text style={styles.settingsTitle} onPress={() => this.logOut()}>
+                <TouchableOpacity style={{...styles.settingsElement, ...styles.touchableSetting}} onPress={() => this.logOut()}>
+                  <Text style={{...styles.settingsTitle, ...{color: Colors.primaryBackground}}}>
                     Logout
                   </Text>
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
           </ScrollView>
@@ -141,11 +154,19 @@ const styles = StyleSheet.create({
   },
   settingsElement: {
     flexDirection: 'row',
-    paddingHorizontal: 22,
+    marginHorizontal: 22,
+    marginVertical: 4,
+    padding: 12,
     alignItems: 'center'
+  },
+  touchableSetting: {
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: Colors.primaryBackground
   },
   settingsSection: {
     flexGrow: 1,
+    flexDirection: 'column'
   },
   settingsSectionTitle: {
     margin: 22,

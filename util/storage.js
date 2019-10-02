@@ -56,6 +56,18 @@ export async function secureDeleteItem(type) {
     await AsyncStorage.getItem(STORAGE_CONSTS.USER_ID)}`)
 }
 
+export async function removeSynced() {
+    // TODO MAYBE FIRBASE FUNCTIONS?
+}
+
+export async function syncOld() {
+    const toSync = [STORAGE_CONSTS.PAGES, STORAGE_CONSTS.TASKS];
+    toSync.forEach(async s => {
+        const data = JSON.parse(await AsyncStorage.getItem(s) || []);
+        await setItem(s, data)
+    })
+}
+
 export async function find() {
 }
 
