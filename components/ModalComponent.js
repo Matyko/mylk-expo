@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Modal, Platform, Text, View, TouchableOpacity, BackHandler} from 'react-native';
+import {Modal, Platform, Text, View, TouchableOpacity, BackHandler, ScrollView} from 'react-native';
 import {Ionicons} from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 
@@ -48,9 +48,9 @@ export default class ModalComponent extends Component {
                         onPress={() => this.props.closeModal()}
                     />
                 </TouchableOpacity>
-                <View style={{flex: 1}}>
+                <ScrollView style={{flex: 1}}>
                     {this.props.children}
-                </View>
+                </ScrollView>
             </Modal>
         );
     }

@@ -65,6 +65,7 @@ export default class JournalScreen extends Component {
         const pages = this.state.pages.slice();
         page._id = new Date().getTime().toString() + pages.length;
         pages.push(page);
+        this.setState({...this.state, ...{currentPage: page}});
         this.updatePages(pages)
     }
 
@@ -80,6 +81,7 @@ export default class JournalScreen extends Component {
     }
 
     async updatePages(pages) {
+        pages = pages.sort(sortByDate);
         await Storage.setItem(STORAGE_CONSTS.PAGES, pages);
         this.setState({...this.state, ...{pages, modalVisible: false}});
     }
@@ -87,6 +89,18 @@ export default class JournalScreen extends Component {
     async deletePage(page) {
         await Storage.deleteListItem(STORAGE_CONSTS.PAGES, this.state.pages, page);
         const pages = this.state.pages.filter(e => e !== page);
+        if (this.state.currentPage === page) {
+            const index = this.state.pages.indexOf(page);
+            const prev = this.state.pages[index - 1];
+            const next = this.state.pages[index + 1];
+            if (prev) {
+                this.setState({...this.state, ...{currentPage: prev}})
+            } else if (next) {
+                this.setState({...this.state, ...{currentPage: next}})
+            } else {
+                this.setState({...this.state, ...{currentPage: undefined}})
+            }
+        }
         this.setState({...this.state, ...{pages, modalVisible: false}});
     }
 
@@ -111,30 +125,26 @@ export default class JournalScreen extends Component {
     };
 
     render() {
+        const viewMode = this.state.listView ? {} : {flexDirection: 'row'};
         return (
             <GestureRecognizer
                 style={{flex: 1}}
-                onSwipeLeft={() => this.onSwipe(this.DIRECTIONS.RIGHT)}
-                onSwipeRight={() => this.onSwipe(this.DIRECTIONS.LEFT)}
+                onSwipeRight={() => this.onSwipe(this.DIRECTIONS.RIGHT)}
+                onSwipeLeft={() => this.onSwipe(this.DIRECTIONS.LEFT)}
                 config={this.config}>
-                <ScrollView style={styles.container}>
-                    {this.state.listView && this.state.pages.concat(this.state.accomplishments).sort(sortByDate).map(page => {
+                <ScrollView
+                    style={{...styles.container, ...viewMode}}
+                    pagingEnabled={!this.state.listView}
+                    horizontal={!this.state.listView}>
+                    {this.state.pages.concat(this.state.accomplishments).sort(sortByDate).map(page => {
                         return <PageElement
                             key={page._id}
+                            fullPage={!this.state.listView}
                             page={page}
                             toEdit={() => this.setState({...this.state, ...{editedPage: page, modalVisible: true}})}
                             deletePage={() => this.deletePage(page)}
                             openImages={() => this.openImages(page)}/>
                     })}
-                    {!this.state.listView && this.state.currentPage &&
-                        <PageElement
-                            key={this.state.currentPage._id}
-                            page={this.state.currentPage}
-                            fullPage={true}
-                            toEdit={() => this.setState({...this.state, ...{editedPage: this.state.currentPage, modalVisible: true}})}
-                            deletePage={() => this.deletePage(this.state.currentPage)}
-                            openImages={() => this.openImages(this.state.currentPage)}/>
-                    }
                 </ScrollView>
                 <FloatingActionButton pressFunction={() => this.setState({...this.state, ...{modalVisible: true}})}/>
                 <FloatingActionButton

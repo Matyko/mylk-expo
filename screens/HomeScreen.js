@@ -32,7 +32,7 @@ export default class HomeScreen extends Component {
                 let tasks = result ? JSON.parse(result) : [];
                 tasks.map(t => {
                    if (t.repeats) {
-                       t = this.handleRepeat(t)
+                       t = this.handleRepeat(t);
                    }
                    return t;
                 });
@@ -81,6 +81,8 @@ export default class HomeScreen extends Component {
                 case "year":
                     date.setFullYear(date.getFullYear() + 1);
             }
+            const newDate = formatDate(date);
+            task.date = newDate + (dates[1] ? ' ' + dates[1] : '');
             task.checked = false;
         }
         return task;

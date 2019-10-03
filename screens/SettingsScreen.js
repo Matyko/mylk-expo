@@ -15,14 +15,15 @@ export default class SettingsScreen extends Component {
       hasPassCode: false,
       showPassCodeModal: false,
       passCode: null,
-      syncData: false,
+      syncData: true,
     }
   }
 
   async componentWillMount() {
     const passCode = await SecureStore.getItemAsync(STORAGE_CONSTS.PASSCODE);
-    const syncData = await Storage.getItem(STORAGE_CONSTS.SYNC);
-    this.setState({...this.state, ...{hasPassCode: !!passCode, passCode, syncData}});
+    const syncData = JSON.parse(await Storage.getItem(STORAGE_CONSTS.SYNC) || 'false');
+    await this.setState({...this.state, ...{hasPassCode: !!passCode, passCode, syncData}});
+    this.forceUpdate();
   }
 
   setPassCode(setPasscode) {
