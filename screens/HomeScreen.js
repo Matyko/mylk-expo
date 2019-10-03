@@ -11,8 +11,6 @@ import HomeScreenPill from "../components/HomeScreenPill";
 import formatDate from "../util/formatDate";
 import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
-// import canvasAnimation from "../util/canvasAnimation";
-// import Canvas from 'react-native-canvas'
 
 export default class HomeScreen extends Component {
     constructor(props) {
@@ -88,10 +86,6 @@ export default class HomeScreen extends Component {
         return task;
     }
 
-    // handleCanvas = (canvas) => {
-    //     canvasAnimation(canvas)
-    // };
-
     componentWillMount() {
         this.getTasks();
         this.getPages();
@@ -115,7 +109,6 @@ export default class HomeScreen extends Component {
             }];
         return (
             <View style={styles.container}>
-                {/*<Canvas style={styles.canvas} ref={this.handleCanvas}/>*/}
                 <ScrollView
                     style={styles.container}
                     contentContainerStyle={styles.contentContainer}>
