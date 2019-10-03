@@ -72,49 +72,8 @@ export default class TasksScreen extends Component {
         this.setState({...this.state, ...{modalVisible: true, editedTask: task}})
     }
 
-    async saveTask(task) {
-        if (task.hasOwnProperty('_id')) {
-            await this.updateTask(task)
-        } else {
-            await this.createTask(task)
-        }
-    }
-
-    async createTask(task) {
-        const tasks = this.state.tasks.slice();
-        task._id = new Date().getTime().toString() + tasks.length;
-        const currentTime = new Date().getTime();
-        const dueTime = parseDate(task.date);
-        if (currentTime < dueTime) {
-            task._notificationId = await this.notificationManager.createNotification({
-                title: 'Mylk task reminder',
-                body: task.title,
-                time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0),
-                repeats: task.repeats
-            });
-        }
-        tasks.push(task);
-        await this.updateTasks(tasks);
-    }
-
-    async updateTask(task) {
-        if (task._notificationId) {
-            await this.notificationManager.cancelNotification(task._notificationId);
-        }
-        task._notificationId = await this.notificationManager.createNotification({
-            title: 'Mylk task reminder',
-            body: task.title,
-            time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0),
-            repeat: task.repeat
-        });
-        const tasks = this.state.tasks.map(e => {
-            if (e._id === task._id) {
-                console.log(task)
-                return task;
-            }
-            return e;
-        });
-        await this.updateTasks(tasks)
+    async savedTask(tasks) {
+       this.setState({...this.state, ...{tasks, modalVisible: false}})
     }
 
     async deleteTask(task) {
@@ -185,7 +144,7 @@ export default class TasksScreen extends Component {
                     title="Create a task"
                 >
                     <TaskEditor task={this.state.editedTask}
-                                saveTask={task => this.saveTask(task)}/>
+                                saveTask={task => this.savedTask(task)}/>
                 </ModalComponent>
                 <PageAutomator/>
             </View>

@@ -7,31 +7,20 @@ import Colors from "../constants/Colors";
 import mLogger from "../util/mLogger";
 import FancyButton from "./FancyButton";
 import EmojiAddon from "./EmojiAddon";
+import {Task} from "../models/Task";
 
 export default class TaskEditor extends Component {
     constructor(props) {
         super(props);
-        if (props.task) {
-            this.state = {
-                mode: props.task.isFullDay ? 'date' : 'datetime',
-                date: props.task.date || formatDate(new Date),
-                title: props.task.title || '',
-                repeats: props.task.repeats || null,
-                errors: {
-                    desc: ''
-                },
-            };
-        } else {
-            this.state = {
-                mode: 'date',
-                date: formatDate(new Date),
-                title: '',
-                repeats: null,
-                errors: {
-                    desc: ''
-                },
-            };
-        }
+        this.state = {
+            mode: props.task && props.task.isFullDay ? 'date' : 'datetime' || 'date',
+            date: props.task && props.task.date || formatDate(new Date),
+            title: props.task && props.task.title || '',
+            repeats: props.task && props.task.repeats || null,
+            errors: {
+                desc: ''
+            },
+        };
     }
 
     changeMode() {
@@ -53,19 +42,21 @@ export default class TaskEditor extends Component {
         this.setState({...this.state, ...{title: text}})
     }
 
-    saveTask() {
-        let task = {
-            title: this.state.title,
-            date: this.state.date,
-            created_at: new Date(),
-            isFullDay: this.state.mode === 'date',
-            repeats: this.state.repeats
-        };
+    async saveTask() {
+        let task;
         if (this.props.task) {
-           task = {...this.props.task, ...task};
+            task = new Task(this.props.task);
+            await task.cancelNotification();
+        } else {
+            task = new Task({})
         }
+        task.title = this.state.title;
+        task.date = this.state.date;
+        task.isFullDay = this.state.mode === 'date';
+        task.repeats = this.state.repeats;
+        await task.createNotification();
         mLogger(`saving task: ${task}`);
-        this.props.saveTask(task);
+        await this.props.savedTask(await task.save());
     }
 
     render() {

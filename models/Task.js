@@ -5,11 +5,12 @@ import {BaseModel} from "./BaseModel";
 import STORAGE_CONSTS from "../util/storageConsts";
 
 export class Task extends BaseModel {
-    constructor({title, date, created_at, isFullDay, repeats, id, notificationId}) {
-        super({title, date, created_at, id, type: STORAGE_CONSTS.TASKS});
+    constructor({title, date, created_at, isFullDay, repeats, id, notificationId, checked}) {
+        super({title, date, created_at, id, type: STORAGE_CONSTS.TASKS, classType: Task});
         this._notificationId = notificationId || null;
         this.isFullDay = isFullDay;
         this.repeats = repeats;
+        this.checked = checked || false;
         this._notificationManager = new NotificationManager();
         if (this.repeats) {
             this._handleRepeat()
@@ -17,17 +18,22 @@ export class Task extends BaseModel {
     }
 
     async createNotification() {
-        this._notificationId = await this._notificationManager.createNotification({
-            title: 'Mylk task reminder',
-            body: this.title,
-            time: parseDate(this.date) + (this.isFullDay ? 25200000 : 0),
-            repeat: this.repeats
-        });
-        return this._notificationId;
+        if (new Date().getTime() < parseDate(this.date)) {
+            this._notificationId = await this._notificationManager.createNotification({
+                title: 'Mylk task reminder',
+                body: this.title,
+                time: parseDate(this.date) + (this.isFullDay ? 25200000 : 0),
+                repeat: this.repeats
+            });
+            return this._notificationId;
+        }
     }
 
     async cancelNotification() {
-        await this._notificationManager.cancelNotification(this._notificationId);
+        if (this._notificationId) {
+            await this._notificationManager.cancelNotification(this._notificationId);
+        }
+        this._notificationId = null;
     }
 
     _handleRepeat() {
