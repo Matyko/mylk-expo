@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View, Alert} from 'react-native';
 import ModalComponent from "../components/ModalComponent";
 import TaskElement from "../components/TaskElement";
 import FloatingActionButton from "../components/FloatingActionButton";

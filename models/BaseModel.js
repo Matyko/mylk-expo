@@ -16,7 +16,7 @@ export class BaseModel {
     }
 
     async save() {
-        const all = this.getAll();
+        const all = await this.getAll();
         let newAll;
         if (all.find(e => e._id === this._id)) {
             newAll = all.map(e => {
@@ -37,9 +37,10 @@ export class BaseModel {
     }
 
     async delete() {
-        const all = this.getAll();
+        const all = await this.getAll();
         await Storage.deleteListItem(this._type, all, this);
         return all.filter(e => e._id !== this._id).map(e => {
+            console.log(e);
             return new this.classType(e);
         })
     }
