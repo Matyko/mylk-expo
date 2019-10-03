@@ -12,6 +12,7 @@ import parseDate from "../util/parseDate";
 import PageAutomator from "../util/PageAutomator";
 import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
+import {Task} from "../models/Task";
 
 export default class TasksScreen extends Component {
     constructor(props) {
@@ -80,12 +81,9 @@ export default class TasksScreen extends Component {
         if (task.checked) {
             await this.setChecked(task);
         }
-        if (task._notificationId) {
-            await this.notificationManager.cancelNotification(task._notificationId);
-        }
+        const taskObj = new Task(task);
         try {
-            await Storage.deleteListItem(STORAGE_CONSTS.TASKS, this.state.tasks, task);
-            const tasks = this.state.tasks.filter(e => e !== task);
+            const tasks = await taskObj.remove();
             const state = {...this.state, ...{tasks, modalVisible: false}};
             this.setState(state);
         } catch {

@@ -60,4 +60,9 @@ export class Task extends BaseModel {
         }
     }
 
+    async remove() {
+        this.cancelNotification();
+        return await this.delete()
+    }
+
 }

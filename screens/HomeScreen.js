@@ -11,6 +11,7 @@ import formatDate from "../util/formatDate";
 import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
 import {Task} from "../models/Task";
+import {Page} from "../models/Page";
 
 export default class HomeScreen extends Component {
     constructor(props) {
@@ -31,9 +32,6 @@ export default class HomeScreen extends Component {
             Storage.getItem(STORAGE_CONSTS.TASKS).then(async result => {
                 let tasks = result ? JSON.parse(result) : [];
                 tasks.map(t => {
-                   if (t.repeats) {
-                       t = this.handleRepeat(t);
-                   }
                    return new Task(t);
                 });
                 await Storage.setItem(STORAGE_CONSTS.TASKS, tasks);
@@ -53,39 +51,16 @@ export default class HomeScreen extends Component {
             Storage.getItem(STORAGE_CONSTS.PAGES).then(async result => {
                 let pages = result ? JSON.parse(result) : [];
                 const today = formatDate(new Date());
-                pages = pages.filter(t => {
-                    return today === t.date
+                pages = pages.filter(p => {
+                    return today === p.date
+                }).map(p => {
+                    return new Page(p)
                 });
                 this.setState({...this.state, ...{pages}})
             })
         } catch {
             Alert.alert('Could not load your pages');
         }
-    }
-
-    handleRepeat(task) {
-        const dates = task.date.split(' ');
-        const date = new Date(dates[0]);
-        const today = new Date(new Date().toDateString());
-        if (date.getTime() < today.getTime()) {
-            switch(task.repeats) {
-                case "day":
-                    date.setDate(today.getDate());
-                    break;
-                case "week":
-                    date.setDate(date.getDate() + 7);
-                    break;
-                case "month":
-                    date.setMonth(date.getMonth() + 1);
-                    break;
-                case "year":
-                    date.setFullYear(date.getFullYear() + 1);
-            }
-            const newDate = formatDate(date);
-            task.date = newDate + (dates[1] ? ' ' + dates[1] : '');
-            task.checked = false;
-        }
-        return task;
     }
 
     componentWillMount() {

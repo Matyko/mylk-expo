@@ -38,9 +38,8 @@ export class BaseModel {
 
     async delete() {
         const all = this.getAll();
-        const newAll = all.filter(e => e._id !== this._id);
-        await Storage.setItem(this._type, newAll);
-        return newAll.map(e => {
+        await Storage.deleteListItem(this._type, all, this);
+        return all.filter(e => e._id !== this._id).map(e => {
             return new this.classType(e);
         })
     }

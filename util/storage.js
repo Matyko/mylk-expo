@@ -41,9 +41,7 @@ export async function setItem(type, data) {
 export async function deleteListItem(type, data, toDelete) {
     if (type === STORAGE_CONSTS.TASKS || type === STORAGE_CONSTS.PAGES) {
         const reference = firebase.firestore().collection('userData').doc(firebase.auth().currentUser.uid).collection(type);
-        data.forEach(d => {
-            reference.doc(d._id).delete()
-        })
+        reference.doc(toDelete._id).delete()
     }
     const id = await getId();
     if (id) {
