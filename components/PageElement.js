@@ -9,7 +9,7 @@ export default class PageElement extends Component{
     constructor(props) {
         super(props);
         this.state = {
-            open: false,
+            open: !!this.props.fullPage,
             editable: false
         };
         this.config = {
@@ -38,11 +38,12 @@ export default class PageElement extends Component{
             <GestureRecognizer
             onSwipeLeft={() => this.onSwipe(this.DIRECTIONS.RIGHT)}
             onSwipeRight={() => this.onSwipe(this.DIRECTIONS.LEFT)}
+            style={this.props.fullPage ? {height: '100%'} : {}}
             config={this.config}>
                 <TouchableOpacity
                     onPress={() => this.setState({...this.state, ...{open: !this.state.open}})}
                     onLongPress={() => this.setState({...this.state, ...{open: true, editable: !this.state.editable}})}
-                    style={[styles.container, {maxHeight: this.state.open ? 10000 : 150}]}>
+                    style={[styles.container, {maxHeight: this.props.fullPage ? 10000 : this.state.open ? 10000 : 150}]}>
                     <View style={styles.topDataContainer}>
                         {this.props.page.mood && <Text style={styles.topData}>Mood</Text>}
                         <Text style={styles.topData}>{this.props.page.date}</Text>

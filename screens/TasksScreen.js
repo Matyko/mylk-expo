@@ -144,7 +144,6 @@ export default class TasksScreen extends Component {
         }
     }
 
-
     render() {
         return (
             <View style={{flex: 1}}>
@@ -206,7 +205,6 @@ TasksScreen.navigationOptions = {
         fontWeight: 'bold',
     },
 };
-
 
 const styles = StyleSheet.create({
     container: {

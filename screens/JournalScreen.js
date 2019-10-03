@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {ScrollView, StyleSheet, View} from "react-native";
+import {ScrollView, StyleSheet} from "react-native";
 import FloatingActionButton from "../components/FloatingActionButton";
 import ModalComponent from "../components/ModalComponent";
 import sortByDate from "../util/sortByDate";
@@ -9,6 +9,7 @@ import PageEditor from "../components/PageEditor";
 import ImageViewer from "react-native-image-zoom-viewer";
 import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
+import GestureRecognizer from "react-native-swipe-gestures";
 
 export default class JournalScreen extends Component {
     constructor(props) {
@@ -19,8 +20,18 @@ export default class JournalScreen extends Component {
             editedPage: null,
             visibleImages: [],
             accomplishments: [],
-            imageModalVisible: false
-        }
+            imageModalVisible: false,
+            currentPage: null,
+            listView: true
+        };
+        this.DIRECTIONS = {
+            RIGHT: 'RIGHT',
+            LEFT: 'LEFT'
+        };
+        this.config = {
+            velocityThreshold: 0.3,
+            directionalOffsetThreshold: 30
+        };
     }
 
     openImages(page) {
@@ -31,8 +42,7 @@ export default class JournalScreen extends Component {
     }
 
     async componentWillMount() {
-        // TODO ONLY FOR DEBUGGING REMOVE LATER
-        // await Storage.setItem(STORAGE_CONSTS.PAGES, JSON.stringify([]));
+        this.props.navigation.setParams('listView', true);
         await this.getPages();
         this.props.navigation.addListener('willFocus', () => this.getPages());
     }
@@ -40,7 +50,7 @@ export default class JournalScreen extends Component {
     async getPages() {
         const result = await Storage.getItem(STORAGE_CONSTS.PAGES);
         const pages = result ? JSON.parse(result) : [];
-        this.setState({...this.state, ...{pages}});
+        this.setState({...this.state, ...{pages, currentPage: pages[0]}});
     }
 
     async savePage(task) {
@@ -80,11 +90,35 @@ export default class JournalScreen extends Component {
         this.setState({...this.state, ...{pages, modalVisible: false}});
     }
 
+    onSwipe = (gestureName) => {
+        if (!this.state.listView) {
+            const currentPageIndex = this.state.pages.indexOf(this.state.currentPage);
+            switch (gestureName) {
+                case this.DIRECTIONS.LEFT:
+                    const next = this.state.pages[currentPageIndex + 1];
+                    if (next) {
+                        this.setState({...this.state, ...{currentPage: next}})
+                    }
+                    break;
+                case this.DIRECTIONS.RIGHT:
+                    const previous = this.state.pages[currentPageIndex - 1];
+                    if (previous) {
+                        this.setState({...this.state, ...{currentPage: previous}})
+                    }
+                    break;
+            }
+        }
+    };
+
     render() {
         return (
-            <View style={{flex: 1}}>
+            <GestureRecognizer
+                style={{flex: 1}}
+                onSwipeLeft={() => this.onSwipe(this.DIRECTIONS.RIGHT)}
+                onSwipeRight={() => this.onSwipe(this.DIRECTIONS.LEFT)}
+                config={this.config}>
                 <ScrollView style={styles.container}>
-                    {this.state.pages.concat(this.state.accomplishments).sort(sortByDate).map(page => {
+                    {this.state.listView && this.state.pages.concat(this.state.accomplishments).sort(sortByDate).map(page => {
                         return <PageElement
                             key={page._id}
                             page={page}
@@ -92,8 +126,21 @@ export default class JournalScreen extends Component {
                             deletePage={() => this.deletePage(page)}
                             openImages={() => this.openImages(page)}/>
                     })}
+                    {!this.state.listView && this.state.currentPage &&
+                        <PageElement
+                            key={this.state.currentPage._id}
+                            page={this.state.currentPage}
+                            fullPage={true}
+                            toEdit={() => this.setState({...this.state, ...{editedPage: this.state.currentPage, modalVisible: true}})}
+                            deletePage={() => this.deletePage(this.state.currentPage)}
+                            openImages={() => this.openImages(this.state.currentPage)}/>
+                    }
                 </ScrollView>
                 <FloatingActionButton pressFunction={() => this.setState({...this.state, ...{modalVisible: true}})}/>
+                <FloatingActionButton
+                    isLeft={true}
+                    iconName={this.state.listView ? 'apps' : 'list'}
+                    pressFunction={() => this.setState({...this.state, ...{listView: !this.state.listView}})}/>
                 <ModalComponent
                     closeModal={() => this.setState({...this.state, ...{modalVisible: false, editedPage: false}})}
                     modalVisible={this.state.modalVisible}
@@ -109,7 +156,7 @@ export default class JournalScreen extends Component {
                     modalVisible={this.state.imageModalVisible}>
                     <ImageViewer imageUrls={this.state.visibleImages}/>
                 </ModalComponent>
-            </View>
+            </GestureRecognizer>
         );
     }
 }
@@ -124,7 +171,7 @@ JournalScreen.navigationOptions = {
         color: Colors.primaryText,
         lineHeight: 79,
         fontWeight: 'bold',
-    },
+    }
 };
 
 const styles = StyleSheet.create({
