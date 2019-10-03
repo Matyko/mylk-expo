@@ -21,7 +21,7 @@ export default class TasksScreen extends Component {
             modalVisible: false,
             editedTask: null
         };
-        this.notificationManager = new NotificationManager;
+        this.notificationManager = new NotificationManager();
         this.pageAutomator = new PageAutomator;
     }
 

@@ -5,12 +5,12 @@ import {
     View,
     Animated
 } from 'react-native';
-import NotificationManager from "../util/NotificationManager";
 import Colors from "../constants/Colors";
 import HomeScreenPill from "../components/HomeScreenPill";
 import formatDate from "../util/formatDate";
 import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
+import {Task} from "../models/Task";
 
 export default class HomeScreen extends Component {
     constructor(props) {
@@ -34,7 +34,7 @@ export default class HomeScreen extends Component {
                    if (t.repeats) {
                        t = this.handleRepeat(t);
                    }
-                   return t;
+                   return new Task(t);
                 });
                 await Storage.setItem(STORAGE_CONSTS.TASKS, tasks);
                 const today = formatDate(new Date());
@@ -114,7 +114,6 @@ export default class HomeScreen extends Component {
                 <ScrollView
                     style={styles.container}
                     contentContainerStyle={styles.contentContainer}>
-                    <NotificationManager/>
                     <Animated.View
                         style={style}>
                         <HomeScreenPill text={`Today is: ${new Date().toDateString()}`}/>

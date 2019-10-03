@@ -1,8 +1,7 @@
-import React from "react";
 import * as Permissions from "expo-permissions";
 import { Notifications } from "expo";
 
-export default class NotificationManager extends React.Component {
+export default class NotificationManager {
 
     sendNotificationImmediately = async ({title, body}) => {
         const hasPermissions = await this.askPermissions();
@@ -58,8 +57,4 @@ export default class NotificationManager extends React.Component {
         }
         return finalStatus === "granted";
     };
-
-    render() {
-        return null;
-    }
 }
