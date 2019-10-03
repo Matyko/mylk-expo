@@ -95,7 +95,8 @@ export default class TaskEditor extends Component {
                                     marginLeft: 40,
                                     flexGrow: 1,
                                     borderColor: Colors.transparent,
-                                    borderBottomColor: Colors.light
+                                    borderBottomColor: Colors.light,
+                                    color: Colors.black
                                 }
                             }}
                             onDateChange={date => this.setDate(date)}
@@ -118,6 +119,7 @@ export default class TaskEditor extends Component {
                             errorMessage={this.state.errors.desc}
                             value={this.state.title}
                             onChangeText={text => this.setText(text)}
+                            inputStyle={{color: Colors.black}}
                         />
                     </EmojiAddon>
                 </View>
@@ -126,7 +128,7 @@ export default class TaskEditor extends Component {
                     <EmojiAddon
                         name="timer_clock">
                         <Picker
-                            style={{flexGrow: 1}}
+                            style={{flexGrow: 1, color: Colors.black}}
                             selectedValue={this.state.repeats}
                             onValueChange={repeats => this.setState({...this.state, ...{repeats}})}>
                             <Picker.Item label="Never" value={null} />
@@ -153,7 +155,8 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         paddingTop: 10,
-        paddingHorizontal: 20
+        paddingHorizontal: 20,
+        backgroundColor: Colors.white,
     },
     formElement: {
       flexBasis: 1,
@@ -171,5 +174,6 @@ const styles = StyleSheet.create({
     },
     label: {
         paddingVertical: 5,
+        color: Colors.black
     }
 });

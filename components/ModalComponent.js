@@ -48,9 +48,9 @@ export default class ModalComponent extends Component {
                         onPress={() => this.props.closeModal()}
                     />
                 </TouchableOpacity>
-                <ScrollView style={{flex: 1}}>
+                <View style={{flex: 1}}>
                     {this.props.children}
-                </ScrollView>
+                </View>
             </Modal>
         );
     }

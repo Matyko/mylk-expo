@@ -14,7 +14,7 @@ export async function getItem(type) {
 }
 
 async function getId() {
-   return firebase.auth().currentUser.uid || await AsyncStorage.getItem(STORAGE_CONSTS.USER_ID);;
+   return firebase.auth().currentUser.uid || await AsyncStorage.getItem(STORAGE_CONSTS.USER_ID);
 }
 
 export async function setItem(type, data) {

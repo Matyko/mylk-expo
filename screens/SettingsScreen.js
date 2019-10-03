@@ -142,7 +142,8 @@ SettingsScreen.navigationOptions = {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: Colors.white
   },
   settingsContent: {
     flexGrow: 1
@@ -184,7 +185,8 @@ const styles = StyleSheet.create({
     width: 100
   },
   settingsTitle: {
-    flexGrow: 1
+    flexGrow: 1,
+    color: Colors.black
   },
   footerText: {
     flexGrow: 0,

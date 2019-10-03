@@ -25,7 +25,7 @@ HomeStack.navigationOptions = {
     tabBarLabel: 'Home',
     tabBarOptions: {
         activeTintColor: Colors.primaryBackground,
-    },
+        backgroundColor: Colors.white    },
     tabBarIcon: ({focused}) => (
         <TabBarIcon
             focused={focused}
@@ -47,6 +47,7 @@ TaskStack.navigationOptions = {
     tabBarLabel: 'Tasks',
     tabBarOptions: {
         activeTintColor: Colors.primaryBackground,
+        backgroundColor: Colors.white
     },
     tabBarIcon: ({focused}) => (
         <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-clipboard' : 'md-clipboard'}/>
@@ -66,6 +67,7 @@ JournalStack.navigationOptions = {
     tabBarLabel: 'Journal',
     tabBarOptions: {
         activeTintColor: Colors.primaryBackground,
+        backgroundColor: Colors.white
     },
     tabBarIcon: ({focused}) => (
         <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-book' : 'md-book'}/>
@@ -85,6 +87,7 @@ SettingsStack.navigationOptions = {
     tabBarLabel: 'Settings',
     tabBarOptions: {
         activeTintColor: Colors.primaryBackground,
+        backgroundColor: Colors.white
     },
     tabBarIcon: ({focused}) => (
         <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}/>
