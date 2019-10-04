@@ -12,6 +12,7 @@ import {
 import Colors from "../constants/Colors";
 import {LinearGradient} from "expo-linear-gradient";
 import {Ionicons} from "@expo/vector-icons";
+import Emoji from "react-native-emoji";
 
 export default class PageElement extends Component{
     constructor(props) {
@@ -35,6 +36,10 @@ export default class PageElement extends Component{
                 }}}>
                 <View style={styles.topDataContainer}>
                     {this.props.page.mood && <Text style={styles.topData}>Mood</Text>}
+                    {this.props._emojis && this.props._emojis.map(e => {
+                        return <Emoji name={e.key} key={e.key} style={{flexGrow: 0, fontSize: 15, marginLeft: 5}}/>
+                        })
+                    }
                     <Text style={styles.topData}>{this.props.page.date}</Text>
                 </View>
                 <TouchableOpacity

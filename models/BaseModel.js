@@ -1,5 +1,6 @@
 import formatDate from "../util/formatDate";
 import * as Storage from '../util/storage';
+import Emoji from 'node-emoji';
 
 export class BaseModel {
     constructor({title, date, created_at, _id, id, type, classType}) {
@@ -8,7 +9,8 @@ export class BaseModel {
         this.date = date || formatDate(new Date());
         this.created_at = created_at || new Date();
         this._type = type;
-        this._classType = classType
+        this._classType = classType;
+        this._emojis = []
     }
 
     async getAll() {
@@ -16,6 +18,7 @@ export class BaseModel {
     }
 
     async save() {
+        this._emojis = this._searchTextForEmojis();
         const all = await this.getAll();
         let newAll;
         if (all.find(e => e._id === this._id)) {
@@ -31,6 +34,7 @@ export class BaseModel {
             newAll.push(this)
         }
         await Storage.setItem(this._type, newAll);
+        console.log(this._emojis);
         return newAll.map(e => {
             return new this._classType(e);
         })
@@ -42,5 +46,26 @@ export class BaseModel {
         return all.filter(e => e._id !== this._id).map(e => {
             return new this._classType(e);
         })
+    }
+
+    _searchTextForEmojis() {
+        const result = [];
+        const maxEmojis = 3;
+        const stringArray = this.title.toLowerCase().split(' ');
+        for (const string of stringArray) {
+            const found = Emoji.findByName(string);
+            if (found) {
+                result.push(found);
+            } else if (string.charAt(string.length - 1) === 's') {
+                const secondTry = Emoji.findByName(string.substring(0, string.length - 1));
+                if (secondTry) {
+                    result.push(secondTry)
+                }
+            }
+            if (result.length === maxEmojis) {
+                break;
+            }
+        }
+        return result;
     }
 }

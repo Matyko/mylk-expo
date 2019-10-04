@@ -96,32 +96,33 @@ export async function setUpSynced() {
     for (const type of toSync) {
         const ref = await firebase.firestore().collection('userData').doc(firebase.auth().currentUser.uid).collection(type);
 
-        ref.on("child_changed", async snapshot => {
-            const changed = snapshot.val();
-            const existing = await getItem(type) || [];
-            existing.map(e => {
-                if (e._id === changed._id) {
-                    return changed;
-                } else {
-                    return e
-                }
-            });
-            await setItem(type, existing)
-        });
-
-        ref.on("child_added", async snapshot => {
-            const newChild = snapshot.val();
-            const existing = await getItem(type) || [];
-            existing.push(newChild);
-            await setItem(type, existing)
-        });
-
-        ref.on("child_removed", async snapshot => {
-            const removed = snapshot.val();
-            const existing = await getItem(type) || [];
-            const newArr = existing.filter(e => e._id !== removed._id);
-            await setItem(type, newArr);
-        })
+        // TODO
+        // ref.on("child_changed", async snapshot => {
+        //     const changed = snapshot.val();
+        //     const existing = await getItem(type) || [];
+        //     existing.map(e => {
+        //         if (e._id === changed._id) {
+        //             return changed;
+        //         } else {
+        //             return e
+        //         }
+        //     });
+        //     await setItem(type, existing)
+        // });
+        //
+        // ref.on("child_added", async snapshot => {
+        //     const newChild = snapshot.val();
+        //     const existing = await getItem(type) || [];
+        //     existing.push(newChild);
+        //     await setItem(type, existing)
+        // });
+        //
+        // ref.on("child_removed", async snapshot => {
+        //     const removed = snapshot.val();
+        //     const existing = await getItem(type) || [];
+        //     const newArr = existing.filter(e => e._id !== removed._id);
+        //     await setItem(type, newArr);
+        // })
     }
 }
 

@@ -5,6 +5,7 @@ import {Ionicons} from "@expo/vector-icons";
 import {CheckBox} from "react-native-elements";
 import parseDate from "../util/parseDate";
 import GestureRecognizer from 'react-native-swipe-gestures';
+import Emoji from "react-native-emoji";
 
 export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
 
@@ -83,16 +84,20 @@ export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
                     </View>
                     <View style={styles.taskElementTitle}>
                         <Text numberOfLines={1}>{task.title}</Text>
-                        <View style={{flexDirection: 'row'}}>
-                            {icon &&
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                             <View style={styles.taskElementIcon}>
+                                {icon &&
                                 <Ionicons
                                     name={icon}
                                     size={20}
                                     color={Colors.tabIconDefault}
                                 />
+                                }
+                                {task._emojis && task._emojis.map(e => {
+                                    return <Emoji name={e.key} key={e.key} style={{flexGrow: 0, fontSize: 15, marginLeft: 5}}/>
+                                })
+                                }
                             </View>
-                            }
                             <Text numberOfLines={1}>{task.date}</Text>
                         </View>
                     </View>
@@ -148,6 +153,7 @@ const styles = StyleSheet.create({
         flexShrink: 1,
         flexBasis: 'auto',
         alignSelf: 'center',
+        flexDirection: 'row',
         marginRight: 5
     },
     checkBoxContainer: {

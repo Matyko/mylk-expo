@@ -42,7 +42,8 @@
     "react-native-datepicker": "^1.7.2",
     "react-native-elements": "^1.2.0",
     "react-native-emoji": "^1.8.0",
-    "react-native-webview": "^7.4.0"
+    "react-native-webview": "^7.4.0",
+    "node-emoji": "latest"
   },
   "private": true
 }
