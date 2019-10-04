@@ -25,12 +25,21 @@ export default class HomeScreen extends Component {
             this.getTasks();
             this.getPages();
         });
+        this.init();
+    }
+
+    async init() {
+        const toSync = await Storage.getItem(STORAGE_CONSTS.SYNC)
+        if (toSync) {
+            await Storage.setUpSynced();
+            await Storage.syncAll();
+        }
     }
 
     getTasks() {
         try {
             Storage.getItem(STORAGE_CONSTS.TASKS).then(async result => {
-                let tasks = result ? JSON.parse(result) : [];
+                let tasks = result || [];
                 tasks.map(t => {
                    return new Task(t);
                 });
@@ -49,7 +58,7 @@ export default class HomeScreen extends Component {
     getPages() {
         try {
             Storage.getItem(STORAGE_CONSTS.PAGES).then(async result => {
-                let pages = result ? JSON.parse(result) : [];
+                let pages = result || [];
                 const today = formatDate(new Date());
                 pages = pages.filter(p => {
                     return today === p.date

@@ -30,7 +30,7 @@ export default class TasksScreen extends Component {
         try {
             mLogger('Loading tasks');
             Storage.getItem(STORAGE_CONSTS.TASKS).then(result => {
-                const tasks = result ? JSON.parse(result) : [];
+                const tasks = result || [];
                 this.setState({...this.state, ...{tasks}})
             })
         } catch {
@@ -142,7 +142,7 @@ export default class TasksScreen extends Component {
                     title="Create a task"
                 >
                     <TaskEditor task={this.state.editedTask}
-                                saveTask={task => this.savedTask(task)}/>
+                                savedTask={task => this.savedTask(task)}/>
                 </ModalComponent>
                 <PageAutomator/>
             </View>

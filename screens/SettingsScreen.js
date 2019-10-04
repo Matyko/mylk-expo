@@ -21,7 +21,7 @@ export default class SettingsScreen extends Component {
 
   async componentWillMount() {
     const passCode = await SecureStore.getItemAsync(STORAGE_CONSTS.PASSCODE);
-    const syncData = JSON.parse(await Storage.getItem(STORAGE_CONSTS.SYNC) || 'false');
+    const syncData = await Storage.getItem(STORAGE_CONSTS.SYNC) || false;
     await this.setState({...this.state, ...{hasPassCode: !!passCode, passCode, syncData}});
     this.forceUpdate();
   }
@@ -37,7 +37,7 @@ export default class SettingsScreen extends Component {
   async syncData(syncData) {
     await Storage.setItem(STORAGE_CONSTS.SYNC, syncData);
     if (syncData) {
-      await Storage.syncOld();
+      await Storage.syncAll();
     }
     this.setState({...this.state, ...{syncData}})
   }

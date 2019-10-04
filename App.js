@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import timerFix from "./util/timerWarningFix";
 import AppNavigator from './navigation/AppNavigator';
 import firebase from 'firebase'
+import * as Storage from './util/storage';
 import '@firebase/firestore';
 
 const firebaseConfig = {
@@ -45,7 +46,7 @@ export default function App(props) {
   } else {
     return (
       <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+        {Platform.OS === 'ios' && <StatusBar barStyle="default" /> || <StatusBar translucent={true}/>}
         <AppNavigator />
       </View>
     );
@@ -64,7 +65,7 @@ async function loadResourcesAsync() {
       // We include SpaceMono because we use it in HomeScreen.js. Feel free to
       // remove this if you are not using it in your app
       'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
-    }),
+    })
   ]);
 }
 

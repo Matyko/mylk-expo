@@ -49,7 +49,7 @@ export default class JournalScreen extends Component {
 
     async getPages() {
         const result = await Storage.getItem(STORAGE_CONSTS.PAGES);
-        const pages = result ? JSON.parse(result) : [];
+        const pages = result || [];
         this.setState({...this.state, ...{pages, currentPage: pages[0]}});
     }
 

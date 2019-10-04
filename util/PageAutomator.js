@@ -7,7 +7,7 @@ export default class PageAutomator extends React.Component {
 
     async taskChecked({_id, title, finishedDay}) {
         const result = await Storage.getItem(STORAGE_CONSTS.PAGES);
-        const pages = result ? JSON.parse(result) : [];
+        const pages = result || [];
         const page = pages.find(e => e.finishedDay === finishedDay);
         if (page) {
             page._tasks.push({_id, title})
@@ -27,7 +27,7 @@ export default class PageAutomator extends React.Component {
 
     async taskUnChecked({_id, finishedDay}) {
         const result = await Storage.getItem(STORAGE_CONSTS.PAGES);
-        let pages = result ? JSON.parse(result) : [];
+        let pages = result || [];
         const page = pages.find(e => e.finishedDay === finishedDay);
         if (page) {
             page._tasks = page._tasks.filter(e => e._id !== _id);

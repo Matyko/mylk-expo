@@ -9,7 +9,12 @@ import mLogger from "./mLogger";
 export async function getItem(type) {
     const id = await getId();
     if (id) {
-        return await AsyncStorage.getItem(`${type}.${id}`)
+        try {
+            return JSON.parse(await AsyncStorage.getItem(`${type}.${id}`))
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
     }
 }
 
@@ -20,7 +25,7 @@ async function getId() {
 export async function setItem(type, data) {
     if (type === STORAGE_CONSTS.TASKS || type === STORAGE_CONSTS.PAGES) {
         try {
-            const sync = JSON.parse(await getItem(STORAGE_CONSTS.SYNC) || 'false');
+            const sync = await getItem(STORAGE_CONSTS.SYNC) || false;
             if (sync) {
                 const reference = firebase.firestore().collection('userData').doc(firebase.auth().currentUser.uid).collection(type);
                 data.forEach(d => {
@@ -45,7 +50,10 @@ export async function deleteListItem(type, data, toDelete) {
     }
     const id = await getId();
     if (id) {
-        return await AsyncStorage.setItem(`${type}.${id}`, JSON.stringify(data.filter(d => d !== toDelete)))
+        console.log(toDelete._id);
+        const filtered = data.filter(d => d._id !== toDelete._id);
+        console.log(filtered);
+        return await AsyncStorage.setItem(`${type}.${id}`, JSON.stringify(filtered))
     }
 }
 
@@ -74,14 +82,70 @@ export async function removeSynced() {
     // TODO MAYBE FIREBASE FUNCTIONS?
 }
 
-export async function syncOld() {
+export async function syncAll() {
     const toSync = [STORAGE_CONSTS.PAGES, STORAGE_CONSTS.TASKS];
-    toSync.forEach(async s => {
-        const data = JSON.parse(await AsyncStorage.getItem(s) || '[]');
-        await setItem(s, data)
-    })
+    for (const type of toSync) {
+        const data = await AsyncStorage.getItem(type) || [];
+        await setItem(type, data)
+    }
+    await getSynced();
+}
+
+export async function setUpSynced() {
+    const toSync = [STORAGE_CONSTS.PAGES, STORAGE_CONSTS.TASKS];
+    for (const type of toSync) {
+        const ref = await firebase.firestore().collection('userData').doc(firebase.auth().currentUser.uid).collection(type);
+
+        ref.on("child_changed", async snapshot => {
+            const changed = snapshot.val();
+            const existing = await getItem(type) || [];
+            existing.map(e => {
+                if (e._id === changed._id) {
+                    return changed;
+                } else {
+                    return e
+                }
+            });
+            await setItem(type, existing)
+        });
+
+        ref.on("child_added", async snapshot => {
+            const newChild = snapshot.val();
+            const existing = await getItem(type) || [];
+            existing.push(newChild);
+            await setItem(type, existing)
+        });
+
+        ref.on("child_removed", async snapshot => {
+            const removed = snapshot.val();
+            const existing = await getItem(type) || [];
+            const newArr = existing.filter(e => e._id !== removed._id);
+            await setItem(type, newArr);
+        })
+    }
+}
+
+export async function getSynced() {
+    const toSync = [STORAGE_CONSTS.PAGES, STORAGE_CONSTS.TASKS];
+    for (const type of toSync) {
+        const querySnapshot = await firebase.firestore().collection('userData').doc(firebase.auth().currentUser.uid).collection(type).get();
+        const existing = await getItem(type) || [];
+        const existingIds = existing.map(e => e._id);
+        querySnapshot.forEach(doc => {
+            const index = existingIds.indexOf(doc.id);
+            const data = doc.data();
+            if (type === STORAGE_CONSTS.TASKS) {
+                console.log(data);
+            }
+            if (index !== -1) {
+                existing[index] = {...existing[index], ...data}
+            } else {
+                existing.push(data)
+            }
+        });
+        await setItem(type, existing)
+    }
 }
 
 export async function find() {
 }
-
