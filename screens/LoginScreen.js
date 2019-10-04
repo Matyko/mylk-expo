@@ -68,7 +68,7 @@ export default class LoginScreen extends Component {
         this.setState({...this.state, ...{loading: true}});
         firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(async ({ user }) => {
             if (this.state.rememberMe) {
-                await AsyncStorage.setItem(STORAGE_CONSTS.USER_ID, user.uid);
+                await SecureStore.setItemAsync(STORAGE_CONSTS.USER_ID, user.uid);
                 await AsyncStorage.setItem(STORAGE_CONSTS.EMAIL, this.state.email);
                 await SecureStore.setItemAsync(STORAGE_CONSTS.PASSWORD, this.state.password);
             }
