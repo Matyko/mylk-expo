@@ -25,10 +25,10 @@ export default class HomeScreen extends Component {
             this.getTasks();
             this.getPages();
         });
-        this.init();
+        this.initSync();
     }
 
-    async init() {
+    async initSync() {
         const toSync = await Storage.getItem(STORAGE_CONSTS.SYNC)
         if (toSync) {
             await Storage.setUpSynced();
