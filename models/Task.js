@@ -5,10 +5,11 @@ import {BaseModel} from "./BaseModel";
 import STORAGE_CONSTS from "../util/storageConsts";
 
 export class Task extends BaseModel {
-    constructor({title, date, created_at, isFullDay, repeats, id, _id, notificationId, checked}) {
-        super({title, date, created_at, id, _id, type: STORAGE_CONSTS.TASKS, classType: Task});
+    constructor({title, text, date, created_at, isFullDay, repeats, id, _id, notificationId, checked}) {
+        super({title, text, date, created_at, id, _id, type: STORAGE_CONSTS.TASKS, classType: Task});
         this._notificationId = notificationId || null;
         this.isFullDay = isFullDay;
+        this.text = text;
         this.repeats = repeats;
         this.checked = checked || false;
         this._notificationManager = new NotificationManager();

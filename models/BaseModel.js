@@ -3,9 +3,10 @@ import * as Storage from '../util/storage';
 import Emoji from 'node-emoji';
 
 export class BaseModel {
-    constructor({title, date, created_at, _id, id, type, classType}) {
+    constructor({title, text, date, created_at, _id, id, type, classType}) {
         this._id = _id || id || Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         this.title = title || '';
+        this.text = text || '';
         this.date = date || formatDate(new Date());
         this.created_at = created_at || new Date();
         this._type = type;
@@ -14,7 +15,8 @@ export class BaseModel {
     }
 
     async getAll() {
-        return await Storage.getItem(this._type) || [];
+        const all = await Storage.getItem(this._type) || [];
+        return all.map(e => new this._classType(e))
     }
 
     async save() {
@@ -51,7 +53,7 @@ export class BaseModel {
     _searchTextForEmojis() {
         const result = [];
         const maxEmojis = 3;
-        const stringArray = this.title.toLowerCase().split(' ');
+        const stringArray = this.title.toLowerCase().split(' ').concat(this.text.toLowerCase.split(' '));
         for (const string of stringArray) {
             const found = Emoji.findByName(string);
             if (found) {
@@ -68,4 +70,11 @@ export class BaseModel {
         }
         return result;
     }
+}
+
+export async function getAllStatic(type, classType) {
+    const all = await Storage.getItem(type) || [];
+    return all.map(e => {
+        return new classType(e)
+    })
 }

@@ -24,7 +24,8 @@ export default class PageElement extends Component{
     }
 
     render() {
-        const maxWidth = Math.floor(Dimensions.get("window").width) - 30;
+        const width = Math.floor(Dimensions.get("window").width) - 30;
+        console.log(this.props.page._emojis);
         return (
             <TouchableOpacity
                 onPress={() => this.setState({...this.state, ...{open: !this.state.open}})}
@@ -32,33 +33,17 @@ export default class PageElement extends Component{
                 style={{...styles.container,
                     ...{
                     maxHeight: this.state.open ? 10000 : 150,
-                    maxWidth
+                    width
                 }}}>
                 <View style={styles.topDataContainer}>
                     {this.props.page.mood && <Text style={styles.topData}>Mood</Text>}
-                    {this.props._emojis && this.props._emojis.map(e => {
-                        return <Emoji name={e.key} key={e.key} style={{flexGrow: 0, fontSize: 15, marginLeft: 5}}/>
+                    {this.props.page._emojis && this.props.page._emojis.map(e => {
+                        return <Text key={e.key}>{e.emoji}</Text>
                         })
                     }
                     <Text style={styles.topData}>{this.props.page.date}</Text>
                 </View>
-                <TouchableOpacity
-                    style={styles.images}
-                    onPress={() => this.props.openImages()}>
-                    {this.props.page.images && this.props.page.images.map(path => {
-                        return <Image key={path} source={{ uri: path }} style={styles.image} />
-                    })}
-                </TouchableOpacity>
-                <View style={styles.textContainer}>
-                    <Text>{this.props.page.text}</Text>
-                    {this.props.page._tasks &&
-                        this.props.page._tasks.map(t => {
-                            return <Text key={t._id}>{t.title}</Text>
-                        })
-                    }
-                </View>
                 {this.state.editable &&
-                !this.props.page._tasks &&
                 <View style={styles.bottom}>
                     <Ionicons
                         name={Platform.OS === 'ios' ? 'ios-close-circle' : 'md-close-circle'}
@@ -76,6 +61,21 @@ export default class PageElement extends Component{
                     />
                 </View>
                 }
+                <TouchableOpacity
+                    style={styles.images}
+                    onPress={() => this.props.openImages()}>
+                    {this.props.page.images && this.props.page.images.map(path => {
+                        return <Image key={path} source={{ uri: path }} style={styles.image} />
+                    })}
+                </TouchableOpacity>
+                <View style={styles.textContainer}>
+                    <Text>{this.props.page.text}</Text>
+                    {this.props.page._tasks &&
+                        this.props.page._tasks.map(t => {
+                            return <Text key={t._id}>{t.title}</Text>
+                        })
+                    }
+                </View>
                 {!this.state.open &&
                     <LinearGradient
                         start={[0.5, 1]}

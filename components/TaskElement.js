@@ -65,6 +65,8 @@ export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
         directionalOffsetThreshold: 30
     };
 
+    console.log(task._emojis);
+
     return (
         <GestureRecognizer
             onSwipeLeft={() => onSwipe(DIRECTIONS.RIGHT)}
@@ -94,8 +96,8 @@ export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
                                 />
                                 }
                                 {task._emojis && task._emojis.map(e => {
-                                    return <Emoji name={e.key} key={e.key} style={{flexGrow: 0, fontSize: 15, marginLeft: 5}}/>
-                                })
+                                    return <Text key={e.key}>{e.emoji}</Text>
+                                    })
                                 }
                             </View>
                             <Text numberOfLines={1}>{task.date}</Text>
@@ -121,11 +123,11 @@ export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
 
 const styles = StyleSheet.create({
     taskElement: {
-        backgroundColor: '#fff',
+        backgroundColor: Colors.white,
         flexDirection: "row",
         borderRadius: 10,
         flex: 1,
-        shadowColor: "#000",
+        shadowColor: Colors.black,
         shadowOffset: {
             width: 0,
             height: 1,

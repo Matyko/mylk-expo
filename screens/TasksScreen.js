@@ -23,7 +23,7 @@ export default class TasksScreen extends Component {
             editedTask: null
         };
         this.notificationManager = new NotificationManager();
-        this.pageAutomator = new PageAutomator;
+        this.pageAutomator = new PageAutomator();
     }
 
     async componentWillMount() {
@@ -144,7 +144,6 @@ export default class TasksScreen extends Component {
                     <TaskEditor task={this.state.editedTask}
                                 savedTask={task => this.savedTask(task)}/>
                 </ModalComponent>
-                <PageAutomator/>
             </View>
         );
     }
