@@ -48,12 +48,13 @@ export default class TaskEditor extends Component {
             task = new Task(this.props.task);
             await task.cancelNotification();
         } else {
-            task = new Task({})
+            task = new Task({
+                title: this.state.title,
+                date: this.state.date,
+                isFullDay: this.state.mode === 'date',
+                repeats: this.state.repeats
+            })
         }
-        task.title = this.state.title;
-        task.date = this.state.date;
-        task.isFullDay = this.state.mode === 'date';
-        task.repeats = this.state.repeats;
         await task.createNotification();
         mLogger(`saving task: ${task}`);
         await this.props.savedTask(await task.save());

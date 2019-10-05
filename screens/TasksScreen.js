@@ -142,7 +142,7 @@ export default class TasksScreen extends Component {
                     title="Create a task"
                 >
                     <TaskEditor task={this.state.editedTask}
-                                savedTask={task => this.savedTask(task)}/>
+                                savedTask={tasks => this.savedTask(tasks)}/>
                 </ModalComponent>
             </View>
         );

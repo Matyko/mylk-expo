@@ -96,22 +96,22 @@ export default class LoginScreen extends Component {
     render() {
         return (
             <View style={styles.container}>
-                {/*<Video*/}
-                {/*    source={{ uri: "https://s3-eu-west-1.amazonaws.com/video.gallereplay.com/artistarea/Lighthouse%20stands%20in%20Istanbul%E2%80%99s%20harbour_0554659b-5dc1-43d6-8a93-b31ec6b67f63/Cinemagraph_plain/1920x1080/cinemagraph.mp4"}}*/}
-                {/*    style={styles.backgroundVideo}*/}
-                {/*    rate={1}*/}
-                {/*    shouldPlay={true}*/}
-                {/*    isLooping={true}*/}
-                {/*    volume={1}*/}
-                {/*    muted={true}*/}
-                {/*    resizeMode="cover"*/}
-                {/*/>*/}
-                <LinearGradient
-                    start={[0, 1]}
-                    end={[1, 0]}
-                    colors={[Colors.primaryText, Colors.primaryBackground]}
-                    style={[styles.backgroundVideo, {opacity: 0.6}]}
+                <Video
+                    source={require('../assets/video/11.mp4')}
+                    style={styles.backgroundVideo}
+                    rate={1}
+                    shouldPlay={true}
+                    isLooping={true}
+                    volume={1}
+                    muted={true}
+                    resizeMode="cover"
                 />
+                {/*<LinearGradient*/}
+                {/*    start={[0, 1]}*/}
+                {/*    end={[1, 0]}*/}
+                {/*    colors={[Colors.primaryText, Colors.primaryBackground]}*/}
+                {/*    style={[styles.backgroundVideo, {opacity: 0.6}]}*/}
+                {/*/>*/}
                 <KeyboardAvoidingView behavior='padding' style={styles.container}>
                     <View style={styles.loginContainer}>
                         <View style={styles.logo}>
@@ -156,11 +156,15 @@ export default class LoginScreen extends Component {
                         {!this.state.passCodeCheck && <View style={styles.lastElement}>
                             <FancyButton
                                 title="Login"
+                                borderColor={Colors.white}
+                                textColor={Colors.white}
                                 loading={this.state.loading}
                                 pressFn={() => this.login()}
                             />
                             <FancyButton
                                 title="Register"
+                                borderColor={Colors.white}
+                                textColor={Colors.white}
                                 loading={this.state.loading}
                                 pressFn={() => this.register()}
                             />

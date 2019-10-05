@@ -33,7 +33,7 @@ export class BaseModel {
             })
         } else {
             newAll = all.slice();
-            newAll.push(this)
+            newAll.push(this);
         }
         await Storage.setItem(this._type, newAll);
 

@@ -7,6 +7,7 @@ import Colors from "../constants/Colors";
 import mLogger from "../util/mLogger";
 import ImagePickerComponent from "./ImagePickerComponent";
 import FancyButton from "./FancyButton";
+import {Page} from "../models/Page";
 
 export default class PageEditor extends Component {
     constructor(props) {
@@ -30,18 +31,19 @@ export default class PageEditor extends Component {
         this.setState({...this.state, ...{text: text}})
     }
 
-    savePage() {
-        let page = {
-            text: this.state.text,
-            date: this.state.date,
-            images: this.state.images,
-            created_at: new Date()
-        };
+    async savePage() {
+        let page;
         if (this.props.page) {
-            page = {...this.props.page, ...page};
+            page = new Page(this.props.page)
+        } else {
+            page = new Page({
+                text: this.state.text,
+                date: this.state.date,
+                images: this.state.images,
+            });
         }
         mLogger(`saving page: ${page}`);
-        this.props.savePage(page);
+        await this.props.savedPage(await page.save());
     }
 
     render() {

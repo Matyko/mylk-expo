@@ -29,11 +29,11 @@ export default class HomeScreen extends Component {
     }
 
     async initSync() {
-        const toSync = await Storage.getItem(STORAGE_CONSTS.SYNC)
-        if (toSync) {
-            await Storage.setUpSynced();
-            await Storage.syncAll();
-        }
+        // const toSync = await Storage.getItem(STORAGE_CONSTS.SYNC)
+        // if (toSync) {
+        //     await Storage.setUpSynced();
+        //     await Storage.syncAll();
+        // }
     }
 
     getTasks() {

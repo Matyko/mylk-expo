@@ -12,6 +12,7 @@ import STORAGE_CONSTS from '../util/storageConsts';
 import GestureRecognizer from "react-native-swipe-gestures";
 import {getAllStatic} from "../models/BaseModel";
 import {Page} from "../models/Page";
+import mLogger from "../util/mLogger";
 
 export default class JournalScreen extends Component {
     constructor(props) {
@@ -54,54 +55,31 @@ export default class JournalScreen extends Component {
         this.setState({...this.state, ...{pages, currentPage: pages[0]}});
     }
 
-    async savePage(task) {
-        if (task.hasOwnProperty('_id')) {
-            await this.updatePage(task)
-        } else {
-            await this.createPage(task)
-        }
-    }
-
-    async createPage(page) {
-        const pages = this.state.pages.slice();
-        page._id = new Date().getTime().toString() + pages.length;
-        pages.push(page);
-        this.setState({...this.state, ...{currentPage: page}});
-        this.updatePages(pages)
-    }
-
-    async updatePage(page) {
-        const pages = this.state.pages.map(e => {
-            if (e._id === page._id) {
-                return page;
-            }
-            return e;
-        });
-        this.updatePages(pages);
-    }
-
-    async updatePages(pages) {
-        pages = pages.sort(sortByDate);
-        await Storage.setItem(STORAGE_CONSTS.PAGES, pages);
-        this.setState({...this.state, ...{pages, modalVisible: false}});
+    async savedPage(pages) {
+        this.setState({...this.state, ...{pages}})
     }
 
     async deletePage(page) {
-        await Storage.deleteListItem(STORAGE_CONSTS.PAGES, this.state.pages, page);
-        const pages = this.state.pages.filter(e => e !== page);
-        if (this.state.currentPage === page) {
-            const index = this.state.pages.indexOf(page);
-            const prev = this.state.pages[index - 1];
-            const next = this.state.pages[index + 1];
-            if (prev) {
-                this.setState({...this.state, ...{currentPage: prev}})
-            } else if (next) {
-                this.setState({...this.state, ...{currentPage: next}})
-            } else {
-                this.setState({...this.state, ...{currentPage: undefined}})
+        const pageObj = new Page(page);
+        try {
+            const pages = await pageObj.delete();
+            if (this.state.currentPage === page) {
+                const index = this.state.pages.indexOf(page);
+                const prev = this.state.pages[index - 1];
+                const next = this.state.pages[index + 1];
+                if (prev) {
+                    this.setState({...this.state, ...{currentPage: prev}})
+                } else if (next) {
+                    this.setState({...this.state, ...{currentPage: next}})
+                } else {
+                    this.setState({...this.state, ...{currentPage: undefined}})
+                }
             }
+            this.setState({...this.state, ...{pages, modalVisible: false}});
+        } catch (e) {
+            mLogger('Could not remove page')
         }
-        this.setState({...this.state, ...{pages, modalVisible: false}});
+
     }
 
     onSwipe = (gestureName) => {
@@ -157,7 +135,7 @@ export default class JournalScreen extends Component {
                     title="Create a page"
                 >
                     <PageEditor
-                        savePage={page => this.savePage(page)}
+                        savedPage={pages => this.savedPage(pages)}
                         page={this.state.editedPage}
                     />
                 </ModalComponent>
