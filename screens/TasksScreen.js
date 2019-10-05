@@ -158,7 +158,8 @@ TasksScreen.navigationOptions = {
     headerTitleStyle: {
         color: Colors.primaryText,
         lineHeight: 79,
-        fontWeight: 'bold',
+        fontFamily: 'nunito-black',
+        fontWeight: 'normal'
     },
 };
 

@@ -10,6 +10,8 @@ import ImageViewer from "react-native-image-zoom-viewer";
 import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
 import GestureRecognizer from "react-native-swipe-gestures";
+import {getAllStatic} from "../models/BaseModel";
+import {Page} from "../models/Page";
 
 export default class JournalScreen extends Component {
     constructor(props) {
@@ -48,8 +50,7 @@ export default class JournalScreen extends Component {
     }
 
     async getPages() {
-        const result = await Storage.getItem(STORAGE_CONSTS.PAGES);
-        const pages = result || [];
+        const pages = await getAllStatic(STORAGE_CONSTS.PAGES, Page);
         this.setState({...this.state, ...{pages, currentPage: pages[0]}});
     }
 
@@ -72,7 +73,6 @@ export default class JournalScreen extends Component {
     async updatePage(page) {
         const pages = this.state.pages.map(e => {
             if (e._id === page._id) {
-                console.log(page)
                 return page;
             }
             return e;
@@ -180,7 +180,8 @@ JournalScreen.navigationOptions = {
     headerTitleStyle: {
         color: Colors.primaryText,
         lineHeight: 79,
-        fontWeight: 'bold',
+        fontFamily: 'nunito-black',
+        fontWeight: 'normal'
     }
 };
 

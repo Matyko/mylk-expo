@@ -6,11 +6,15 @@ import {getAllStatic} from "../models/BaseModel";
 
 export default class PageAutomator {
 
-    async taskChecked({_id, title, finishedDay}) {
+    async taskChecked({_id, title, _emojis, finishedDay}) {
         const pages = await getAllStatic(STORAGE_CONSTS.PAGES, Page);
         const page = pages.find(e => e.finishedDay === finishedDay);
         if (page) {
+            if (!Array.isArray(page._tasks)) {
+                page._tasks = []
+            }
             page._tasks.push({_id, title});
+            page._emojis.concat(_emojis);
             page.save();
         } else {
             const newPage = new Page({
@@ -18,9 +22,10 @@ export default class PageAutomator {
                 date: formatDate(new Date(finishedDay)),
                 finishedDay: finishedDay,
                 created_at: new Date(),
+                _emojis: _emojis || [],
                 _tasks: [{_id, title}]
             });
-            await newPage.save()
+            await newPage.save();
         }
     }
 

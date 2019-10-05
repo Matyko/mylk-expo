@@ -5,10 +5,12 @@ import FancyButton from "../components/FancyButton";
 import mLogger from "../util/mLogger";
 import * as firebase from "firebase";
 import {LinearGradient} from "expo-linear-gradient";
+import {StyledText} from "../components/StyledText";
 import Colors from '../constants/Colors';
 import PassCode from "../components/PassCode";
 import STORAGE_CONSTS from '../util/storageConsts';
 import * as SecureStore from "expo-secure-store";
+import {Video} from "expo-av";
 
 export default class LoginScreen extends Component {
     constructor(props) {
@@ -85,10 +87,10 @@ export default class LoginScreen extends Component {
         firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then(r => {
             this.login();
         })
-            .catch(e => {
-                console.log(e);
-                this.setState({...this.state, ...{loading: false}});
-            })
+        .catch(e => {
+            console.log(e);
+            this.setState({...this.state, ...{loading: false}});
+        })
     }
 
     render() {
@@ -113,18 +115,15 @@ export default class LoginScreen extends Component {
                 <KeyboardAvoidingView behavior='padding' style={styles.container}>
                     <View style={styles.loginContainer}>
                         <View style={styles.logo}>
-                            <Text style={styles.logoText}>
-                                MYLK
-                            </Text>
+                            <StyledText style={styles.logoText}>Mylk</StyledText>
                         </View>
                         {!this.state.passCodeCheck && <View style={styles.form}>
                             <View style={styles.formElement}>
                                 <Input
-                                    style={styles.input}
                                     placeholder='Enter email'
                                     errorMessage={this.state.errors.desc}
                                     placeholderTextColor={Colors.white}
-                                    inputStyle={{borderColor: Colors.white, color: Colors.white}}
+                                    inputStyle={styles.input}
                                     inputContainerStyle={{borderColor: Colors.white}}
                                     value={this.state.email}
                                     onChangeText={email => this.setState({...this.state, ...{email}})}
@@ -132,11 +131,10 @@ export default class LoginScreen extends Component {
                             </View>
                             <View style={styles.formElement}>
                                 <Input
-                                    style={styles.input}
                                     placeholder='Enter password'
                                     errorMessage={this.state.errors.desc}
                                     placeholderTextColor={Colors.white}
-                                    inputStyle={{borderColor: Colors.white, color: Colors.white}}
+                                    inputStyle={styles.input}
                                     inputContainerStyle={{borderColor: Colors.white}}
                                     secureTextEntry={true}
                                     value={this.state.password}
@@ -218,10 +216,9 @@ const styles = StyleSheet.create({
         paddingTop: 100
     },
     logoText: {
-       color: Colors.white,
+       color: Colors.white ,
         fontSize: 50,
         textAlign: 'center',
-        fontWeight: 'bold'
     },
 
 });

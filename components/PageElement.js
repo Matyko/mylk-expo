@@ -12,7 +12,7 @@ import {
 import Colors from "../constants/Colors";
 import {LinearGradient} from "expo-linear-gradient";
 import {Ionicons} from "@expo/vector-icons";
-import Emoji from "react-native-emoji";
+import EmojiAddon from "./EmojiAddon";
 
 export default class PageElement extends Component{
     constructor(props) {
@@ -25,7 +25,6 @@ export default class PageElement extends Component{
 
     render() {
         const width = Math.floor(Dimensions.get("window").width) - 30;
-        console.log(this.props.page._emojis);
         return (
             <TouchableOpacity
                 onPress={() => this.setState({...this.state, ...{open: !this.state.open}})}
@@ -72,7 +71,7 @@ export default class PageElement extends Component{
                     <Text>{this.props.page.text}</Text>
                     {this.props.page._tasks &&
                         this.props.page._tasks.map(t => {
-                            return <Text key={t._id}>{t.title}</Text>
+                            return <EmojiAddon key={t._id} name="heavy_check_mark" fontSize={12}><Text>{t.title}</Text></EmojiAddon>
                         })
                     }
                 </View>

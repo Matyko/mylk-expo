@@ -36,7 +36,7 @@ export class BaseModel {
             newAll.push(this)
         }
         await Storage.setItem(this._type, newAll);
-        console.log(this._emojis);
+
         return newAll.map(e => {
             return new this._classType(e);
         })
@@ -53,7 +53,9 @@ export class BaseModel {
     _searchTextForEmojis() {
         const result = [];
         const maxEmojis = 3;
-        const stringArray = this.title.toLowerCase().split(' ').concat(this.text.toLowerCase.split(' '));
+        let stringArray = [];
+        Array.prototype.push.apply(stringArray, this.title ? this.title.toLowerCase().split(' ') : []);
+        Array.prototype.push.apply(stringArray, this.text ? this.text.toLowerCase().split(' ') : []);
         for (const string of stringArray) {
             const found = Emoji.findByName(string);
             if (found) {

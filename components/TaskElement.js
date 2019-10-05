@@ -65,7 +65,7 @@ export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
         directionalOffsetThreshold: 30
     };
 
-    console.log(task._emojis);
+
 
     return (
         <GestureRecognizer

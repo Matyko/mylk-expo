@@ -8,9 +8,8 @@ export class Task extends BaseModel {
     constructor({title, text, date, created_at, isFullDay, repeats, id, _id, notificationId, checked}) {
         super({title, text, date, created_at, id, _id, type: STORAGE_CONSTS.TASKS, classType: Task});
         this._notificationId = notificationId || null;
-        this.isFullDay = isFullDay;
-        this.text = text;
-        this.repeats = repeats;
+        this.isFullDay = isFullDay || false;
+        this.repeats = repeats || false;
         this.checked = checked || false;
         this._notificationManager = new NotificationManager();
         if (this.repeats) {
