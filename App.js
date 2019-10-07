@@ -7,7 +7,6 @@ import { Ionicons } from '@expo/vector-icons';
 import timerFix from "./util/timerWarningFix";
 import AppNavigator from './navigation/AppNavigator';
 import firebase from 'firebase'
-import * as Storage from './util/storage';
 import '@firebase/firestore';
 
 const firebaseConfig = {

@@ -4,7 +4,7 @@ import ModalComponent from "../components/ModalComponent";
 import TaskElement from "../components/TaskElement";
 import FloatingActionButton from "../components/FloatingActionButton";
 import TaskEditor from "../components/TaskEditor";
-import Colors from "../constants/Colors";
+import Colors, {hexToRgb} from "../constants/Colors";
 import sortByDate from "../util/sortByDate";
 import mLogger from "../util/mLogger";
 import NotificationManager from "../util/NotificationManager"
@@ -13,6 +13,8 @@ import PageAutomator from "../util/PageAutomator";
 import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
 import {Task} from "../models/Task";
+
+const rgbBG = hexToRgb(Colors.primaryBackground);
 
 export default class TasksScreen extends Component {
     constructor(props) {
@@ -104,7 +106,11 @@ export default class TasksScreen extends Component {
     render() {
         return (
             <View style={{flex: 1}}>
-                <ScrollView style={styles.container}>
+                <View style={{flexGrow: 0, backgroundColor: `rgba(${rgbBG.r},${rgbBG.g},${rgbBG.b},0.8)`}}>
+                    <TaskEditor task={this.state.editedTask}
+                                savedTask={tasks => this.savedTask(tasks)}/>
+                </View>
+                <ScrollView style={{flexGrow: 2, backgroundColor: `rgba(${rgbBG.r},${rgbBG.g},${rgbBG.b},0.6)`}}>
                     {this.state.tasks.sort(sortByDate).map(task => {
                         if (!task.checked) {
                             return <TaskElement
@@ -136,14 +142,6 @@ export default class TasksScreen extends Component {
                     })}
                 </ScrollView>
                 <FloatingActionButton pressFunction={() => this.setState({...this.state, ...{modalVisible: true}})}/>
-                <ModalComponent
-                    closeModal={() => this.setState({...this.state, ...{modalVisible: false, editedTask: null}})}
-                    modalVisible={this.state.modalVisible}
-                    title="Create a task"
-                >
-                    <TaskEditor task={this.state.editedTask}
-                                savedTask={tasks => this.savedTask(tasks)}/>
-                </ModalComponent>
             </View>
         );
     }
@@ -164,11 +162,6 @@ TasksScreen.navigationOptions = {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        paddingTop: 15,
-        backgroundColor: Colors.white,
-    },
     separator: {
         height: 1,
         backgroundColor: Colors.light,

@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import {Input} from 'react-native-elements';
 import {View, StyleSheet, Text, ScrollView} from "react-native";
-import DatePicker from "react-native-datepicker";
 import formatDate from "../util/formatDate";
 import Colors from "../constants/Colors";
 import mLogger from "../util/mLogger";
 import ImagePickerComponent from "./ImagePickerComponent";
 import FancyButton from "./FancyButton";
 import {Page} from "../models/Page";
+import DateTimePicker from "./DateTimePicker";
 
 export default class PageEditor extends Component {
     constructor(props) {
@@ -52,28 +52,9 @@ export default class PageEditor extends Component {
                 <View style={styles.form}>
                     <View style={styles.formElement}>
                         <Text style={styles.label}>Date</Text>
-                        <DatePicker
-                            style={styles.datePicker}
+                        <DateTimePicker
                             date={this.state.date}
                             mode={this.state.mode}
-                            placeholder="select date"
-                            format={`YYYY-MM-DD${this.state.mode === 'datetime' ? ' HH:mm' : ''}`}
-                            confirmBtnText="Confirm"
-                            cancelBtnText="Cancel"
-                            customStyles={{
-                                dateIcon: {
-                                    position: 'absolute',
-                                    left: 0,
-                                    top: 4,
-                                    marginLeft: 0
-                                },
-                                dateInput: {
-                                    marginLeft: 36,
-                                    flexGrow: 1,
-                                    borderColor: 'transparent',
-                                    borderBottomColor: Colors.light
-                                }
-                            }}
                             onDateChange={date => this.setDate(date)}
                         />
                     </View>
