@@ -44,9 +44,9 @@ export default class HomeScreen extends Component {
                    return new Task(t);
                 });
                 await Storage.setItem(STORAGE_CONSTS.TASKS, tasks);
-                const today = formatDate(new Date());
+                const today = new Date(new Date().toDateString());
                 tasks = tasks.filter(t => {
-                    return !t.checked && today === t.date.split(' ')[0]
+                    return !t.checked && today.getTime() === new Date(new Date(t.date).toDateString()).getTime()
                 });
                 this.setState({...this.state, ...{tasks}})
             })

@@ -13,7 +13,8 @@ export default class TaskEditor extends Component {
         super(props);
         this.state = {
             mode: props.task && props.task.isFullDay ? 'date' : 'datetime' || 'date',
-            date: props.task && props.task.date || formatDate(new Date),
+            date: props.task && props.task.date || new Date(),
+            humanizedDate: props.task && props.task.humanizedDate || 'Today',
             title: props.task && props.task.title || '',
             repeats: props.task && props.task.repeats || null,
             animVal: new Animated.Value(0),
@@ -29,8 +30,8 @@ export default class TaskEditor extends Component {
         this.setState(copy);
     }
 
-    setDate(date) {
-        this.setState({...this.state, ...{date: date}});
+    setDate({date, humanizedDate}) {
+        this.setState({...this.state, ...{humanizedDate, date}});
     }
 
     setRepeats() {
@@ -51,15 +52,23 @@ export default class TaskEditor extends Component {
     componentWillReceiveProps(nextProps, nextContext) {
         const state = {
             mode: this.props.task && this.props.task.isFullDay ? 'date' : 'datetime' || 'date',
-            date: this.props.task && this.props.task.date || formatDate(new Date),
+            date: this.props.task && this.props.task.date || new Date(),
             title: this.props.task && this.props.task.title || '',
-            repeats: this.props.task && this.props.task.repeats || null
+            repeats: this.props.task && this.props.task.repeats || null,
+            humanizedDate: this.props.task && this.props.task.humanizedDate || 'Today'
         };
         this.setState({...this.state, ...state});
-        console.log(this.state);
     }
 
     close() {
+        const state = {
+            mode: 'date',
+            date: this.props.task && this.props.task.date || new Date(),
+            title: this.props.task && this.props.task.title || '',
+            repeats: this.props.task && this.props.task.repeats || null,
+            humanizedDate: this.props.task && this.props.task.humanizedDate || 'Today'
+        };
+        this.setState({...this.state, ...state});
         Animated.spring(this.state.animVal, {
             toValue: 0
         }).start()
@@ -75,6 +84,7 @@ export default class TaskEditor extends Component {
                 title: this.state.title,
                 date: this.state.date,
                 isFullDay: this.state.mode === 'date',
+                humanizedDate: this.state.humanizedDate,
                 repeats: this.state.repeats
             })
         }
@@ -85,7 +95,7 @@ export default class TaskEditor extends Component {
     }
 
     render() {
-        const style = [{maxHeight: this.state.animVal.interpolate({inputRange:[0,1], outputRange:[0,50]})}];
+        const style = [{maxHeight: this.state.animVal.interpolate({inputRange:[0,1], outputRange:[0,80]})}];
         return (
             <View style={styles.container}>
                 <View style={styles.formRow}>
@@ -102,17 +112,17 @@ export default class TaskEditor extends Component {
                             onFocus={() => this.open()}
                         />
                     </View>
-                    <View style={styles.saveButton}>
+                    <Animated.View style={[styles.saveButton, {opacity:  this.state.animVal.interpolate({inputRange:[0, 1], outputRange:[0.01,1]})}]}>
                         <Ionicons
                             name={Platform.OS === 'ios' ? 'ios-add-circle-outline' : 'md-add-circle-outline'}
                             size={35}
                             color={Colors.primaryText}
                             onPress={() => this.saveTask()}/>
-                    </View>
+                    </Animated.View>
                 </View>
                 <Animated.View style={[styles.formRow, style]}>
-                    <View style={[styles.formElement, {flexGrow: 2}]}>
-                        {/*<Text style={styles.label}>Date</Text>*/}
+                    <View style={[styles.formElement, {flexGrow: 3}]}>
+                        <Text style={styles.label}>Date</Text>
                         <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
                             <DateTimePicker
                                 onDateChange={date => this.setDate(date)}
@@ -121,10 +131,10 @@ export default class TaskEditor extends Component {
                                 mode={this.state.mode}/>
                         </View>
                     </View>
-                    <View style={[styles.formElement, {flexGrow: 1, marginBottom: 10}]}>
-                        {/*<Text style={styles.label}>Repeats</Text>*/}
+                    <View style={[styles.formElement, {flexGrow: 2}]}>
+                        <Text style={styles.label}>Repeats</Text>
                             <Picker
-                                style={{color: Colors.primaryText}}
+                                style={{color: Colors.primaryText, height: 25}}
                                 selectedValue={this.state.repeats}
                                 onValueChange={repeats => this.setState({...this.state, ...{repeats}})}>
                                 <Picker.Item label="Never" value={null} />
@@ -152,8 +162,11 @@ const styles = StyleSheet.create({
       flexBasis: 1,
       flexShrink: 0,
       flexGrow: 1,
+        padding: 5,
       flexDirection: 'column',
-      justifyContent: 'space-between'
+      justifyContent: 'space-between',
+        minHeight: 50,
+        height: '100%',
     },
     formRow: {
         flexDirection: 'row',
@@ -169,7 +182,7 @@ const styles = StyleSheet.create({
     },
     label: {
         alignSelf: 'flex-start',
-        padding: 5,
-        color: Colors.primaryText
+        color: Colors.primaryText,
+        marginBottom: 10
     }
 });

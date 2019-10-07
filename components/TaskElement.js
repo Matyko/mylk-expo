@@ -100,7 +100,7 @@ export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
                                     })
                                 }
                             </View>
-                            <Text numberOfLines={1}>{task.date}</Text>
+                            <Text numberOfLines={1}>{task.humanizedDate}</Text>
                         </View>
                     </View>
                     <View style={{flexGrow: 0, flexShrink: 1, flexBasis: 'auto', width: 40}}>

@@ -65,7 +65,7 @@ async function loadResourcesAsync() {
       // remove this if you are not using it in your app
       'nunito': require('./assets/fonts/Nunito-Regular.ttf'),
       'nunito-black': require('./assets/fonts/Nunito-Black.ttf'),
-      'nunito-light': require('./assets/fonts/Nunito-ExtraLightItalic.ttf')
+      'nunito-light': require('./assets/fonts/Nunito-ExtraLight.ttf')
     })
   ]);
 }

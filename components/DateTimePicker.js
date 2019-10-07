@@ -127,6 +127,7 @@ export default class DateTimePicker extends Component {
             try {
                 const { action, year, month, day } = await DatePickerAndroid.open({
                     date: this.state.dateTime,
+                    minDate: new Date()
                 });
                 if (action !== DatePickerAndroid.dismissedAction) {
                     await this.setDate(new Date(year, month, day));
@@ -158,7 +159,7 @@ export default class DateTimePicker extends Component {
     async setDate(dateTime) {
         await this.setState({...this.state, ...{dateTime}});
         await this.getHumanizedData(dateTime);
-        this.props.onDateChange(this.state.humanizedDateTime);
+        this.props.onDateChange({humanizedDate: this.state.humanizedDateTime, date: this.state.dateTime});
     }
 
     async handleDateChange(val) {
@@ -211,22 +212,18 @@ export default class DateTimePicker extends Component {
     render() {
         return (
             <View style={{flexDirection: 'row', flex: 1}}>
-                {(this.props.mode === constants.DATETIME || this.props.mode === constants.DATE) &&
-                    <TouchableOpacity style={{flexGrow: 1}}
-                                      onPress={() => this.handleDateChange()}>
-                        <Text style={{color: this.props.textColor || Colors.black}}>
-                            {this.state.humanizedDate}
-                        </Text>
-                    </TouchableOpacity>
-                }
-                {(this.props.mode === constants.DATETIME || this.props.mode === constants.TIME) &&
-                    <TouchableOpacity style={{flexGrow: 1}}
-                                      onPress={() => this.handleTimeChange()}>
-                        <Text style={{color: this.props.textColor || Colors.black}}>
-                            {this.state.humanizedTime}
-                        </Text>
-                    </TouchableOpacity>
-                }
+                <TouchableOpacity style={{flexGrow: 1}}
+                                  onPress={() => this.handleDateChange()}>
+                    <Text style={{color: this.props.textColor || Colors.black}}>
+                        {this.state.humanizedDate}
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{flexGrow: 1}}
+                                  onPress={() => this.handleTimeChange()}>
+                    <Text style={{color: this.props.textColor || Colors.black}}>
+                        {this.state.humanizedTime}
+                    </Text>
+                </TouchableOpacity>
                 {this.state.showIOS && <DatePickerIOS date={this.state.date} mode={this.props.mode} onDateChange={this.setDate} />}
             </View>
         )

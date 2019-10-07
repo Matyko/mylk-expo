@@ -19,7 +19,7 @@ export default class PageAutomator {
         } else {
             const newPage = new Page({
                 text: 'What I accomplished today:',
-                date: formatDate(new Date(finishedDay)),
+                date: new Date(finishedDay),
                 finishedDay: finishedDay,
                 created_at: new Date(),
                 _emojis: _emojis || [],

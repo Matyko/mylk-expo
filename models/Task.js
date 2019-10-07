@@ -22,7 +22,7 @@ export class Task extends BaseModel {
             this._notificationId = await this._notificationManager.createNotification({
                 title: 'Mylk task reminder',
                 body: this.title,
-                time: parseDate(this.date) + (this.isFullDay ? 25200000 : 0),
+                time: this.date,
                 repeat: this.repeats
             });
             return this._notificationId;
@@ -37,8 +37,7 @@ export class Task extends BaseModel {
     }
 
     _handleRepeat() {
-        const dates = this.date.split(' ');
-        const date = new Date(dates[0]);
+        const date = new Date(this.date.toDateString());
         const today = new Date(new Date().toDateString());
         if (date.getTime() < today.getTime()) {
             switch(this.repeats) {
@@ -54,8 +53,9 @@ export class Task extends BaseModel {
                 case "year":
                     date.setFullYear(date.getFullYear() + 1);
             }
-            const newDate = formatDate(date);
-            this.date = newDate + (dates[1] ? ' ' + dates[1] : '');
+            date.setHours(this.date.getHours());
+            date.setMinutes(this.date.getMinutes());
+            this.date = date;
             this.checked = false;
         }
     }
