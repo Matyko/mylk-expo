@@ -54,7 +54,10 @@ export default class TasksScreen extends Component {
             }
             await this.pageAutomator.taskUnChecked(task);
         } else {
-            task.finishedDay = new Date(new Date().toDateString()).getTime();
+            const today = new Date();
+            today.setHours(0);
+            today.setMinutes(0);
+            task.finishedDay = today.getTime();
             await this.pageAutomator.taskChecked(task);
             if (task._notificationId && !task.repeats) {
                 await this.notificationManager.cancelNotification(task._notificationId);

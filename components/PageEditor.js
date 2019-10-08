@@ -23,14 +23,6 @@ export default class PageEditor extends Component {
         };
     }
 
-    setDate(date) {
-        this.setState({...this.state, ...{date: date}});
-    }
-
-    setText(text) {
-        this.setState({...this.state, ...{text: text}})
-    }
-
     async savePage() {
         let page;
         if (this.props.page) {
@@ -38,12 +30,17 @@ export default class PageEditor extends Component {
         } else {
             page = new Page({
                 text: this.state.text,
-                date: this.state.date,
+                date: this.state.date.getTime(),
                 images: this.state.images,
             });
         }
         mLogger(`saving page: ${page}`);
-        await this.props.savedPage(await page.save());
+        const pages = await page.save();
+        if (pages) {
+            await this.props.savedPage(pages);
+        } else {
+            mLogger(`could not save page: ${page}`)
+        }
     }
 
     render() {
@@ -55,7 +52,7 @@ export default class PageEditor extends Component {
                         <DateTimePicker
                             date={this.state.date}
                             mode={this.state.mode}
-                            onDateChange={date => this.setDate(date)}
+                            onDateChange={date => this.setState({...this.state, ...{date: date}})}
                         />
                     </View>
                     <View style={styles.textInputContainer}>
@@ -67,7 +64,7 @@ export default class PageEditor extends Component {
                             multiline={true}
                             numberOfLines={10}
                             value={this.state.text}
-                            onChangeText={text => this.setText(text)}
+                            onChangeText={text => this.setState({...this.state, ...{text: text}})}
                         />
                     </View>
                     <View style={styles.formElement}>

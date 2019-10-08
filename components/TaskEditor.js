@@ -12,10 +12,10 @@ export default class TaskEditor extends Component {
         super(props);
         this.state = {
             mode: props.task && props.task.isFullDay ? 'date' : 'datetime' || 'date',
-            date: props.task && new Date(+props.task.date) || new Date(),
+            date: props.task && props.task.date || new Date(),
             humanizedDate: props.task && props.task.humanizedDate || 'Today',
             title: props.task && props.task.title || '',
-            repeats: props.task && props.task.repeats || null,
+            repeats: props.task && props.task.repeats || false,
             animVal: new Animated.Value(0),
             errors: {
                 desc: ''
@@ -32,12 +32,13 @@ export default class TaskEditor extends Component {
     componentWillReceiveProps(nextProps, nextContext) {
         const state = {
             mode: this.props.task && this.props.task.isFullDay ? 'date' : 'datetime' || 'date',
-            date: this.props.task && new Date(+this.props.task.date) || new Date(),
+            date: this.props.task && props.task.date || new Date(),
             title: this.props.task && this.props.task.title || '',
-            repeats: this.props.task && this.props.task.repeats || null,
+            repeats: this.props.task && this.props.task.repeats || false,
             humanizedDate: this.props.task && this.props.task.humanizedDate || 'Today'
         };
         this.setState({...this.state, ...state});
+        this.open()
     }
 
     close() {

@@ -1,5 +1,4 @@
 import React from "react";
-import formatDate from "./formatDate";
 import STORAGE_CONSTS from '../util/storageConsts';
 import {Page} from "../models/Page";
 import {getAllStatic} from "../models/BaseModel";
@@ -19,9 +18,9 @@ export default class PageAutomator {
         } else {
             const newPage = new Page({
                 text: 'What I accomplished today:',
-                date: new Date(finishedDay),
+                date: new Date(finishedDay).getTime(),
                 finishedDay: finishedDay,
-                created_at: new Date(),
+                created_at: new Date().getTime(),
                 _emojis: _emojis || [],
                 _tasks: [{_id, title}]
             });
