@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import {Input} from 'react-native-elements';
 import {View, StyleSheet, Picker, Text, Platform, Animated} from "react-native";
-import formatDate from "../util/formatDate";
 import Colors from "../constants/Colors";
 import mLogger from "../util/mLogger";
 import { Ionicons } from "@expo/vector-icons";
@@ -13,7 +12,7 @@ export default class TaskEditor extends Component {
         super(props);
         this.state = {
             mode: props.task && props.task.isFullDay ? 'date' : 'datetime' || 'date',
-            date: props.task && props.task.date || new Date(),
+            date: props.task && new Date(+props.task.date) || new Date(),
             humanizedDate: props.task && props.task.humanizedDate || 'Today',
             title: props.task && props.task.title || '',
             repeats: props.task && props.task.repeats || null,
@@ -22,25 +21,6 @@ export default class TaskEditor extends Component {
                 desc: ''
             },
         };
-    }
-
-    changeMode() {
-        const copy = JSON.parse(JSON.stringify(this.state));
-        copy.mode = copy.mode === 'date' ? 'datetime' : 'date';
-        this.setState(copy);
-    }
-
-    setDate({date, humanizedDate}) {
-        this.setState({...this.state, ...{humanizedDate, date}});
-    }
-
-    setRepeats() {
-        const repeats = this.state.repeats ? false : 'day';
-        this.setState({...this.state, ...{repeats}})
-    }
-
-    setText(text) {
-        this.setState({...this.state, ...{title: text}})
     }
 
     open() {
@@ -52,7 +32,7 @@ export default class TaskEditor extends Component {
     componentWillReceiveProps(nextProps, nextContext) {
         const state = {
             mode: this.props.task && this.props.task.isFullDay ? 'date' : 'datetime' || 'date',
-            date: this.props.task && this.props.task.date || new Date(),
+            date: this.props.task && new Date(+this.props.task.date) || new Date(),
             title: this.props.task && this.props.task.title || '',
             repeats: this.props.task && this.props.task.repeats || null,
             humanizedDate: this.props.task && this.props.task.humanizedDate || 'Today'
@@ -63,10 +43,10 @@ export default class TaskEditor extends Component {
     close() {
         const state = {
             mode: 'date',
-            date: this.props.task && this.props.task.date || new Date(),
-            title: this.props.task && this.props.task.title || '',
-            repeats: this.props.task && this.props.task.repeats || null,
-            humanizedDate: this.props.task && this.props.task.humanizedDate || 'Today'
+            date: new Date(),
+            title: '',
+            repeats: null,
+            humanizedDate: 'Today'
         };
         this.setState({...this.state, ...state});
         Animated.spring(this.state.animVal, {
@@ -82,7 +62,7 @@ export default class TaskEditor extends Component {
         } else {
             task = new Task({
                 title: this.state.title,
-                date: this.state.date,
+                date: this.state.date.getTime(),
                 isFullDay: this.state.mode === 'date',
                 humanizedDate: this.state.humanizedDate,
                 repeats: this.state.repeats
@@ -90,7 +70,12 @@ export default class TaskEditor extends Component {
         }
         await task.createNotification();
         mLogger(`saving task: ${task}`);
-        await this.props.savedTask(await task.save());
+        const tasks = await task.save();
+        if (tasks) {
+            await this.props.savedTask(tasks);
+        } else {
+            mLogger(`could not save task: ${task}`)
+        }
         this.close();
     }
 
@@ -105,7 +90,7 @@ export default class TaskEditor extends Component {
                             placeholder='Enter task description...'
                             errorMessage={this.state.errors.desc}
                             value={this.state.title}
-                            onChangeText={text => this.setText(text)}
+                            onChangeText={text => this.setState({...this.state, ...{title: text}})}
                             placeholderTextColor={Colors.primaryText}
                             inputContainerStyle={{borderColor: Colors.primaryText}}
                             inputStyle={{color: Colors.primaryText}}
@@ -125,7 +110,7 @@ export default class TaskEditor extends Component {
                         <Text style={styles.label}>Date</Text>
                         <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
                             <DateTimePicker
-                                onDateChange={date => this.setDate(date)}
+                                onDateChange={({date, humanizedDate}) => this.setState({...this.state, ...{humanizedDate, date}})}
                                 textColor={Colors.primaryText}
                                 borderColor={Colors.primaryText}
                                 mode={this.state.mode}/>

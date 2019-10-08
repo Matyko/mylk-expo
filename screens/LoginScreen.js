@@ -29,6 +29,9 @@ export default class LoginScreen extends Component {
     }
 
     async componentDidMount() {
+        // TODO TESTING
+        this.props.navigation.navigate('Main');
+        return;
         try {
             const passCode = await SecureStore.getItemAsync(STORAGE_CONSTS.PASSCODE);
             const password = await SecureStore.getItemAsync(STORAGE_CONSTS.PASSWORD);
@@ -96,22 +99,22 @@ export default class LoginScreen extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Video
-                    source={require('../assets/video/11.mp4')}
-                    style={styles.backgroundVideo}
-                    rate={1}
-                    shouldPlay={true}
-                    isLooping={true}
-                    volume={1}
-                    muted={true}
-                    resizeMode="cover"
-                />
-                {/*<LinearGradient*/}
-                {/*    start={[0, 1]}*/}
-                {/*    end={[1, 0]}*/}
-                {/*    colors={[Colors.primaryText, Colors.primaryBackground]}*/}
-                {/*    style={[styles.backgroundVideo, {opacity: 0.6}]}*/}
+                {/*<Video*/}
+                {/*    source={require('../assets/video/11.mp4')}*/}
+                {/*    style={styles.backgroundVideo}*/}
+                {/*    rate={1}*/}
+                {/*    shouldPlay={true}*/}
+                {/*    isLooping={true}*/}
+                {/*    volume={1}*/}
+                {/*    muted={true}*/}
+                {/*    resizeMode="cover"*/}
                 {/*/>*/}
+                <LinearGradient
+                    start={[0, 1]}
+                    end={[1, 0]}
+                    colors={[Colors.primaryText, Colors.primaryBackground]}
+                    style={[styles.backgroundVideo, {opacity: 0.6}]}
+                />
                 <KeyboardAvoidingView behavior='padding' style={styles.container}>
                     <View style={styles.loginContainer}>
                         <View style={styles.logo}>

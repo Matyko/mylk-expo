@@ -7,11 +7,11 @@ import {
 } from 'react-native';
 import Colors from "../constants/Colors";
 import HomeScreenPill from "../components/HomeScreenPill";
-import formatDate from "../util/formatDate";
 import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
 import {Task} from "../models/Task";
 import {Page} from "../models/Page";
+import {getAllStatic} from "../models/BaseModel";
 
 export default class HomeScreen extends Component {
     constructor(props) {
@@ -22,59 +22,47 @@ export default class HomeScreen extends Component {
             animVal: new Animated.Value(0)
         };
         this.props.navigation.addListener('willFocus', () => {
-            this.getTasks();
-            this.getPages();
+            this.getData();
         });
-        this.initSync();
+        // this.initSync();
     }
 
     async initSync() {
-        // const toSync = await Storage.getItem(STORAGE_CONSTS.SYNC)
-        // if (toSync) {
-        //     await Storage.setUpSynced();
-        //     await Storage.syncAll();
-        // }
-    }
-
-    getTasks() {
-        try {
-            Storage.getItem(STORAGE_CONSTS.TASKS).then(async result => {
-                let tasks = result || [];
-                tasks.map(t => {
-                   return new Task(t);
-                });
-                await Storage.setItem(STORAGE_CONSTS.TASKS, tasks);
-                const today = new Date(new Date().toDateString());
-                tasks = tasks.filter(t => {
-                    return !t.checked && today.getTime() === new Date(new Date(t.date).toDateString()).getTime()
-                });
-                this.setState({...this.state, ...{tasks}})
-            })
-        } catch {
-            Alert.alert('Could not load your tasks');
+        const toSync = await Storage.getItem(STORAGE_CONSTS.SYNC)
+        if (toSync) {
+            await Storage.setUpSynced();
+            await Storage.syncAll();
         }
     }
 
-    getPages() {
-        try {
-            Storage.getItem(STORAGE_CONSTS.PAGES).then(async result => {
-                let pages = result || [];
-                const today = formatDate(new Date());
-                pages = pages.filter(p => {
-                    return today === p.date
-                }).map(p => {
-                    return new Page(p)
+    getData() {
+        const data = [
+            {type: STORAGE_CONSTS.PAGES, classType: Page, stateName: 'tasks'},
+            {type: STORAGE_CONSTS.TASKS, classType: Task, stateName: 'pages'}
+        ];
+
+        data.forEach(async ({type, classType, stateName}) => {
+            try {
+                let array = await getAllStatic(type, classType);
+                const today = new Date();
+                today.setHours(0);
+                today.setMinutes(0);
+                array = array.filter(element => {
+                    const eDate = new Date(+element.date);
+                    eDate.setHours(0);
+                    eDate.setMinutes(0);
+                    return !element.checked && today.getTime() === eDate.getTime()
                 });
-                this.setState({...this.state, ...{pages}})
-            })
-        } catch {
-            Alert.alert('Could not load your pages');
-        }
+                this.setState({...this.state, ...{[stateName]: array}})
+            } catch {
+                Alert.alert(`Could not load your ${type.toLowerCase()}`);
+            }
+        })
+
     }
 
     componentWillMount() {
-        this.getTasks();
-        this.getPages();
+        this.getData();
     }
 
     componentDidMount() {
