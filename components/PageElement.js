@@ -40,7 +40,7 @@ export default class PageElement extends Component{
                         return <Text key={e.key}>{e.emoji}</Text>
                         })
                     }
-                    <Text style={styles.topData}>{this.props.page.date}</Text>
+                    <Text style={styles.topData}>{this.props.page.humanizedDate}</Text>
                 </View>
                 {this.state.editable &&
                 <View style={styles.bottom}>

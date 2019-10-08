@@ -3,13 +3,14 @@ import * as Storage from '../util/storage';
 import Emoji from 'node-emoji';
 
 export class BaseModel {
-    constructor({title, text, date, created_at, modified_at,  _id, id, type, classType, finishedDay}) {
+    constructor({title, text, date, created_at, modified_at, _id, id, type, classType, finishedDay, humanizedDate}) {
         this._id = _id || id || Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         this.title = title || '';
         this.text = text || '';
         this.date = date ? new Date(+date) : new Date().getTime();
         this.created_at = created_at ? new Date(+created_at) : new Date().getTime();
         this.finishedDay = finishedDay || null;
+        this.humanizedDate = humanizedDate || '';
         this.modified_at = modified_at ? new Date(+modified_at) : this.created_at;
         this._type = type;
         this._classType = classType;

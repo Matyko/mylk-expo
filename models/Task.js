@@ -5,8 +5,19 @@ import {BaseModel} from "./BaseModel";
 import STORAGE_CONSTS from "../util/storageConsts";
 
 export class Task extends BaseModel {
-    constructor({title, text, date, created_at, isFullDay, repeats, id, _id, notificationId, _notificationId, checked, finishedDay} = {}) {
-        super({finishedDay, title, text, date, created_at, id, _id, type: STORAGE_CONSTS.TASKS, classType: Task});
+    constructor({title, text, date, created_at, isFullDay, repeats, id, _id, notificationId, _notificationId, checked, finishedDay, humanizedDate} = {}) {
+        super({
+            finishedDay,
+            humanizedDate,
+            title,
+            text,
+            date,
+            created_at,
+            id,
+            _id,
+            type: STORAGE_CONSTS.TASKS,
+            classType: Task
+        });
         this._notificationId = notificationId || _notificationId || null;
         this.isFullDay = isFullDay || false;
         this.repeats = repeats || false;
@@ -40,7 +51,7 @@ export class Task extends BaseModel {
         const date = new Date(this.date.toDateString());
         const today = new Date(new Date().toDateString());
         if (date.getTime() < today.getTime()) {
-            switch(this.repeats) {
+            switch (this.repeats) {
                 case "day":
                     date.setDate(today.getDate());
                     break;

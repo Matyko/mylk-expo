@@ -13,6 +13,7 @@ import PageAutomator from "../util/PageAutomator";
 import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
 import {Task} from "../models/Task";
+import {getAllStatic} from "../models/BaseModel";
 
 const rgbBG = hexToRgb(Colors.primaryBackground);
 
@@ -31,10 +32,8 @@ export default class TasksScreen extends Component {
     async componentWillMount() {
         try {
             mLogger('Loading tasks');
-            Storage.getItem(STORAGE_CONSTS.TASKS).then(result => {
-                const tasks = result || [];
-                this.setState({...this.state, ...{tasks}})
-            })
+            const tasks = await getAllStatic(STORAGE_CONSTS.TASKS, Task);
+            this.setState({...this.state, ...{tasks}});
         } catch {
             Alert.alert('Could not load your tasks');
             mLogger('could not load tasks')
@@ -44,12 +43,12 @@ export default class TasksScreen extends Component {
     async setChecked(task) {
         if (task.checked) {
             const currentTime = new Date().getTime();
-            const dueTime = parseDate(task.date);
+            const dueTime = task.date.getTime();
             if (currentTime < dueTime && !task.repeats) {
                 task._notificationId = await this.notificationManager.createNotification({
                     title: 'Mylk task reminder',
                     body: task.title,
-                    time: parseDate(task.date) + (task.isFullDay ? 25200000 : 0)
+                    time: task.date.getTime() + (task.isFullDay ? 25200000 : 0)
                 });
             }
             await this.pageAutomator.taskUnChecked(task);
@@ -64,14 +63,12 @@ export default class TasksScreen extends Component {
                 delete task._notificationId
             }
         }
-        const tasks = this.state.tasks.map(e => {
-            if (e === task) {
-                e.finishedDay = !e.checked ? new Date(new Date().toDateString()).getTime() : null;
-                e.checked = !e.checked;
-            }
-            return e
-        });
-        await this.updateTasks(tasks);
+        task.finishedDay = !task.checked ? new Date(new Date().toDateString()).getTime() : null;
+        task.checked = !task.checked;
+        const tasks = await task.save();
+        const state = {...this.state, ...{tasks, modalVisible: false}};
+        this.setState(state);
+
     }
 
     editTask(task) {
@@ -93,16 +90,6 @@ export default class TasksScreen extends Component {
             this.setState(state);
         } catch {
             Alert.alert('Could not delete your task');
-        }
-    }
-
-    async updateTasks(tasks) {
-        const state = {...this.state, ...{tasks, modalVisible: false}};
-        try {
-            await Storage.setItem(STORAGE_CONSTS.TASKS, tasks);
-            this.setState(state);
-        } catch {
-            Alert.alert('Could not update your task');
         }
     }
 
