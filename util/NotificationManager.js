@@ -3,7 +3,7 @@ import { Notifications } from "expo";
 
 export default class NotificationManager {
 
-    sendNotificationImmediately = async ({title, body}) => {
+    static sendNotificationImmediately = async ({title, body}) => {
         const hasPermissions = await this.askPermissions();
         if (hasPermissions) {
             return await Notifications.presentLocalNotificationAsync({
@@ -15,10 +15,10 @@ export default class NotificationManager {
         }
     };
 
-    scheduleNotification = async ({title, body, time, repeat = undefined}) => {
+    static scheduleNotification = async ({title, body, time, repeat = undefined}) => {
         const hasPermissions = await this.askPermissions();
         if (hasPermissions) {
-            return Notifications.scheduleLocalNotificationAsync(
+            return await Notifications.scheduleLocalNotificationAsync(
                 {
                     title,
                     body
@@ -34,7 +34,7 @@ export default class NotificationManager {
     };
 
 
-    async createNotification({title, body, time}) {
+    static async createNotification({title, body, time}) {
         if (time) {
             return await this.scheduleNotification({title, body, time})
         } else {
@@ -42,11 +42,11 @@ export default class NotificationManager {
         }
     }
 
-    async cancelNotification(notificationId) {
+    static async cancelNotification(notificationId) {
         return await Notifications.cancelScheduledNotificationAsync(notificationId)
     }
 
-    askPermissions = async () => {
+    static askPermissions = async () => {
         const { status: existingStatus } = await Permissions.getAsync(
             Permissions.NOTIFICATIONS
         );

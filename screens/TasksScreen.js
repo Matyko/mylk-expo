@@ -41,22 +41,20 @@ export default class TasksScreen extends Component {
     }
 
     async setChecked(task) {
+        task = new Task(task);
         if (task.checked) {
             const currentTime = new Date().getTime();
-            const dueTime = task.date.getTime();
+            const dueTime = task.timeStamp;
             if (currentTime < dueTime && !task.repeats) {
                 task._notificationId = await this.notificationManager.createNotification({
                     title: 'Mylk task reminder',
                     body: task.title,
-                    time: task.date.getTime() + (task.isFullDay ? 25200000 : 0)
+                    time: task.timeStamp
                 });
             }
             await this.pageAutomator.taskUnChecked(task);
         } else {
-            const today = new Date();
-            today.setHours(0);
-            today.setMinutes(0);
-            task.finishedDay = today.getTime();
+            task.finishedDay = new Date(new Date().toDateString()).getTime();
             await this.pageAutomator.taskChecked(task);
             if (task._notificationId && !task.repeats) {
                 await this.notificationManager.cancelNotification(task._notificationId);
@@ -76,7 +74,7 @@ export default class TasksScreen extends Component {
     }
 
     async savedTask(tasks) {
-       this.setState({...this.state, ...{tasks, modalVisible: false}})
+       this.setState({...this.state, ...{tasks, modalVisible: false, editedTask: null}})
     }
 
     async deleteTask(task) {

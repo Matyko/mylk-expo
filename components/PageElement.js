@@ -6,13 +6,13 @@ import {
     Image,
     TouchableOpacity,
     Platform,
-    Dimensions,
-    ScrollView
+    Dimensions
 } from "react-native";
 import Colors from "../constants/Colors";
 import {LinearGradient} from "expo-linear-gradient";
 import {Ionicons} from "@expo/vector-icons";
 import EmojiAddon from "./EmojiAddon";
+import getHumanizedData from "../util/formatDate";
 
 export default class PageElement extends Component{
     constructor(props) {
@@ -21,6 +21,7 @@ export default class PageElement extends Component{
             open: !!this.props.fullPage,
             editable: false
         };
+        console.log(this.props.page)
     }
 
     render() {
@@ -40,7 +41,7 @@ export default class PageElement extends Component{
                         return <Text key={e.key}>{e.emoji}</Text>
                         })
                     }
-                    <Text style={styles.topData}>{this.props.page.humanizedDate}</Text>
+                    <Text style={styles.topData}>{getHumanizedData(this.props.page.timeStamp)}</Text>
                 </View>
                 {this.state.editable &&
                 <View style={styles.bottom}>

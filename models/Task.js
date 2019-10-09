@@ -1,17 +1,16 @@
-import formatDate from "../util/formatDate";
 import NotificationManager from "../util/NotificationManager"
-import parseDate from "../util/parseDate";
 import {BaseModel} from "./BaseModel";
 import STORAGE_CONSTS from "../util/storageConsts";
+import mLogger from "../util/mLogger";
 
 export class Task extends BaseModel {
-    constructor({title, text, date, created_at, isFullDay, repeats, id, _id, notificationId, _notificationId, checked, finishedDay, humanizedDate} = {}) {
+    constructor({title, text, timeStamp, created_at, repeats, id, _id, notificationId, _notificationId, checked, finishedDay, humanizedDate} = {}) {
         super({
             finishedDay,
             humanizedDate,
             title,
             text,
-            date,
+            timeStamp,
             created_at,
             id,
             _id,
@@ -19,36 +18,36 @@ export class Task extends BaseModel {
             classType: Task
         });
         this._notificationId = notificationId || _notificationId || null;
-        this.isFullDay = isFullDay || false;
         this.repeats = repeats || false;
         this.checked = checked || false;
-        this._notificationManager = new NotificationManager();
         if (this.repeats) {
             this._handleRepeat()
         }
     }
 
     async createNotification() {
-        if (new Date().getTime() < parseDate(this.date)) {
-            this._notificationId = await this._notificationManager.createNotification({
+        if (new Date().getTime() < this.timeStamp) {
+            this._notificationId = await NotificationManager.createNotification({
                 title: 'Mylk task reminder',
                 body: this.title,
-                time: this.date,
+                time: this.timeStamp,
                 repeat: this.repeats
             });
+            mLogger(`notification created with id: ${this._notificationId}`);
             return this._notificationId;
         }
     }
 
     async cancelNotification() {
         if (this._notificationId) {
-            await this._notificationManager.cancelNotification(this._notificationId);
+            await NotificationManager.cancelNotification(this._notificationId);
         }
         this._notificationId = null;
     }
 
     _handleRepeat() {
-        const date = new Date(this.date.toDateString());
+        const oDate = new Date(this.timeStamp);
+        const date = new Date(oDate.toDateString());
         const today = new Date(new Date().toDateString());
         if (date.getTime() < today.getTime()) {
             switch (this.repeats) {
@@ -64,9 +63,9 @@ export class Task extends BaseModel {
                 case "year":
                     date.setFullYear(date.getFullYear() + 1);
             }
-            date.setHours(this.date.getHours());
-            date.setMinutes(this.date.getMinutes());
-            this.date = date;
+            date.setHours(oDate.getHours());
+            date.setMinutes(oDate.getMinutes());
+            this.timeStamp = date.getTime();
             this.checked = false;
         }
     }

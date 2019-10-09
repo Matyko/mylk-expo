@@ -12,13 +12,14 @@ const constants = {
     CUSTOM: 'Custom'
 };
 
-export default async function getHumanizedData(date) {
-    const humanizedDate = await getHumanizedDate(date);
-    const humanizedTime = await getHumanizedTime(date);
+export default function getHumanizedData(date) {
+    const DATE = new Date(+date);
+    const humanizedDate = getHumanizedDate(DATE);
+    const humanizedTime = getHumanizedTime(DATE);
     return humanizedDate + " " + humanizedTime;
 }
 
-async function getHumanizedDate(date) {
+export function getHumanizedDate(date) {
     if (isToday(date)) {
         return constants.TODAY
     } else if (isTomorrow(date)) {
@@ -28,7 +29,7 @@ async function getHumanizedDate(date) {
     }
 }
 
-async function getHumanizedTime(date) {
+export function getHumanizedTime(date) {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     if (+minutes === 0) {

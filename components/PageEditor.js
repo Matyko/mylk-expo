@@ -13,8 +13,8 @@ export default class PageEditor extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            mode: props.page ? props.page.isFullDay : 'date',
-            date: props.page ? props.page.date : formatDate(new Date),
+            date: props.page ? new Date(props.page.timeStamp) : new Date(),
+            humanizedDate: props.page ? props.page.humanizedDate : '',
             text: props.page ? props.page.text : '',
             images: props.page ? props.page.images : [],
             errors: {
@@ -24,6 +24,7 @@ export default class PageEditor extends Component {
     }
 
     async savePage() {
+        console.log(this.state);
         let page;
         if (this.props.page) {
             page = new Page(this.props.page)
@@ -31,6 +32,7 @@ export default class PageEditor extends Component {
             page = new Page({
                 text: this.state.text,
                 date: this.state.date.getTime(),
+                humanizedDate: this.state.humanizedDate,
                 images: this.state.images,
             });
         }
@@ -52,7 +54,7 @@ export default class PageEditor extends Component {
                         <DateTimePicker
                             date={this.state.date}
                             mode={this.state.mode}
-                            onDateChange={date => this.setState({...this.state, ...{date: date}})}
+                            onDateChange={dateObj => this.setState({...this.state, ...{date: dateObj.date, humanizedDate: dateObj.humanizedDate}})}
                         />
                     </View>
                     <View style={styles.textInputContainer}>

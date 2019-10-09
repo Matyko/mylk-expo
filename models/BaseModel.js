@@ -3,12 +3,12 @@ import * as Storage from '../util/storage';
 import Emoji from 'node-emoji';
 
 export class BaseModel {
-    constructor({title, text, date, created_at, modified_at, _id, id, type, classType, finishedDay, humanizedDate}) {
+    constructor({title, text, timeStamp, created_at, modified_at, _id, id, type, classType, finishedDay, humanizedDate}) {
         this._id = _id || id || Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         this.title = title || '';
         this.text = text || '';
-        this.date = date ? new Date(+date) : new Date().getTime();
-        this.created_at = created_at ? new Date(+created_at) : new Date().getTime();
+        this.timeStamp = timeStamp || new Date().getTime();
+        this.created_at = created_at || new Date().getTime();
         this.finishedDay = finishedDay || null;
         this.humanizedDate = humanizedDate || '';
         this.modified_at = modified_at ? new Date(+modified_at) : this.created_at;
@@ -26,10 +26,9 @@ export class BaseModel {
         this._emojis = this._searchTextForEmojis();
         const all = await this.getAll();
         let newAll;
-        if (all.find(e => e._id === this._id)) {
+        const found = all.find(e => e._id === this._id);
+        if (found) {
             newAll = all.map(e => {
-                e.date = e.date.getTime();
-                e.created_at = e.created_at.getTime();
                 e.modified_at = new Date().getTime();
                 if (e._id === this._id) {
                     return this;

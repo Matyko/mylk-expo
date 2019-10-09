@@ -18,12 +18,13 @@ export default class PageAutomator {
         } else {
             const newPage = new Page({
                 text: 'What I accomplished today:',
-                date: new Date(finishedDay).getTime(),
+                date: finishedDay,
                 finishedDay: finishedDay,
                 created_at: new Date().getTime(),
                 _emojis: _emojis || [],
                 _tasks: [{_id, title}]
             });
+            console.log(newPage);
             await newPage.save();
         }
     }

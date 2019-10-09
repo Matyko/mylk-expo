@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import mLogger from "../util/mLogger";
 import Colors from "../constants/Colors";
+import getHumanizedData, {getHumanizedDate, getHumanizedTime} from "../util/formatDate";
 
 const constants = {
     TODAY: 'Today',
@@ -46,72 +47,14 @@ export default class DateTimePicker extends Component {
     }
 
     async getHumanizedData(date) {
-        const humanizedDate = await this.getHumanizedDate(date);
-        const humanizedTime = await this.getHumanizedTime(date);
+        const humanizedDate = getHumanizedDate(date);
+        const humanizedTime = getHumanizedTime(date);
         const humanizedDateTime = humanizedDate + " " + humanizedTime;
         await this.setState({...this.state, ...{
                 humanizedDate,
                 humanizedTime,
                 humanizedDateTime
             }});
-    }
-
-    async getHumanizedDate(date) {
-        if (this.isToday(date)) {
-            await this.setState({...this.state, ...{datePickerVal: constants.TODAY}});
-            return constants.TODAY
-        } else if (this.isTomorrow(date)) {
-            await this.setState({...this.state, ...{datePickerVal: constants.TOMORROW}});
-            return constants.TOMORROW
-        } else {
-            await this.setState({...this.state, ...{datePickerVal: constants.CUSTOM}});
-            return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
-        }
-    }
-
-    async getHumanizedTime(date) {
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        if (+minutes === 0) {
-            switch (hours) {
-                case 0:
-                    await this.setState({...this.state, ...{timePickerVal: constants.ALL_DAY}});
-                    return constants.ALL_DAY;
-                case 9:
-                    await this.setState({...this.state, ...{timePickerVal: constants.MORNING}});
-                    return constants.MORNING;
-                case 12:
-                    await this.setState({...this.state, ...{timePickerVal: constants.AFTERNOON}});
-                    return constants.AFTERNOON;
-                case 18:
-                    await this.setState({...this.state, ...{timePickerVal: constants.EVENING}});
-                    return constants.EVENING;
-                case 21:
-                    await this.setState({...this.state, ...{timePickerVal: constants.NIGHT}});
-                    return constants.NIGHT;
-                default:
-                    await this.setState({...this.state, ...{timePickerVal: constants.CUSTOM}});
-                    return `${hours.toString().length === 1 ? '0' + hours : hours}` + ":" + `${minutes.toString().length === 1 ? '0' + minutes : minutes}`;
-            }
-        }
-        return `${hours.toString().length === 1 ? '0' + hours : hours}` + ":" + `${minutes.toString().length === 1 ? '0' + minutes : minutes}`
-    }
-
-    isToday(date) {
-        const today = new Date();
-        return this.compareDates(today, date)
-    }
-
-    isTomorrow(date) {
-        const today = new Date();
-        const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
-        return this.compareDates(tomorrow, date)
-    }
-
-    compareDates(date1, date2) {
-        return date1.getDate() === date2.getDate() &&
-            date1.getMonth() === date2.getMonth() &&
-            date1.getFullYear() === date2.getFullYear()
     }
 
     async startSelect(mode) {
@@ -180,7 +123,6 @@ export default class DateTimePicker extends Component {
     }
 
     async handleTimeChange(val) {
-        console.log(val === constants.MORNING);
         const date = new Date(this.state.dateTime.getTime());
         switch (val) {
             case constants.MORNING:
@@ -215,13 +157,13 @@ export default class DateTimePicker extends Component {
                 <TouchableOpacity style={{flexGrow: 1}}
                                   onPress={() => this.handleDateChange()}>
                     <Text style={{color: this.props.textColor || Colors.black}}>
-                        {this.state.humanizedDate}
+                        {getHumanizedDate(this.state.dateTime)}
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{flexGrow: 1}}
                                   onPress={() => this.handleTimeChange()}>
                     <Text style={{color: this.props.textColor || Colors.black}}>
-                        {this.state.humanizedTime}
+                        {getHumanizedTime(this.state.dateTime)}
                     </Text>
                 </TouchableOpacity>
                 {this.state.showIOS && <DatePickerIOS date={this.state.date} mode={this.props.mode} onDateChange={this.setDate} />}

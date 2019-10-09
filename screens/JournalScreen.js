@@ -56,7 +56,7 @@ export default class JournalScreen extends Component {
     }
 
     async savedPage(pages) {
-        this.setState({...this.state, ...{pages}})
+        this.setState({...this.state, ...{pages, modalVisible: false}})
     }
 
     async deletePage(page) {

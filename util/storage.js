@@ -10,6 +10,8 @@ export async function getItem(type) {
     const id = await getId();
     if (id) {
         try {
+            // clear data
+            // await AsyncStorage.setItem(`${type}.${id}`, '[]')
             return JSON.parse(await AsyncStorage.getItem(`${type}.${id}`))
         } catch (e) {
             console.error(e);

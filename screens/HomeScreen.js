@@ -48,7 +48,7 @@ export default class HomeScreen extends Component {
                 today.setHours(0);
                 today.setMinutes(0);
                 array = array.filter(element => {
-                    const eDate = new Date(+element.date);
+                    const eDate = new Date(+element.timeStamp);
                     eDate.setHours(0);
                     eDate.setMinutes(0);
                     return !element.checked && today.getTime() === eDate.getTime()

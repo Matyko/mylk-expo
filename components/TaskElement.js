@@ -6,6 +6,7 @@ import {CheckBox} from "react-native-elements";
 import parseDate from "../util/parseDate";
 import GestureRecognizer from 'react-native-swipe-gestures';
 import Emoji from "react-native-emoji";
+import getHumanizedData from "../util/formatDate";
 
 export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
 
@@ -45,7 +46,7 @@ export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
 
     const getIcon = () => {
         const currentTime = new Date().getTime();
-        const dueTime = parseDate(task.date);
+        const dueTime = task.timeStamp;
         return currentTime < dueTime || task.checked ? task.repeats ? `${prefix}refresh` : null : `${prefix}alert`;
     };
 
@@ -64,8 +65,6 @@ export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
         velocityThreshold: 0.3,
         directionalOffsetThreshold: 30
     };
-
-
 
     return (
         <GestureRecognizer
@@ -100,7 +99,7 @@ export default function TaskElement({task, setChecked, deleteTask, toEdit}) {
                                     })
                                 }
                             </View>
-                            <Text numberOfLines={1}>{task.humanizedDate}</Text>
+                            <Text numberOfLines={1}>{getHumanizedData(task.timeStamp)}</Text>
                         </View>
                     </View>
                     <View style={{flexGrow: 0, flexShrink: 1, flexBasis: 'auto', width: 40}}>
