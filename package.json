@@ -9,6 +9,9 @@
     "test": "jest --watchAll",
     "lint": "eslint ./components --fix"
   },
+  "eslintConfig": {
+    "extends": "expo"
+  },
   "jest": {
     "preset": "jest-expo"
   },
@@ -37,7 +40,7 @@
   "devDependencies": {
     "babel-preset-expo": "^6.0.0",
     "eslint": "^6.5.1",
-    "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-expo": "^6.0.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.16.0",
@@ -47,6 +50,7 @@
     "expo-secure-store": "^6.0.0",
     "jest-expo": "^34.0.0",
     "node-emoji": "latest",
+    "prettier": "^1.18.2",
     "react-native-elements": "^1.2.0",
     "react-native-emoji": "^1.8.0"
   },
