@@ -4,30 +4,30 @@ import * as Font from 'expo-font';
 import React, { useState } from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import timerFix from "./util/timerWarningFix";
+import firebase from 'firebase';
+import timerFix from './util/timerWarningFix';
 import AppNavigator from './navigation/AppNavigator';
-import firebase from 'firebase'
 import '@firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB7hQ1BKUnW77ZbVf3Wh1vxd1luqhOfSlU",
-  authDomain: "mylk-3110c.firebaseapp.com",
-  databaseURL: "https://mylk-3110c.firebaseio.com",
-  projectId: "mylk-3110c",
-  storageBucket: "",
-  messagingSenderId: "884642600594",
-  appId: "1:884642600594:web:d10cd17a9e4ef90065384b"
+  apiKey: 'AIzaSyB7hQ1BKUnW77ZbVf3Wh1vxd1luqhOfSlU',
+  authDomain: 'mylk-3110c.firebaseapp.com',
+  databaseURL: 'https://mylk-3110c.firebaseio.com',
+  projectId: 'mylk-3110c',
+  storageBucket: '',
+  messagingSenderId: '884642600594',
+  appId: '1:884642600594:web:d10cd17a9e4ef90065384b',
 };
 
 firebase.initializeApp(firebaseConfig);
 
 timerFix();
 
-const auth = {loggedIn: false};
+const auth = { loggedIn: false };
 
-firebase.auth().onAuthStateChanged((user) => {
+firebase.auth().onAuthStateChanged(user => {
   if (user != null) {
-    auth.loggedIn = true
+    auth.loggedIn = true;
   }
 });
 
@@ -45,7 +45,9 @@ export default function App(props) {
   } else {
     return (
       <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" /> || <StatusBar translucent={true}/>}
+        {(Platform.OS === 'ios' && <StatusBar barStyle="default" />) || (
+          <StatusBar translucent={true} />
+        )}
         <AppNavigator />
       </View>
     );
@@ -63,10 +65,10 @@ async function loadResourcesAsync() {
       ...Ionicons.font,
       // We include SpaceMono because we use it in HomeScreen.js. Feel free to
       // remove this if you are not using it in your app
-      'nunito': require('./assets/fonts/Nunito-Regular.ttf'),
+      nunito: require('./assets/fonts/Nunito-Regular.ttf'),
       'nunito-black': require('./assets/fonts/Nunito-Black.ttf'),
-      'nunito-light': require('./assets/fonts/Nunito-ExtraLight.ttf')
-    })
+      'nunito-light': require('./assets/fonts/Nunito-ExtraLight.ttf'),
+    }),
   ]);
 }
 

@@ -1,87 +1,109 @@
-import formatDate from "../util/formatDate";
-import * as Storage from '../util/storage';
 import Emoji from 'node-emoji';
+import formatDate from '../util/formatDate';
+import * as Storage from '../util/storage';
 
 export class BaseModel {
-    constructor({title, text, timeStamp, created_at, modified_at, _id, id, type, classType, finishedDay, humanizedDate}) {
-        this._id = _id || id || Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        this.title = title || '';
-        this.text = text || '';
-        this.timeStamp = timeStamp || new Date().getTime();
-        this.created_at = created_at || new Date().getTime();
-        this.finishedDay = finishedDay || null;
-        this.humanizedDate = humanizedDate || '';
-        this.modified_at = modified_at ? new Date(+modified_at) : this.created_at;
-        this._type = type;
-        this._classType = classType;
-        this._emojis = []
-    }
+  constructor({
+    title,
+    text,
+    timeStamp,
+    created_at,
+    modified_at,
+    _id,
+    id,
+    type,
+    classType,
+    finishedDay,
+    humanizedDate,
+  }) {
+    this._id =
+      _id ||
+      id ||
+      Math.random()
+        .toString(36)
+        .substring(2, 15) +
+        Math.random()
+          .toString(36)
+          .substring(2, 15);
+    this.title = title || '';
+    this.text = text || '';
+    this.timeStamp = timeStamp || new Date().getTime();
+    this.created_at = created_at || new Date().getTime();
+    this.finishedDay = finishedDay || null;
+    this.humanizedDate = humanizedDate || '';
+    this.modified_at = modified_at ? new Date(+modified_at) : this.created_at;
+    this._type = type;
+    this._classType = classType;
+    this._emojis = [];
+  }
 
-    async getAll() {
-        const all = await Storage.getItem(this._type) || [];
-        return all.map(e => new this._classType(e))
-    }
+  async getAll() {
+    const all = (await Storage.getItem(this._type)) || [];
+    return all.map(e => new this._classType(e));
+  }
 
-    async save() {
-        this._emojis = this._searchTextForEmojis();
-        const all = await this.getAll();
-        let newAll;
-        const found = all.find(e => e._id === this._id);
-        if (found) {
-            newAll = all.map(e => {
-                e.modified_at = new Date().getTime();
-                if (e._id === this._id) {
-                    return this;
-                } else {
-                    return e;
-                }
-            })
+  async save() {
+    this._emojis = this._searchTextForEmojis();
+    const all = await this.getAll();
+    let newAll;
+    const found = all.find(e => e._id === this._id);
+    if (found) {
+      newAll = all.map(e => {
+        e.modified_at = new Date().getTime();
+        if (e._id === this._id) {
+          return this;
         } else {
-            newAll = all.slice();
-            newAll.push(this);
+          return e;
         }
-        await Storage.setItem(this._type, newAll);
-
-        return newAll.map(e => {
-            return new this._classType(e);
-        })
+      });
+    } else {
+      newAll = all.slice();
+      newAll.push(this);
     }
+    await Storage.setItem(this._type, newAll);
 
-    async delete() {
-        const all = await this.getAll();
-        await Storage.deleteListItem(this._type, all, this);
-        return all.filter(e => e._id !== this._id).map(e => {
-            return new this._classType(e);
-        })
-    }
+    return newAll.map(e => {
+      return new this._classType(e);
+    });
+  }
 
-    _searchTextForEmojis() {
-        const result = [];
-        const maxEmojis = 3;
-        let stringArray = [];
-        Array.prototype.push.apply(stringArray, this.title ? this.title.toLowerCase().split(' ') : []);
-        Array.prototype.push.apply(stringArray, this.text ? this.text.toLowerCase().split(' ') : []);
-        for (const string of stringArray) {
-            const found = Emoji.findByName(string);
-            if (found) {
-                result.push(found);
-            } else if (string.charAt(string.length - 1) === 's') {
-                const secondTry = Emoji.findByName(string.substring(0, string.length - 1));
-                if (secondTry) {
-                    result.push(secondTry)
-                }
-            }
-            if (result.length === maxEmojis) {
-                break;
-            }
+  async delete() {
+    const all = await this.getAll();
+    await Storage.deleteListItem(this._type, all, this);
+    return all
+      .filter(e => e._id !== this._id)
+      .map(e => {
+        return new this._classType(e);
+      });
+  }
+
+  _searchTextForEmojis() {
+    const result = [];
+    const maxEmojis = 3;
+    let stringArray = [];
+    Array.prototype.push.apply(stringArray, this.title ? this.title.toLowerCase().split(' ') : []);
+    Array.prototype.push.apply(stringArray, this.text ? this.text.toLowerCase().split(' ') : []);
+    for (const string of stringArray) {
+      const found = Emoji.findByName(string);
+      if (found) {
+        result.push(found);
+      } else if (string.charAt(string.length - 1) === 's') {
+        const secondTry = Emoji.findByName(string.substring(0, string.length - 1));
+        if (secondTry) {
+          result.push(secondTry);
         }
-        return result;
+      }
+      if (result.length === maxEmojis) {
+        break;
+      }
     }
+    return result;
+  }
 }
 
 export async function getAllStatic(type, classType) {
-    const all = await Storage.getItem(type) || [];
-    return all.map(e => {
-        return new classType(e)
-    })
+  const all = (await Storage.getItem(type)) || [];
+  return all.map(e => {
+    return new classType(e);
+  });
 }

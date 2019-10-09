@@ -14,9 +14,7 @@ export default class NotificationManager {
     return Promise.reject(new Error('permission missing'));
   }
 
-  static async scheduleNotification({
-    title, body, time, repeat = undefined,
-  }) {
+  static async scheduleNotification({ title, body, time, repeat = undefined }) {
     const hasPermissions = await this.askPermissions();
     if (hasPermissions) {
       return await Notifications.scheduleLocalNotificationAsync(
@@ -27,12 +25,11 @@ export default class NotificationManager {
         {
           repeat,
           time,
-        },
+        }
       );
     }
     return Promise.reject(new Error('permission missing'));
   }
-
 
   static async createNotification({ title, body, time }) {
     if (time) {
@@ -46,9 +43,7 @@ export default class NotificationManager {
   }
 
   static async askPermissions() {
-    const { status: existingStatus } = await Permissions.getAsync(
-      Permissions.NOTIFICATIONS,
-    );
+    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
       const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);

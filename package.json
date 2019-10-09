@@ -7,7 +7,7 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "test": "jest --watchAll",
-    "lint": "eslint ./components --fix"
+    "lint": "eslint ./ --fix"
   },
   "eslintConfig": {
     "extends": "expo"
