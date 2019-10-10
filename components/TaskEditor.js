@@ -16,6 +16,7 @@ export default class TaskEditor extends Component {
       title: (props.task && props.task.title) || '',
       repeats: (props.task && props.task.repeats) || false,
       animVal: new Animated.Value(0),
+      isOpen: false,
       errors: {
         desc: '',
       },
@@ -23,12 +24,14 @@ export default class TaskEditor extends Component {
   }
 
   open() {
+    this.setState({ ...this.state, ...{ isOpen: true } });
     Animated.spring(this.state.animVal, {
       toValue: 1,
     }).start();
   }
 
   componentWillReceiveProps(nextProps, nextContext) {
+    console.log(nextProps.task && new Date(nextProps.task.timeStamp));
     const state = {
       date: (nextProps.task && new Date(+nextProps.task.timeStamp)) || new Date(),
       title: (nextProps.task && nextProps.task.title) || '',
@@ -47,6 +50,7 @@ export default class TaskEditor extends Component {
       title: '',
       repeats: null,
       humanizedDate: 'Today',
+      isOpen: false,
     };
     this.setState({ ...this.state, ...state });
     Keyboard.dismiss();
@@ -90,25 +94,27 @@ export default class TaskEditor extends Component {
     return (
       <View style={styles.container}>
         <Animated.View style={[styles.formRow, style]}>
-          <View style={[styles.formElement, { flexGrow: 3 }]}>
-            <Text style={styles.label}>Date</Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-              <DateTimePicker
-                onDateChange={({ date, humanizedDate }) =>
-                  this.setState({
-                    ...this.state,
-                    ...{
-                      humanizedDate,
-                      date,
-                    },
-                  })
-                }
-                date={this.state.date}
-                textColor={Colors.primaryText}
-                borderColor={Colors.primaryText}
-              />
+          {this.isOpen && (
+            <View style={[styles.formElement, { flexGrow: 3 }]}>
+              <Text style={styles.label}>Date</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                <DateTimePicker
+                  onDateChange={({ date, humanizedDate }) =>
+                    this.setState({
+                      ...this.state,
+                      ...{
+                        humanizedDate,
+                        date,
+                      },
+                    })
+                  }
+                  date={this.state.date}
+                  textColor={Colors.primaryText}
+                  borderColor={Colors.primaryText}
+                />
+              </View>
             </View>
-          </View>
+          )}
           <View style={[styles.formElement, { flexGrow: 2 }]}>
             <Text style={styles.label}>Repeats</Text>
             <Picker

@@ -1,5 +1,13 @@
 import React from 'react';
-import { Platform, StyleSheet, Text, View, Animated, TouchableWithoutFeedback } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Animated,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CheckBox } from 'react-native-elements';
 import GestureRecognizer from 'react-native-swipe-gestures';
@@ -50,12 +58,9 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit }) {
         : null
       : `${prefix}alert`;
   };
-
-  const AnimatedClose = Animated.createAnimatedComponent(Ionicons);
-  const animVal = new Animated.Value(0.01);
+  const animVal = new Animated.Value(0);
   const grow = Animated.spring(animVal, { toValue: 1, bounciness: 1 });
   const shrink = Animated.spring(animVal, { toValue: 0, bounciness: 1 });
-  const interpolateIcon = animVal.interpolate({ inputRange: [0, 1], outputRange: [0, 1] });
   const prefix = Platform.OS === 'ios' ? 'ios-' : 'md-';
   const icon = getIcon();
 
@@ -68,10 +73,13 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit }) {
 
   return (
     <GestureRecognizer
+      style={{ flex: 1, flexDirection: 'row' }}
       onSwipeLeft={() => onSwipe(DIRECTIONS.RIGHT)}
       onSwipeRight={() => onSwipe(DIRECTIONS.LEFT)}
       config={config}>
-      <TouchableWithoutFeedback onLongPress={() => showHidden()} onPress={() => toEdit()}>
+      <TouchableWithoutFeedback
+        onLongPress={() => showHidden()}
+        onPress={() => toEdit()}>
         <View style={{ ...styles.taskElement, ...{ opacity: task.checked ? 0.6 : 1 } }}>
           <View style={styles.checkBoxContainer}>
             <CheckBox
@@ -98,22 +106,34 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit }) {
               <Text numberOfLines={1}>{getHumanizedData(task.timeStamp)}</Text>
             </View>
           </View>
-          <View style={{ flexGrow: 0, flexShrink: 1, flexBasis: 'auto', width: 40 }}>
-            <AnimatedClose
-              name={Platform.OS === 'ios' ? 'ios-close-circle' : 'md-close-circle'}
-              size={30}
-              color={Colors.primaryBackground}
-              style={{
-                position: 'absolute',
-                left: 5,
-                top: 8,
-                transform: [{ scale: interpolateIcon }],
-              }}
-              onPress={() => deleteTask()}
-            />
-          </View>
         </View>
       </TouchableWithoutFeedback>
+      <Animated.View
+        style={{
+          flexGrow: 0,
+          flexBasis: 'auto',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: 50,
+          maxWidth: animVal.interpolate({ inputRange: [0, 1], outputRange: [0, 50] }),
+          overflow: 'hidden',
+          marginRight: 5,
+        }}>
+        <Animated.View
+          style={{
+            transform: [
+              { scale: animVal.interpolate({ inputRange: [0, 1], outputRange: [0, 1] }) },
+            ],
+          }}>
+          <TouchableOpacity onPress={() => deleteTask()}>
+            <Ionicons
+              name={Platform.OS === 'ios' ? 'ios-close-circle' : 'md-close-circle'}
+              size={30}
+              color={Colors.primaryText}
+            />
+          </TouchableOpacity>
+        </Animated.View>
+      </Animated.View>
     </GestureRecognizer>
   );
 }
@@ -122,8 +142,8 @@ const styles = StyleSheet.create({
   taskElement: {
     backgroundColor: Colors.white,
     flexDirection: 'row',
-    borderRadius: 10,
     flex: 1,
+    borderRadius: 10,
     shadowColor: Colors.black,
     shadowOffset: {
       width: 0,

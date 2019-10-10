@@ -6,12 +6,11 @@ import {
   Text,
   TouchableOpacity,
   View,
-  DatePickerIOS,
-  Picker,
+  DatePickerIOS
 } from 'react-native';
 import mLogger from '../util/mLogger';
 import Colors from '../constants/Colors';
-import getHumanizedData, { getHumanizedDate, getHumanizedTime } from '../util/formatDate';
+import { getHumanizedDate, getHumanizedTime } from '../util/formatDate';
 
 const constants = {
   TODAY: 'Today',
