@@ -62,7 +62,6 @@ export default class TaskEditor extends Component {
 
   async saveTask() {
     const og = this.props.task || {};
-
     const task = new Task({
       ...og,
       ...{
@@ -102,14 +101,7 @@ export default class TaskEditor extends Component {
               <Text style={styles.label}>Date</Text>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
                 <DateTimePicker
-                  onDateChange={(date) =>
-                    this.setState({
-                      ...this.state,
-                      ...{
-                        date,
-                      },
-                    })
-                  }
+                  onDateChange={date => this.setState({ date })}
                   date={this.state.date}
                   textColor={Colors.primaryText}
                   borderColor={Colors.primaryText}
