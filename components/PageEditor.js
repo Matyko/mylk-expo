@@ -54,10 +54,10 @@ export default class PageEditor extends Component {
             <DateTimePicker
               date={this.state.date}
               mode={this.state.mode}
-              onDateChange={dateObj =>
+              onDateChange={date =>
                 this.setState({
                   ...this.state,
-                  ...{ date: dateObj.date, humanizedDate: dateObj.humanizedDate },
+                  ...{ date: date },
                 })
               }
             />

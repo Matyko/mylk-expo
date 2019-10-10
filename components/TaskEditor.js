@@ -102,11 +102,10 @@ export default class TaskEditor extends Component {
               <Text style={styles.label}>Date</Text>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
                 <DateTimePicker
-                  onDateChange={({ date, humanizedDate }) =>
+                  onDateChange={(date) =>
                     this.setState({
                       ...this.state,
                       ...{
-                        humanizedDate,
                         date,
                       },
                     })

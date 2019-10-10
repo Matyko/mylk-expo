@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
 import {
   DatePickerAndroid,
   TimePickerAndroid,
@@ -26,50 +26,25 @@ const constants = {
   CUSTOM: 'Custom',
 };
 
-export default class DateTimePicker extends Component {
-  constructor(props) {
-    super(props);
-    const today = new Date();
-    today.setHours(0);
-    today.setMinutes(0);
-    this.state = {
-      dateTime: this.props.date || today,
-      humanizedDateTime: '',
-      showIOS: false,
-      mode: this.props.mode || constants.DATETIME,
-    };
-    this.isIOS = Platform.OS === 'ios';
-  }
+export default function DateTimePicker(props) {
+  const isIOS = Platform.OS === 'ios';
+  const today = new Date();
 
-  componentWillMount() {
-    this.getHumanizedData(this.state.dateTime);
-  }
+  today.setHours(0);
+  today.setMinutes(0);
 
-  async componentWillReceiveProps(nextProps, nextContext) {
-    await this.setState({ ...this.state, ...{ dateTime: this.props.date } });
-    await this.getHumanizedData(nextProps.date);
-    this.forceUpdate();
-  }
+  let dateTime = props.date || today;
+  let showIOS = false;
 
-  async getHumanizedData(date) {
-    const humanizedDate = getHumanizedDate(date);
-    const humanizedTime = getHumanizedTime(date);
-    const humanizedDateTime = humanizedDate + ' ' + humanizedTime;
-    await this.setState({
-      ...this.state,
-      ...{ humanizedDateTime },
-    });
-  }
-
-  async startSelect(mode) {
-    if (this.isIOS) {
-      this.showIOS();
+  const startSelect = mode => {
+    if (isIOS) {
+      showIOS = true;
     } else {
-      await this.selectAndroid(mode);
+      selectAndroid(mode);
     }
-  }
+  };
 
-  async selectAndroid(mode) {
+  const selectAndroid = async mode => {
     if (mode === constants.DATE) {
       try {
         const { action, year, month, day } = await DatePickerAndroid.open({
@@ -77,7 +52,7 @@ export default class DateTimePicker extends Component {
           minDate: new Date(),
         });
         if (action !== DatePickerAndroid.dismissedAction) {
-          await this.setDate(new Date(year, month, day));
+          await setDate(new Date(year, month, day));
         }
       } catch ({ code, message }) {
         mLogger('Cannot open date picker', message);
@@ -101,81 +76,26 @@ export default class DateTimePicker extends Component {
         mLogger('Cannot open time picker', message);
       }
     }
-  }
+  };
 
-  async setDate(dateTime) {
-    await this.setState({ ...this.state, ...{ dateTime } });
-    await this.getHumanizedData(dateTime);
-    this.props.onDateChange({
-      humanizedDate: this.state.humanizedDateTime,
-      date: this.state.dateTime,
-    });
-  }
+  const setDate = date => {
+    showIOS = false;
+    dateTime = date;
+    props.onDateChange(dateTime);
+  };
 
-  async handleDateChange(val) {
-    const today = new Date();
-    today.setHours(0);
-    today.setMinutes(0);
-    switch (val) {
-      case constants.TODAY:
-        await this.setDate(today);
-        break;
-      case constants.TOMORROW:
-        await this.setDate(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1));
-        break;
-      default:
-        await this.startSelect(constants.DATE);
-        break;
-    }
-  }
+  const date = getHumanizedDate(dateTime);
+  const time = getHumanizedTime(dateTime);
 
-  async handleTimeChange(val) {
-    const date = new Date(this.state.dateTime.getTime());
-    switch (val) {
-      case constants.MORNING:
-        date.setHours(9);
-        date.setMinutes(0);
-        await this.setDate(date);
-        break;
-      case constants.AFTERNOON:
-        date.setHours(12);
-        date.setMinutes(0);
-        await this.setDate(date);
-        break;
-      case constants.EVENING:
-        date.setHours(18);
-        date.setMinutes(0);
-        await this.setDate(date);
-        break;
-      case constants.NIGHT:
-        date.setHours(21);
-        date.setMinutes(0);
-        await this.setDate(date);
-        break;
-      default:
-        this.startSelect(constants.TIME);
-    }
-  }
-
-  render() {
-    const date = getHumanizedDate(this.state.dateTime);
-    const time = getHumanizedTime(this.state.dateTime);
-    return (
-      <View style={{ flexDirection: 'row', flex: 1 }}>
-        <TouchableOpacity style={{ flexGrow: 1 }} onPress={() => this.handleDateChange()}>
-          <Text style={{ color: this.props.textColor || Colors.black }}>{date}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{ flexGrow: 1 }} onPress={() => this.handleTimeChange()}>
-          <Text style={{ color: this.props.textColor || Colors.black }}>{time}</Text>
-        </TouchableOpacity>
-        {this.state.showIOS && (
-          <DatePickerIOS
-            date={this.state.date}
-            mode={this.props.mode}
-            onDateChange={this.setDate}
-          />
-        )}
-      </View>
-    );
-  }
+  return (
+    <View style={{ flexDirection: 'row', flex: 1 }}>
+      <TouchableOpacity style={{ flexGrow: 1 }} onPress={() => startSelect(constants.DATE)}>
+        <Text style={{ color: props.textColor || Colors.black }}>{date}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={{ flexGrow: 1 }} onPress={() => startSelect(constants.TIME)}>
+        <Text style={{ color: props.textColor || Colors.black }}>{time}</Text>
+      </TouchableOpacity>
+      {showIOS && <DatePickerIOS date={dateTime} mode={props.mode} onDateChange={this.setDate} />}
+    </View>
+  );
 }
