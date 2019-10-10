@@ -2,7 +2,7 @@ const tintColor = '#2f95dc';
 
 export default {
   tintColor,
-  primaryBackground: '#4b5cbd',
+  primaryBackground: '#3e6ebd',
   // primaryBackground: '#3dbd94',
   // primaryBackground: '#ff3d6c',
   primaryText: '#fff',

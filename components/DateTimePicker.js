@@ -6,7 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  DatePickerIOS
+  DatePickerIOS,
 } from 'react-native';
 import mLogger from '../util/mLogger';
 import Colors from '../constants/Colors';
@@ -34,18 +34,21 @@ export default class DateTimePicker extends Component {
     today.setMinutes(0);
     this.state = {
       dateTime: this.props.date || today,
-      humanizedDate: '',
-      humanizedTime: '',
       humanizedDateTime: '',
       showIOS: false,
-      datePickerVal: constants.TODAY,
-      timePickerVal: constants.ALL_DAY,
+      mode: this.props.mode || constants.DATETIME,
     };
     this.isIOS = Platform.OS === 'ios';
   }
 
-  async componentWillMount() {
-    await this.getHumanizedData(this.state.dateTime);
+  componentWillMount() {
+    this.getHumanizedData(this.state.dateTime);
+  }
+
+  async componentWillReceiveProps(nextProps, nextContext) {
+    await this.setState({ ...this.state, ...{ dateTime: this.props.date } });
+    await this.getHumanizedData(nextProps.date);
+    this.forceUpdate();
   }
 
   async getHumanizedData(date) {
@@ -54,11 +57,7 @@ export default class DateTimePicker extends Component {
     const humanizedDateTime = humanizedDate + ' ' + humanizedTime;
     await this.setState({
       ...this.state,
-      ...{
-        humanizedDate,
-        humanizedTime,
-        humanizedDateTime,
-      },
+      ...{ humanizedDateTime },
     });
   }
 
@@ -159,17 +158,15 @@ export default class DateTimePicker extends Component {
   }
 
   render() {
+    const date = getHumanizedDate(this.state.dateTime);
+    const time = getHumanizedTime(this.state.dateTime);
     return (
       <View style={{ flexDirection: 'row', flex: 1 }}>
         <TouchableOpacity style={{ flexGrow: 1 }} onPress={() => this.handleDateChange()}>
-          <Text style={{ color: this.props.textColor || Colors.black }}>
-            {getHumanizedDate(this.state.dateTime)}
-          </Text>
+          <Text style={{ color: this.props.textColor || Colors.black }}>{date}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{ flexGrow: 1 }} onPress={() => this.handleTimeChange()}>
-          <Text style={{ color: this.props.textColor || Colors.black }}>
-            {getHumanizedTime(this.state.dateTime)}
-          </Text>
+          <Text style={{ color: this.props.textColor || Colors.black }}>{time}</Text>
         </TouchableOpacity>
         {this.state.showIOS && (
           <DatePickerIOS

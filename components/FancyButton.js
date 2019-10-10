@@ -18,26 +18,26 @@ export default class FancyButton extends Component {
   render() {
     const loaderColor = this.props.filled ? Colors.primaryText : Colors.primaryBackground;
     return (
-      <TouchableOpacity onLongPress={() => this.longPress()} onPress={() => this.press()}>
-        <View
-          style={{
-            ...(this.props.filled ? styles.containerFilled : styles.container),
-            ...(this.props.backgroundColor ? { backgroundColor: this.props.backgroundColor } : {}),
-            ...(this.props.borderColor ? { borderColor: this.props.borderColor } : {}),
-          }}>
-          {!this.props.loading && (
-            <Text
-              style={{
-                ...(this.props.filled ? styles.textFilled : styles.text),
-                ...(this.props.textColor ? { color: this.props.textColor } : {}),
-              }}>
-              {this.props.title}
-            </Text>
-          )}
-          {this.props.loading && (
-            <ActivityIndicator color={this.props.textColor ? this.props.textColor : loaderColor} />
-          )}
-        </View>
+      <TouchableOpacity
+        onLongPress={() => this.longPress()}
+        onPress={() => this.press()}
+        style={{
+          ...(this.props.filled ? styles.containerFilled : styles.container),
+          ...(this.props.backgroundColor ? { backgroundColor: this.props.backgroundColor } : {}),
+          ...(this.props.borderColor ? { borderColor: this.props.borderColor } : {}),
+        }}>
+        {!this.props.loading && (
+          <Text
+            style={{
+              ...(this.props.filled ? styles.textFilled : styles.text),
+              ...(this.props.textColor ? { color: this.props.textColor } : {}),
+            }}>
+            {this.props.title}
+          </Text>
+        )}
+        {this.props.loading && (
+          <ActivityIndicator color={this.props.textColor ? this.props.textColor : loaderColor} />
+        )}
       </TouchableOpacity>
     );
   }
@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginVertical: 22,
     minHeight: 40,
+    width: '100%',
   },
   containerFilled: {
     flex: 1,
@@ -66,6 +67,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginVertical: 22,
     minHeight: 40,
+    width: '100%',
   },
   text: {
     borderColor: Colors.transparent,

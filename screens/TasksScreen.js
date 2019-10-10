@@ -92,7 +92,11 @@ export default class TasksScreen extends Component {
       <View style={{ flex: 1 }}>
         <View
           style={{ flexGrow: 0, backgroundColor: `rgba(${rgbBG.r},${rgbBG.g},${rgbBG.b},0.8)` }}>
-          <TaskEditor task={this.state.editedTask} savedTask={tasks => this.savedTask(tasks)} />
+          <TaskEditor
+            task={this.state.editedTask}
+            savedTask={tasks => this.savedTask(tasks)}
+            cancel={() => this.setState({ ...this.state, ...{ editedTask: null } })}
+          />
         </View>
         <ScrollView
           style={{ flexGrow: 2, backgroundColor: `rgba(${rgbBG.r},${rgbBG.g},${rgbBG.b},0.6)` }}>

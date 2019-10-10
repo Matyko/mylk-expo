@@ -6,6 +6,7 @@ import Colors from '../constants/Colors';
 import mLogger from '../util/mLogger';
 import { Task } from '../models/Task';
 import DateTimePicker from './DateTimePicker';
+import FancyButton from './FancyButton';
 
 export default class TaskEditor extends Component {
   constructor(props) {
@@ -23,22 +24,21 @@ export default class TaskEditor extends Component {
     };
   }
 
-  open() {
-    this.setState({ ...this.state, ...{ isOpen: true } });
+  async open() {
+    await this.setState({ ...this.state, ...{ isOpen: true } });
     Animated.spring(this.state.animVal, {
       toValue: 1,
     }).start();
   }
 
-  componentWillReceiveProps(nextProps, nextContext) {
-    console.log(nextProps.task && new Date(nextProps.task.timeStamp));
+  async componentWillReceiveProps(nextProps, nextContext) {
     const state = {
       date: (nextProps.task && new Date(+nextProps.task.timeStamp)) || new Date(),
       title: (nextProps.task && nextProps.task.title) || '',
       repeats: (nextProps.task && nextProps.task.repeats) || false,
       humanizedDate: (nextProps.task && nextProps.task.humanizedDate) || 'Today',
     };
-    this.setState({ ...this.state, ...state });
+    await this.setState({ ...this.state, ...state });
     if (nextProps.task) {
       this.open();
     }
@@ -57,6 +57,7 @@ export default class TaskEditor extends Component {
     Animated.spring(this.state.animVal, {
       toValue: 0,
     }).start();
+    this.props.cancel();
   }
 
   async saveTask() {
@@ -89,12 +90,14 @@ export default class TaskEditor extends Component {
 
   render() {
     const style = [
-      { maxHeight: this.state.animVal.interpolate({ inputRange: [0, 1], outputRange: [0, 80] }) },
+      {
+        maxHeight: this.state.animVal.interpolate({ inputRange: [0, 1], outputRange: [0.01, 60] }),
+      },
     ];
     return (
       <View style={styles.container}>
         <Animated.View style={[styles.formRow, style]}>
-          {this.isOpen && (
+          {this.state.isOpen && (
             <View style={[styles.formElement, { flexGrow: 3 }]}>
               <Text style={styles.label}>Date</Text>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
@@ -115,22 +118,24 @@ export default class TaskEditor extends Component {
               </View>
             </View>
           )}
-          <View style={[styles.formElement, { flexGrow: 2 }]}>
-            <Text style={styles.label}>Repeats</Text>
-            <Picker
-              style={{ color: Colors.primaryText, height: 20 }}
-              selectedValue={this.state.repeats}
-              onValueChange={repeats => this.setState({ ...this.state, ...{ repeats } })}>
-              <Picker.Item label="Never" value={null} />
-              <Picker.Item label="Daily" value="day" />
-              <Picker.Item label="Weekly" value="week" />
-              <Picker.Item label="Monthly" value="month" />
-              <Picker.Item label="Yearly" value="year" />
-            </Picker>
-          </View>
+          {this.state.isOpen && (
+            <View style={[styles.formElement, { flexGrow: 2 }]}>
+              <Text style={[styles.label, { marginLeft: 5 }]}>Repeats</Text>
+              <Picker
+                style={{ color: Colors.primaryText, height: 20 }}
+                selectedValue={this.state.repeats}
+                onValueChange={repeats => this.setState({ ...this.state, ...{ repeats } })}>
+                <Picker.Item label="Never" value={null} />
+                <Picker.Item label="Daily" value="day" />
+                <Picker.Item label="Weekly" value="week" />
+                <Picker.Item label="Monthly" value="month" />
+                <Picker.Item label="Yearly" value="year" />
+              </Picker>
+            </View>
+          )}
         </Animated.View>
         <View style={styles.formRow}>
-          <View style={styles.formElement}>
+          <View style={[styles.formElement, { padding: 0, marginBottom: 5 }]}>
             {/*<Text style={styles.label}>Task description</Text>*/}
             <Input
               placeholder="Enter task description..."
@@ -143,6 +148,8 @@ export default class TaskEditor extends Component {
               onFocus={() => this.open()}
             />
           </View>
+        </View>
+        <Animated.View style={[styles.formRow, style]}>
           <Animated.View
             style={[
               styles.saveButton,
@@ -153,14 +160,35 @@ export default class TaskEditor extends Component {
                 }),
               },
             ]}>
-            <Ionicons
-              name={Platform.OS === 'ios' ? 'ios-add-circle-outline' : 'md-add-circle-outline'}
-              size={35}
-              color={Colors.primaryText}
-              onPress={() => this.saveTask()}
+            <FancyButton
+              title="SAVE"
+              filled={true}
+              borderColor={Colors.primaryText}
+              backgroundColor={Colors.primaryText}
+              pressFn={() => this.saveTask()}
+              textColor={Colors.primaryBackground}
             />
           </Animated.View>
-        </View>
+          <Animated.View
+            style={[
+              styles.saveButton,
+              {
+                opacity: this.state.animVal.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.01, 1],
+                }),
+                paddingLeft: 10,
+              },
+            ]}>
+            <FancyButton
+              title="CANCEL"
+              style={{ width: '100%' }}
+              borderColor={Colors.primaryText}
+              pressFn={() => this.close()}
+              textColor={Colors.primaryText}
+            />
+          </Animated.View>
+        </Animated.View>
       </View>
     );
   }
@@ -191,8 +219,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   saveButton: {
-    flexGrow: 0,
-    minWidth: 30,
+    flexGrow: 1,
     alignItems: 'center',
   },
   label: {

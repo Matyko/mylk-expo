@@ -115,9 +115,10 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit }) {
           justifyContent: 'center',
           alignItems: 'center',
           width: 50,
-          maxWidth: animVal.interpolate({ inputRange: [0, 1], outputRange: [0, 50] }),
+          maxWidth: animVal.interpolate({ inputRange: [0, 1], outputRange: [0.01, 50] }),
           overflow: 'hidden',
-          marginRight: 5,
+          marginRight: animVal.interpolate({ inputRange: [0, 1], outputRange: [15, 7.5] }),
+          marginLeft: animVal.interpolate({ inputRange: [0, 1], outputRange: [0, 7.5] })
         }}>
         <Animated.View
           style={{
@@ -156,7 +157,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 8,
     marginLeft: 15,
-    marginRight: 15,
   },
   taskElementTitle: {
     alignSelf: 'center',
