@@ -5,7 +5,7 @@ export class Page extends BaseModel {
   constructor({
     title,
     text,
-    date,
+    timeStamp,
     created_at,
     id,
     _id,
@@ -21,7 +21,7 @@ export class Page extends BaseModel {
       humanizedDate,
       title,
       text,
-      date,
+      timeStamp,
       created_at,
       id,
       _id,

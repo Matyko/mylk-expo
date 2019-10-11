@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Input } from 'react-native-elements';
-import { View, StyleSheet, Picker, Text, Platform, Animated, Keyboard } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, Picker, Text, Animated, Keyboard } from 'react-native';
 import Colors from '../constants/Colors';
 import mLogger from '../util/mLogger';
 import { Task } from '../models/Task';
@@ -79,7 +78,7 @@ export default class TaskEditor extends Component {
     await task.cancelNotification();
     await task.createNotification();
 
-    mLogger(`saving task: ${task}`);
+    mLogger(`saving task: ${JSON.stringify(task)}`);
 
     const tasks = await task.save();
 

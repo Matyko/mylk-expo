@@ -93,13 +93,15 @@ export class BaseModel {
       });
     }
     for (const string of stringArray) {
-      const found = Emoji.findByName(string);
-      if (found) {
-        result.push(found.key);
-      } else if (string.charAt(string.length - 1) === 's') {
-        const secondTry = Emoji.findByName(string.substring(0, string.length - 1));
-        if (secondTry) {
-          result.push(secondTry.key);
+      if (string.length > 1) {
+        const found = Emoji.findByName(string);
+        if (found) {
+          result.push(found.key);
+        } else if (string.charAt(string.length - 1) === 's') {
+          const secondTry = Emoji.findByName(string.substring(0, string.length - 1));
+          if (secondTry) {
+            result.push(secondTry.key);
+          }
         }
       }
       if (result.length === maxEmojis) {

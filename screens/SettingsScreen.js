@@ -24,13 +24,15 @@ export default class SettingsScreen extends Component {
       showPassCodeModal: false,
       passCode: null,
       syncData: true,
+      hideEmoji: false,
     };
   }
 
   async componentWillMount() {
     const passCode = await SecureStore.getItemAsync(STORAGE_CONSTS.PASSCODE);
     const syncData = (await Storage.getItem(STORAGE_CONSTS.SYNC)) || false;
-    await this.setState({ ...this.state, ...{ hasPassCode: !!passCode, passCode, syncData } });
+    const hideEmoji = (await Storage.getItem(STORAGE_CONSTS.HIDE_EMOJI)) || false;
+    await this.setState({ ...this.state, ...{ hasPassCode: !!passCode, passCode, syncData, hideEmoji } });
     this.forceUpdate();
   }
 
@@ -40,6 +42,12 @@ export default class SettingsScreen extends Component {
     } else {
       this.setState({ ...this.state, ...{ showPassCodeModal: true, removingPassCode: true } });
     }
+  }
+
+  async setEmoji() {
+    await Storage.setItem(STORAGE_CONSTS.HIDE_EMOJI, !this.state.hideEmoji);
+    await this.setState({ ...this.state, ...{ hideEmoji: !this.state.hideEmoji } });
+    this.forceUpdate();
   }
 
   async syncData(syncData) {
@@ -107,7 +115,13 @@ export default class SettingsScreen extends Component {
               {/*</TouchableOpacity>*/}
             </View>
             <View style={styles.settingsSection}>
-              <Text style={styles.settingsSectionTitle}>Profile</Text>
+              <Text style={styles.settingsSectionTitle}>Personal</Text>
+              <View style={styles.settingsElement}>
+                <Text style={styles.settingsTitle}>Auto emoji</Text>
+                <View style={styles.functionality}>
+                  <Switch value={!this.state.hideEmoji} onValueChange={e => this.setEmoji(e)} />
+                </View>
+              </View>
               <TouchableOpacity
                 style={{ ...styles.settingsElement, ...styles.touchableSetting }}
                 onPress={() => this.logOut()}>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { ScrollView, StyleSheet, Text, View, Alert } from 'react-native';
 import TaskElement from '../components/TaskElement';
-import FloatingActionButton from '../components/FloatingActionButton';
+import * as Storage from '../util/storage';
 import TaskEditor from '../components/TaskEditor';
 import Colors, { hexToRgb } from '../constants/Colors';
 import sortByDate from '../util/sortByDate';
@@ -11,6 +11,7 @@ import PageAutomator from '../util/PageAutomator';
 import STORAGE_CONSTS from '../util/storageConsts';
 import { Task } from '../models/Task';
 import { getAllStatic } from '../models/BaseModel';
+import PageElement from '../components/PageElement';
 
 const rgbBG = hexToRgb(Colors.primaryBackground);
 
@@ -21,6 +22,7 @@ export default class TasksScreen extends Component {
       tasks: [],
       modalVisible: false,
       editedTask: null,
+      hideEmoji: false,
     };
     this.notificationManager = new NotificationManager();
     this.pageAutomator = new PageAutomator();
@@ -35,6 +37,10 @@ export default class TasksScreen extends Component {
       Alert.alert('Could not load your tasks');
       mLogger('could not load tasks');
     }
+    this.props.navigation.addListener('willFocus', async () => {
+      const hideEmoji = (await Storage.getItem(STORAGE_CONSTS.HIDE_EMOJI)) || false;
+      this.setState(...this.state, ...{ hideEmoji });
+    });
   }
 
   async setChecked(task) {
@@ -108,6 +114,7 @@ export default class TasksScreen extends Component {
                   task={task}
                   setChecked={() => this.setChecked(task)}
                   deleteTask={() => this.deleteTask(task)}
+                  emoji={!this.state.hideEmoji}
                   toEdit={() => this.editTask(task)}
                 />
               );
@@ -137,9 +144,6 @@ export default class TasksScreen extends Component {
             }
           })}
         </ScrollView>
-        <FloatingActionButton
-          pressFunction={() => this.setState({ ...this.state, ...{ modalVisible: true } })}
-        />
       </View>
     );
   }

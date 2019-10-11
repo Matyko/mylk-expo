@@ -18,7 +18,9 @@ export async function getItem(type) {
     try {
       // clear data
       // await AsyncStorage.setItem(`${type}.${id}`, '[]')
-      return JSON.parse(await AsyncStorage.getItem(`${type}.${id}`));
+      const data = JSON.parse(await AsyncStorage.getItem(`${type}.${id}`));
+      mLogger(`getting data | type: ${type}, value: ${JSON.stringify(data)}`);
+      return data;
     } catch (e) {
       return null;
     }
@@ -48,6 +50,7 @@ export async function setItem(type, data) {
   }
   const id = await getId();
   if (id) {
+    mLogger(`saving data | type: ${type}, value: ${JSON.stringify(data)}`);
     return await AsyncStorage.setItem(`${type}.${id}`, JSON.stringify(data));
   }
   return [];

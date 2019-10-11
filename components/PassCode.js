@@ -7,7 +7,9 @@ import {
   ActivityIndicator,
   Animated,
   Easing,
+  Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
 import Dots from './Dots';
 
@@ -43,6 +45,24 @@ export default class PassCode extends Component {
         </View>
       </TouchableOpacity>
     );
+    this.numbers.push(
+      <View key="empty">
+        <View style={[styles.button, { opacity: 0 }]}>
+          <Text style={styles.buttonText} />
+        </View>
+      </View>
+    );
+    this.numbers.push(
+      <TouchableOpacity key="backspace" onPress={() => this.backspace()}>
+        <View style={[styles.button, { borderColor: 'transparent' }]}>
+          <Ionicons
+            name={Platform.OS === 'ios' ? 'ios-backspace' : 'md-backspace'}
+            size={35}
+            color={Colors.white}
+          />
+        </View>
+      </TouchableOpacity>
+    );
   }
 
   async handlePress(num) {
@@ -51,6 +71,11 @@ export default class PassCode extends Component {
     if (code.length === this.state.codeLength) {
       this.codeEntered();
     }
+  }
+
+  async backspace() {
+    const code = this.state.code.substring(0, this.state.code.length - 1);
+    await this.setState({ ...this.state, ...{ code } });
   }
 
   errorAnimation = () => {

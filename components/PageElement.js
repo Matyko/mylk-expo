@@ -26,6 +26,7 @@ export default class PageElement extends Component {
 
   render() {
     const width = Math.floor(Dimensions.get('window').width) - 30;
+    console.log(this.props.emoji);
     return (
       <TouchableOpacity
         onPress={() => this.setState({ ...this.state, ...{ open: !this.state.open } })}
@@ -41,7 +42,8 @@ export default class PageElement extends Component {
         }}>
         <View style={styles.topDataContainer}>
           {this.props.page.mood && <Text style={styles.topData}>Mood</Text>}
-          {this.props.page._emojis &&
+          {this.props.emoji &&
+            this.props.page._emojis &&
             !!this.props.page._emojis.length &&
             this.props.page._emojis.map(e => {
               return <Emoji key={e} name={e} />;

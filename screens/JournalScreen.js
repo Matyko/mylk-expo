@@ -26,6 +26,7 @@ export default class JournalScreen extends Component {
       imageModalVisible: false,
       currentPage: null,
       listView: true,
+      hideEmoji: false,
     };
     this.DIRECTIONS = {
       RIGHT: 'RIGHT',
@@ -47,7 +48,11 @@ export default class JournalScreen extends Component {
   async componentWillMount() {
     this.props.navigation.setParams('listView', true);
     await this.getPages();
-    this.props.navigation.addListener('willFocus', () => this.getPages());
+    this.props.navigation.addListener('willFocus', async () => {
+      this.getPages();
+      const hideEmoji = (await Storage.getItem(STORAGE_CONSTS.HIDE_EMOJI)) || false;
+      this.setState(...this.state, ...{ hideEmoji });
+    });
   }
 
   async getPages() {
@@ -122,6 +127,7 @@ export default class JournalScreen extends Component {
                   key={page._id}
                   fullPage={!this.state.listView}
                   page={page}
+                  emoji={!this.state.hideEmoji}
                   toEdit={() =>
                     this.setState({ ...this.state, ...{ editedPage: page, modalVisible: true } })
                   }

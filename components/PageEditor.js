@@ -24,24 +24,30 @@ export default class PageEditor extends Component {
   }
 
   async savePage() {
-    let page;
-    if (this.props.page) {
-      page = new Page(this.props.page);
-    } else {
-      page = new Page({
+    const og = this.props.page || {};
+    console.log(this.state.date);
+    const page = new Page({
+      ...og,
+      ...{
         text: this.state.text,
         timeStamp: this.state.date.getTime(),
         humanizedDate: this.state.humanizedDate,
         images: this.state.images,
-      });
-    }
-    mLogger(`saving page: ${page}`);
+      }});
+    mLogger(`saving page: ${JSON.stringify(page)}`);
     const pages = await page.save();
     if (pages) {
       await this.props.savedPage(pages);
     } else {
       mLogger(`could not save page: ${page}`);
     }
+  }
+
+  setDate(date) {
+    this.setState({
+      ...this.state,
+      ...{ date },
+    });
   }
 
   render() {
@@ -53,12 +59,7 @@ export default class PageEditor extends Component {
             <DateTimePicker
               date={this.state.date}
               mode={'date'}
-              onDateChange={date =>
-                this.setState({
-                  ...this.state,
-                  ...{ date: date },
-                })
-              }
+              onDateChange={date => this.setDate(date)}
             />
           </View>
           <View style={styles.textInputContainer}>

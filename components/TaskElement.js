@@ -15,7 +15,7 @@ import Emoji from 'react-native-emoji';
 import Colors from '../constants/Colors';
 import getHumanizedData from '../util/formatDate';
 
-export default function TaskElement({ task, setChecked, deleteTask, toEdit }) {
+export default function TaskElement({ task, setChecked, deleteTask, toEdit, emoji }) {
   const DIRECTIONS = {
     RIGHT: 'RIGHT',
     LEFT: 'LEFT',
@@ -97,7 +97,7 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit }) {
               }}>
               <View style={styles.taskElementIcon}>
                 {icon && <Ionicons name={icon} size={20} color={Colors.tabIconDefault} />}
-                {task._emojis &&
+                {emoji && task._emojis &&
                   !!task._emojis.length &&
                   task._emojis.map(e => {
                     return <Emoji key={e} name={e} />;
