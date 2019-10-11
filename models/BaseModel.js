@@ -60,6 +60,7 @@ export class BaseModel {
       newAll = all.slice();
       newAll.push(this);
     }
+    console.log(newAll);
     await Storage.setItem(this._type, newAll);
 
     return newAll.map(e => {

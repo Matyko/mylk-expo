@@ -26,21 +26,21 @@ export async function getItem(type) {
 }
 
 export async function setItem(type, data) {
-  // if (type === STORAGE_CONSTS.TASKS || type === STORAGE_CONSTS.PAGES) {
-  //     try {
-  //         const sync = await getItem(STORAGE_CONSTS.SYNC) || false;
-  //         if (sync) {
-  //             const reference = firebase.firestore().collection('userData')
-  //             .doc(firebase.auth().currentUser.uid).collection(type);
-  //             data.forEach(d => {
-  //                 reference.doc(d._id).set(d, {merge: true})
-  //             });
-  //             mLogger(`Synced ${type} data to firebase`)
-  //         }
-  //     } catch {
-  //         mLogger(`Could not sync ${type} data to firebase`)
-  //     }
-  // }
+  if (type === STORAGE_CONSTS.TASKS || type === STORAGE_CONSTS.PAGES) {
+      try {
+          const sync = await getItem(STORAGE_CONSTS.SYNC) || false;
+          if (sync) {
+              const reference = firebase.firestore().collection('userData')
+              .doc(firebase.auth().currentUser.uid).collection(type);
+              data.forEach(d => {
+                  reference.doc(d._id).set(d, {merge: true})
+              });
+              mLogger(`Synced ${type} data to firebase`)
+          }
+      } catch {
+          mLogger(`Could not sync ${type} data to firebase`)
+      }
+  }
   const id = await getId();
   if (id) {
     return await AsyncStorage.setItem(`${type}.${id}`, JSON.stringify(data));
@@ -49,15 +49,15 @@ export async function setItem(type, data) {
 }
 
 export async function deleteListItem(type, data, toDelete) {
-  // if (type === STORAGE_CONSTS.TASKS || type === STORAGE_CONSTS.PAGES) {
-  //     try {
-  //         const reference = firebase.firestore().collection('userData')
-  //         .doc(firebase.auth().currentUser.uid).collection(type);
-  //         reference.doc(toDelete._id).delete()
-  //     } catch (e) {
-  //         mLogger('Could not connect to firebase')
-  //     }
-  // }
+  if (type === STORAGE_CONSTS.TASKS || type === STORAGE_CONSTS.PAGES) {
+      try {
+          const reference = firebase.firestore().collection('userData')
+          .doc(firebase.auth().currentUser.uid).collection(type);
+          reference.doc(toDelete._id).delete()
+      } catch (e) {
+          mLogger('Could not connect to firebase')
+      }
+  }
   const id = await getId();
   if (id) {
     const filtered = data.filter(d => d._id !== toDelete._id);

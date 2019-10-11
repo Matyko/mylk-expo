@@ -122,7 +122,6 @@ export default class PassCode extends Component {
               },
             ],
           }}>
-          }}>
           {!!this.state.confirmation && (
             <Text
               style={{
