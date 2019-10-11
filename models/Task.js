@@ -17,6 +17,8 @@ export class Task extends BaseModel {
     checked,
     finishedDay,
     humanizedDate,
+    _emojis,
+    emojis,
   } = {}) {
     super({
       finishedDay,
@@ -27,6 +29,8 @@ export class Task extends BaseModel {
       created_at,
       id,
       _id,
+      _emojis,
+      emojis,
       type: STORAGE_CONSTS.TASKS,
       classType: Task,
     });

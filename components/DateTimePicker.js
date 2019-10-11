@@ -35,7 +35,7 @@ export default function DateTimePicker(props) {
       try {
         const { action, year, month, day } = await DatePickerAndroid.open({
           date: dateTime,
-          minDate: new Date(),
+          minDate: props.minDate,
         });
         if (action !== DatePickerAndroid.dismissedAction) {
           dateTime.setFullYear(year);
@@ -68,13 +68,23 @@ export default function DateTimePicker(props) {
 
   return (
     <View style={{ flexDirection: 'row', flex: 1 }}>
-      <TouchableOpacity style={{ flexGrow: 1 }} onPress={() => startSelect(constants.DATE)}>
-        <Text style={{ color: props.textColor || Colors.black }}>{getHumanizedDate(dateTime)}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={{ flexGrow: 1 }} onPress={() => startSelect(constants.TIME)}>
-        <Text style={{ color: props.textColor || Colors.black }}>{getHumanizedTime(dateTime)}</Text>
-      </TouchableOpacity>
-      {showIOS && <DatePickerIOS date={dateTime} mode={props.mode} onDateChange={props.onDateChange} />}
+      {props.mode !== constants.TIME && (
+        <TouchableOpacity style={{ flexGrow: 1 }} onPress={() => startSelect(constants.DATE)}>
+          <Text style={{ color: props.textColor || Colors.black }}>
+            {getHumanizedDate(dateTime)}
+          </Text>
+        </TouchableOpacity>
+      )}
+      {props.mode !== constants.DATE && (
+        <TouchableOpacity style={{ flexGrow: 1 }} onPress={() => startSelect(constants.TIME)}>
+          <Text style={{ color: props.textColor || Colors.black }}>
+            {getHumanizedTime(dateTime)}
+          </Text>
+        </TouchableOpacity>
+      )}
+      {showIOS && (
+        <DatePickerIOS date={dateTime} mode={props.mode} onDateChange={props.onDateChange} />
+      )}
     </View>
   );
 }

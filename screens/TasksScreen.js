@@ -43,7 +43,7 @@ export default class TasksScreen extends Component {
       const currentTime = new Date().getTime();
       const dueTime = task.timeStamp;
       if (currentTime < dueTime && !task.repeats) {
-        task._notificationId = await this.notificationManager.createNotification({
+        task._notificationId = await NotificationManager.createNotification({
           title: 'Mylk task reminder',
           body: task.title,
           time: task.timeStamp,
@@ -54,7 +54,7 @@ export default class TasksScreen extends Component {
       task.finishedDay = new Date(new Date().toDateString()).getTime();
       await this.pageAutomator.taskChecked(task);
       if (task._notificationId && !task.repeats) {
-        await this.notificationManager.cancelNotification(task._notificationId);
+        await NotificationManager.cancelNotification(task._notificationId);
         delete task._notificationId;
       }
     }

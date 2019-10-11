@@ -60,13 +60,17 @@ export default class TaskEditor extends Component {
     this.props.cancel();
   }
 
+  async setDate(date) {
+    this.setState({ ...this.state, ...{ date } });
+  }
+
   async saveTask() {
     const og = this.props.task || {};
     const task = new Task({
       ...og,
       ...{
         title: this.state.title,
-        date: this.state.date.getTime(),
+        timeStamp: this.state.date.getTime(),
         humanizedDate: this.state.humanizedDate,
         repeats: this.state.repeats,
       },
@@ -101,10 +105,11 @@ export default class TaskEditor extends Component {
               <Text style={styles.label}>Date</Text>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
                 <DateTimePicker
-                  onDateChange={date => this.setState({ date })}
+                  onDateChange={date => this.setDate(date)}
                   date={this.state.date}
                   textColor={Colors.primaryText}
                   borderColor={Colors.primaryText}
+                  minDate={new Date()}
                 />
               </View>
             </View>

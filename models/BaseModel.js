@@ -1,5 +1,4 @@
 import Emoji from 'node-emoji';
-import formatDate from '../util/formatDate';
 import * as Storage from '../util/storage';
 
 export class BaseModel {
@@ -15,6 +14,8 @@ export class BaseModel {
     classType,
     finishedDay,
     humanizedDate,
+    _emojis,
+    emojis,
   }) {
     this._id =
       _id ||
@@ -34,7 +35,7 @@ export class BaseModel {
     this.modified_at = modified_at ? new Date(+modified_at) : this.created_at;
     this._type = type;
     this._classType = classType;
-    this._emojis = [];
+    this._emojis = _emojis || emojis || [];
   }
 
   async getAll() {
@@ -44,6 +45,9 @@ export class BaseModel {
 
   async save() {
     this._emojis = this._searchTextForEmojis();
+    if (this._classType === 'pages') {
+      console.log(this)
+    }
     const all = await this.getAll();
     let newAll;
     const found = all.find(e => e._id === this._id);
@@ -60,7 +64,6 @@ export class BaseModel {
       newAll = all.slice();
       newAll.push(this);
     }
-    console.log(newAll);
     await Storage.setItem(this._type, newAll);
 
     return newAll.map(e => {
@@ -82,16 +85,21 @@ export class BaseModel {
     const result = [];
     const maxEmojis = 3;
     let stringArray = [];
-    Array.prototype.push.apply(stringArray, this.title ? this.title.toLowerCase().split(' ') : []);
-    Array.prototype.push.apply(stringArray, this.text ? this.text.toLowerCase().split(' ') : []);
+    stringArray = [...stringArray, ...(this.title ? this.title.toLowerCase().split(' ') : [])];
+    stringArray = [...stringArray, ...(this.text ? this.text.toLowerCase().split(' ') : [])];
+    if (this._tasks) {
+      this._tasks.forEach(t => {
+        stringArray = [...stringArray, ...(t.title ? t.title.toLowerCase().split(' ') : [])];
+      });
+    }
     for (const string of stringArray) {
       const found = Emoji.findByName(string);
       if (found) {
-        result.push(found);
+        result.push(found.key);
       } else if (string.charAt(string.length - 1) === 's') {
         const secondTry = Emoji.findByName(string.substring(0, string.length - 1));
         if (secondTry) {
-          result.push(secondTry);
+          result.push(secondTry.key);
         }
       }
       if (result.length === maxEmojis) {

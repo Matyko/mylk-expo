@@ -10,9 +10,10 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import Emoji from 'react-native-emoji';
 import Colors from '../constants/Colors';
 import EmojiAddon from './EmojiAddon';
-import getHumanizedData from '../util/formatDate';
+import { getHumanizedDate } from '../util/formatDate';
 
 export default class PageElement extends Component {
   constructor(props) {
@@ -21,7 +22,6 @@ export default class PageElement extends Component {
       open: !!this.props.fullPage,
       editable: false,
     };
-    console.log(this.props.page);
   }
 
   render() {
@@ -42,10 +42,13 @@ export default class PageElement extends Component {
         <View style={styles.topDataContainer}>
           {this.props.page.mood && <Text style={styles.topData}>Mood</Text>}
           {this.props.page._emojis &&
+            !!this.props.page._emojis.length &&
             this.props.page._emojis.map(e => {
-              return <Text key={e.key}>{e.emoji}</Text>;
+              return <Emoji key={e} name={e} />;
             })}
-          <Text style={styles.topData}>{getHumanizedData(this.props.page.timeStamp)}</Text>
+          <Text style={styles.topData}>
+            {getHumanizedDate(new Date(+this.props.page.timeStamp))}
+          </Text>
         </View>
         {this.state.editable && (
           <View style={styles.bottom}>

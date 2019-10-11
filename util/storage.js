@@ -37,11 +37,12 @@ export async function setItem(type, data) {
           .doc(firebase.auth().currentUser.uid)
           .collection(type);
         data.forEach(d => {
-          reference.doc(d._id).set(d, { merge: true });
+          reference.doc(d._id).set(JSON.parse(JSON.stringify(d)), { merge: true });
         });
         mLogger(`Synced ${type} data to firebase`);
       }
     } catch (e) {
+      console.log(e);
       mLogger(`Could not sync ${type} data to firebase`);
     }
   }

@@ -24,14 +24,13 @@ export default class PageEditor extends Component {
   }
 
   async savePage() {
-    console.log(this.state);
     let page;
     if (this.props.page) {
       page = new Page(this.props.page);
     } else {
       page = new Page({
         text: this.state.text,
-        date: this.state.date.getTime(),
+        timeStamp: this.state.date.getTime(),
         humanizedDate: this.state.humanizedDate,
         images: this.state.images,
       });
@@ -53,7 +52,7 @@ export default class PageEditor extends Component {
             <Text style={styles.label}>Date</Text>
             <DateTimePicker
               date={this.state.date}
-              mode={this.state.mode}
+              mode={'date'}
               onDateChange={date =>
                 this.setState({
                   ...this.state,

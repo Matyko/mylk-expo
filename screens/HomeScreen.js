@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { ScrollView, StyleSheet, View, Animated, Text, Platform, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { ScrollView, StyleSheet, View, Animated, Alert } from 'react-native';
 import Colors from '../constants/Colors';
 import HomeScreenPill from '../components/HomeScreenPill';
 import * as Storage from '../util/storage';
@@ -8,7 +7,7 @@ import STORAGE_CONSTS from '../util/storageConsts';
 import { Task } from '../models/Task';
 import { Page } from '../models/Page';
 import { getAllStatic } from '../models/BaseModel';
-import HomeScreenTopElement from "../components/HomeScreenTopElement";
+import HomeScreenTopElement from '../components/HomeScreenTopElement';
 
 export default class HomeScreen extends Component {
   constructor(props) {
@@ -97,7 +96,7 @@ export default class HomeScreen extends Component {
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           <Animated.View style={style(0)}>
-            <HomeScreenTopElement/>
+            <HomeScreenTopElement />
           </Animated.View>
           <Animated.View style={style(1)}>
             <HomeScreenPill

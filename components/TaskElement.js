@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { CheckBox } from 'react-native-elements';
 import GestureRecognizer from 'react-native-swipe-gestures';
+import Emoji from 'react-native-emoji';
 import Colors from '../constants/Colors';
 import getHumanizedData from '../util/formatDate';
 
@@ -77,9 +78,7 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit }) {
       onSwipeLeft={() => onSwipe(DIRECTIONS.RIGHT)}
       onSwipeRight={() => onSwipe(DIRECTIONS.LEFT)}
       config={config}>
-      <TouchableWithoutFeedback
-        onLongPress={() => showHidden()}
-        onPress={() => toEdit()}>
+      <TouchableWithoutFeedback onLongPress={() => showHidden()} onPress={() => toEdit()}>
         <View style={{ ...styles.taskElement, ...{ opacity: task.checked ? 0.6 : 1 } }}>
           <View style={styles.checkBoxContainer}>
             <CheckBox
@@ -99,8 +98,9 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit }) {
               <View style={styles.taskElementIcon}>
                 {icon && <Ionicons name={icon} size={20} color={Colors.tabIconDefault} />}
                 {task._emojis &&
+                  !!task._emojis.length &&
                   task._emojis.map(e => {
-                    return <Text key={e.key}>{e.emoji}</Text>;
+                    return <Emoji key={e} name={e} />;
                   })}
               </View>
               <Text numberOfLines={1}>{getHumanizedData(task.timeStamp)}</Text>
@@ -118,7 +118,7 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit }) {
           maxWidth: animVal.interpolate({ inputRange: [0, 1], outputRange: [0.01, 50] }),
           overflow: 'hidden',
           marginRight: animVal.interpolate({ inputRange: [0, 1], outputRange: [15, 7.5] }),
-          marginLeft: animVal.interpolate({ inputRange: [0, 1], outputRange: [0, 7.5] })
+          marginLeft: animVal.interpolate({ inputRange: [0, 1], outputRange: [0, 7.5] }),
         }}>
         <Animated.View
           style={{
