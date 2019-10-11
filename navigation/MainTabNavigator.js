@@ -68,7 +68,7 @@ JournalStack.navigationOptions = {
     backgroundColor: Colors.white,
   },
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-book' : 'md-book'} />
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-journal' : 'md-journal'} />
   ),
 };
 

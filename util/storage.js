@@ -1,14 +1,15 @@
-// eslint-disable-next-line max-len
-/* eslint-disable no-await-in-loop,no-return-await,no-underscore-dangle,import/no-extraneous-dependencies */
 import * as SecureStore from 'expo-secure-store';
 import { AsyncStorage } from 'react-native';
+import * as firebase from 'firebase';
 import STORAGE_CONSTS from './storageConsts';
 import 'firebase/firestore';
 import 'firebase/auth';
+import mLogger from './mLogger';
 
 async function getId() {
-  // return firebase.auth().currentUser.uid ||
-  return await SecureStore.getItemAsync(STORAGE_CONSTS.USER_ID);
+  return (
+    firebase.auth().currentUser.uid || (await SecureStore.getItemAsync(STORAGE_CONSTS.USER_ID))
+  );
 }
 
 export async function getItem(type) {
@@ -27,19 +28,22 @@ export async function getItem(type) {
 
 export async function setItem(type, data) {
   if (type === STORAGE_CONSTS.TASKS || type === STORAGE_CONSTS.PAGES) {
-      try {
-          const sync = await getItem(STORAGE_CONSTS.SYNC) || false;
-          if (sync) {
-              const reference = firebase.firestore().collection('userData')
-              .doc(firebase.auth().currentUser.uid).collection(type);
-              data.forEach(d => {
-                  reference.doc(d._id).set(d, {merge: true})
-              });
-              mLogger(`Synced ${type} data to firebase`)
-          }
-      } catch {
-          mLogger(`Could not sync ${type} data to firebase`)
+    try {
+      const sync = (await getItem(STORAGE_CONSTS.SYNC)) || false;
+      if (sync) {
+        const reference = firebase
+          .firestore()
+          .collection('userData')
+          .doc(firebase.auth().currentUser.uid)
+          .collection(type);
+        data.forEach(d => {
+          reference.doc(d._id).set(d, { merge: true });
+        });
+        mLogger(`Synced ${type} data to firebase`);
       }
+    } catch (e) {
+      mLogger(`Could not sync ${type} data to firebase`);
+    }
   }
   const id = await getId();
   if (id) {
@@ -50,13 +54,16 @@ export async function setItem(type, data) {
 
 export async function deleteListItem(type, data, toDelete) {
   if (type === STORAGE_CONSTS.TASKS || type === STORAGE_CONSTS.PAGES) {
-      try {
-          const reference = firebase.firestore().collection('userData')
-          .doc(firebase.auth().currentUser.uid).collection(type);
-          reference.doc(toDelete._id).delete()
-      } catch (e) {
-          mLogger('Could not connect to firebase')
-      }
+    try {
+      const reference = firebase
+        .firestore()
+        .collection('userData')
+        .doc(firebase.auth().currentUser.uid)
+        .collection(type);
+      reference.doc(toDelete._id).delete();
+    } catch (e) {
+      mLogger('Could not connect to firebase');
+    }
   }
   const id = await getId();
   if (id) {

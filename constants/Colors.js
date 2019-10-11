@@ -2,7 +2,7 @@ const tintColor = '#2f95dc';
 
 export default {
   tintColor,
-  primaryBackground: '#3e6ebd',
+  primaryBackground: '#ff6a1e',
   // primaryBackground: '#3dbd94',
   // primaryBackground: '#ff3d6c',
   primaryText: '#fff',
@@ -27,7 +27,7 @@ export default {
 };
 
 export function hexToRgb(hex) {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? {
         r: parseInt(result[1], 16),
