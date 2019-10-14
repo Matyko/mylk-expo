@@ -45,9 +45,6 @@ export class BaseModel {
 
   async save() {
     this._emojis = this._searchTextForEmojis();
-    if (this._classType === 'pages') {
-      console.log(this)
-    }
     const all = await this.getAll();
     let newAll;
     const found = all.find(e => e._id === this._id);

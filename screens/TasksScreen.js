@@ -11,7 +11,6 @@ import PageAutomator from '../util/PageAutomator';
 import STORAGE_CONSTS from '../util/storageConsts';
 import { Task } from '../models/Task';
 import { getAllStatic } from '../models/BaseModel';
-import PageElement from '../components/PageElement';
 
 const rgbBG = hexToRgb(Colors.primaryBackground);
 
@@ -39,7 +38,7 @@ export default class TasksScreen extends Component {
     }
     this.props.navigation.addListener('willFocus', async () => {
       const hideEmoji = (await Storage.getItem(STORAGE_CONSTS.HIDE_EMOJI)) || false;
-      this.setState(...this.state, ...{ hideEmoji });
+      this.setState({ ...this.state, ...{ hideEmoji } });
     });
   }
 

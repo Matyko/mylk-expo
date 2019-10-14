@@ -14,6 +14,7 @@ import Emoji from 'react-native-emoji';
 import Colors from '../constants/Colors';
 import EmojiAddon from './EmojiAddon';
 import { getHumanizedDate } from '../util/formatDate';
+import MoodPicker from './MoodPicker';
 
 export default class PageElement extends Component {
   constructor(props) {
@@ -26,7 +27,6 @@ export default class PageElement extends Component {
 
   render() {
     const width = Math.floor(Dimensions.get('window').width) - 30;
-    console.log(this.props.emoji);
     return (
       <TouchableOpacity
         onPress={() => this.setState({ ...this.state, ...{ open: !this.state.open } })}
@@ -41,13 +41,17 @@ export default class PageElement extends Component {
           },
         }}>
         <View style={styles.topDataContainer}>
-          {this.props.page.mood && <Text style={styles.topData}>Mood</Text>}
-          {this.props.emoji &&
-            this.props.page._emojis &&
-            !!this.props.page._emojis.length &&
-            this.props.page._emojis.map(e => {
-              return <Emoji key={e} name={e} />;
-            })}
+          <View style={{ flexGrow: 0 }}>
+            {this.props.page.mood && <MoodPicker selected={this.props.page.mood} fixed={true} />}
+          </View>
+          <View style={{ flexGrow: 1, justifyContent: 'flex-end', flexDirection: 'row' }}>
+            {this.props.emoji &&
+              this.props.page._emojis &&
+              !!this.props.page._emojis.length &&
+              this.props.page._emojis.map(e => {
+                return <Emoji key={e} name={e} />;
+              })}
+          </View>
           <Text style={styles.topData}>
             {getHumanizedDate(new Date(+this.props.page.timeStamp))}
           </Text>
@@ -128,8 +132,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   topDataContainer: {
-    justifyContent: 'flex-end',
     flexDirection: 'row',
+    alignItems: 'center'
   },
   topData: {
     flexGrow: 0,

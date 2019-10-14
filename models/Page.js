@@ -15,6 +15,7 @@ export class Page extends BaseModel {
     humanizedDate,
     _emojis,
     emojis,
+    mood,
   } = {}) {
     super({
       finishedDay,
@@ -32,5 +33,6 @@ export class Page extends BaseModel {
     });
     this.images = images || [];
     this._tasks = _tasks || undefined;
+    this.mood = mood || null;
   }
 }
