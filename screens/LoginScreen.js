@@ -10,6 +10,7 @@ import { StyledText } from '../components/StyledText';
 import Colors from '../constants/Colors';
 import PassCode from '../components/PassCode';
 import STORAGE_CONSTS from '../util/storageConsts';
+import {Video} from "expo-av";
 
 export default class LoginScreen extends Component {
   constructor(props) {
@@ -100,22 +101,22 @@ export default class LoginScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {/*<Video*/}
-        {/*    source={require('../assets/video/11.mp4')}*/}
-        {/*    style={styles.backgroundVideo}*/}
-        {/*    rate={1}*/}
-        {/*    shouldPlay={true}*/}
-        {/*    isLooping={true}*/}
-        {/*    volume={1}*/}
-        {/*    muted={true}*/}
-        {/*    resizeMode="cover"*/}
-        {/*/>*/}
-        <LinearGradient
-          start={[0, 1]}
-          end={[1, 0]}
-          colors={[Colors.primaryText, Colors.primaryBackground]}
-          style={[styles.backgroundVideo, { opacity: 0.6 }]}
+        <Video
+          source={require('../assets/video/11.mp4')}
+          style={styles.backgroundVideo}
+          rate={1}
+          shouldPlay={true}
+          isLooping={true}
+          volume={1}
+          muted={true}
+          resizeMode="cover"
         />
+        {/*<LinearGradient*/}
+        {/*  start={[0, 1]}*/}
+        {/*  end={[1, 0]}*/}
+        {/*  colors={[Colors.primaryText, Colors.primaryBackground]}*/}
+        {/*  style={[styles.backgroundVideo, { opacity: 0.6 }]}*/}
+        {/*/>*/}
         <KeyboardAvoidingView behavior="padding" style={styles.container}>
           <View style={styles.loginContainer}>
             <View style={styles.logo}>

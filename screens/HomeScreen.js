@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { ScrollView, StyleSheet, View, Animated, Alert } from 'react-native';
 import Colors from '../constants/Colors';
 import HomeScreenPill from '../components/HomeScreenPill';
-import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
 import { Task } from '../models/Task';
 import { Page } from '../models/Page';
@@ -22,15 +21,6 @@ export default class HomeScreen extends Component {
     this.props.navigation.addListener('willFocus', () => {
       this.getData();
     });
-    // this.initSync();
-  }
-
-  async initSync() {
-    const toSync = await Storage.getItem(STORAGE_CONSTS.SYNC);
-    if (toSync) {
-      await Storage.setUpSynced();
-      await Storage.syncAll();
-    }
   }
 
   getData() {

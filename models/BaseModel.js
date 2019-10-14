@@ -1,5 +1,7 @@
 import Emoji from 'node-emoji';
 import * as Storage from '../util/storage';
+import STORAGE_CONSTS from "../util/storageConsts";
+import sortByDate from "../util/sortByDate";
 
 export class BaseModel {
   constructor({
@@ -60,6 +62,11 @@ export class BaseModel {
     } else {
       newAll = all.slice();
       newAll.push(this);
+    }
+    if (this._type === STORAGE_CONSTS.PAGES) {
+      newAll = newAll.sort(sortByDate).reverse();
+    } else {
+      newAll = newAll.sort(sortByDate);
     }
     await Storage.setItem(this._type, newAll);
 

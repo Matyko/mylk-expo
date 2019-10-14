@@ -13,6 +13,7 @@ import STORAGE_CONSTS from '../util/storageConsts';
 import { getAllStatic } from '../models/BaseModel';
 import { Page } from '../models/Page';
 import mLogger from '../util/mLogger';
+import CalendarView from '../components/CalendarView';
 
 export default class JournalScreen extends Component {
   constructor(props) {
@@ -25,8 +26,13 @@ export default class JournalScreen extends Component {
       accomplishments: [],
       imageModalVisible: false,
       currentPage: null,
-      listView: true,
+      listView: false,
+      pageView: false,
+      calendarView: true,
       hideEmoji: false,
+      currentMonth: 0,
+      calendarDate: new Date(),
+      events: [],
     };
     this.DIRECTIONS = {
       RIGHT: 'RIGHT',
@@ -51,13 +57,23 @@ export default class JournalScreen extends Component {
     this.props.navigation.addListener('willFocus', async () => {
       this.getPages();
       const hideEmoji = (await Storage.getItem(STORAGE_CONSTS.HIDE_EMOJI)) || false;
-      this.setState(...this.state, ...{ hideEmoji });
+      this.setState({ ...this.state, ...{ hideEmoji } });
     });
   }
 
   async getPages() {
     const pages = await getAllStatic(STORAGE_CONSTS.PAGES, Page);
-    this.setState({ ...this.state, ...{ pages, currentPage: pages[0] } });
+    const events = pages.filter(e => {
+      const date = new Date(e.timeStamp);
+      return (
+        date.getFullYear() === this.state.calendarDate.getFullYear() &&
+        date.getMonth() === this.state.calendarDate.getMonth()
+      );
+    });
+    this.setState({
+      ...this.state,
+      ...{ pages, currentPage: pages[0], events },
+    });
   }
 
   async savedPage(pages) {
@@ -106,6 +122,13 @@ export default class JournalScreen extends Component {
     }
   };
 
+  onScrollEnd(e) {
+    let contentOffset = e.nativeEvent.contentOffset;
+    let viewSize = e.nativeEvent.layoutMeasurement;
+    let pageNum = Math.floor(contentOffset.x / viewSize.width);
+    // TODO current page here
+  }
+
   render() {
     const viewMode = this.state.listView ? {} : { flexDirection: 'row' };
     return (
@@ -114,29 +137,34 @@ export default class JournalScreen extends Component {
         onSwipeRight={() => this.onSwipe(this.DIRECTIONS.RIGHT)}
         onSwipeLeft={() => this.onSwipe(this.DIRECTIONS.LEFT)}
         config={this.config}>
-        <ScrollView
-          style={{ ...styles.container, ...viewMode }}
-          pagingEnabled={!this.state.listView}
-          horizontal={!this.state.listView}>
-          {this.state.pages
-            .concat(this.state.accomplishments)
-            .sort(sortByDate)
-            .map(page => {
-              return (
-                <PageElement
-                  key={page._id}
-                  fullPage={!this.state.listView}
-                  page={page}
-                  emoji={!this.state.hideEmoji}
-                  toEdit={() =>
-                    this.setState({ ...this.state, ...{ editedPage: page, modalVisible: true } })
-                  }
-                  deletePage={() => this.deletePage(page)}
-                  openImages={() => this.openImages(page)}
-                />
-              );
-            })}
-        </ScrollView>
+        {!this.state.calendarView && (
+          <ScrollView
+            style={{ ...styles.container, ...viewMode }}
+            pagingEnabled={!this.state.listView}
+            onMomentumScrollEnd={this.onScrollEnd}
+            horizontal={!this.state.listView}>
+            {this.state.pages
+              .concat(this.state.accomplishments)
+              .sort(sortByDate)
+              .reverse()
+              .map(page => {
+                return (
+                  <PageElement
+                    key={page._id}
+                    fullPage={!this.state.listView}
+                    page={page}
+                    emoji={!this.state.hideEmoji}
+                    toEdit={() =>
+                      this.setState({ ...this.state, ...{ editedPage: page, modalVisible: true } })
+                    }
+                    deletePage={() => this.deletePage(page)}
+                    openImages={() => this.openImages(page)}
+                  />
+                );
+              })}
+          </ScrollView>
+        )}
+        {this.state.calendarView && <CalendarView date={this.state.calendarDate} />}
         <FloatingActionButton
           pressFunction={() => this.setState({ ...this.state, ...{ modalVisible: true } })}
         />
