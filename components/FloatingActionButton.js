@@ -1,4 +1,4 @@
-import { Platform, TouchableOpacity, View } from 'react-native';
+import { Animated, Platform, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import Colors from '../constants/Colors';
@@ -9,6 +9,12 @@ function useForceUpdate() {
 }
 
 let open = false;
+const animVal = new Animated.Value(0);
+const animate = (val) => {
+  Animated.spring(animVal, {
+    toValue: val,
+  }).start();
+};
 
 export default function FloatingActionButton({ iconName, pressFunction, isLeft, subButtons }) {
   const prefix = Platform.OS === 'ios' ? 'ios-' : 'md-';
@@ -19,6 +25,7 @@ export default function FloatingActionButton({ iconName, pressFunction, isLeft, 
   const mainButton = () => {
     if (subButtons && subButtons.length) {
       open = !open;
+      animate(open ? 1 : 0);
     }
     if (pressFunction) {
       pressFunction();
@@ -40,14 +47,29 @@ export default function FloatingActionButton({ iconName, pressFunction, isLeft, 
           <Ionicons name={icon} size={25} color={Colors.primaryText} onPress={() => mainButton()} />
         </TouchableOpacity>
       </View>
-      {subButtons && !!subButtons.length && open && (
+      {subButtons && !!subButtons.length && (
         <View style={[hidden, { transform: [{ translateY: -60 * subButtons.length }] }]}>
-          {subButtons.map(button => (
-            <View key={button.icon} style={hiddenButton}>
+          {subButtons.map((button, index) => (
+            <Animated.View
+              key={button.icon}
+              style={[
+                hiddenButton,
+                {
+                  transform: [
+                    {
+                      translateY: animVal.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [(subButtons.length - index) * 50, 0],
+                      }),
+                    },
+                    { scale: animVal.interpolate({ inputRange: [0, 1], outputRange: [0.01, 1] }) },
+                  ],
+                },
+              ]}>
               <TouchableOpacity onPress={event => subButtonTap(event, button.fn)}>
                 <Ionicons name={prefix + button.icon} size={25} color={Colors.primaryText} />
               </TouchableOpacity>
-            </View>
+            </Animated.View>
           ))}
         </View>
       )}
