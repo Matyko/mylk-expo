@@ -128,7 +128,7 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit, emoj
           }}>
           <TouchableOpacity onPress={() => deleteTask()}>
             <Ionicons
-              name={Platform.OS === 'ios' ? 'ios-close-circle' : 'md-close-circle'}
+              name={Platform.OS === 'ios' ? 'ios-trash' : 'md-trash'}
               size={30}
               color={Colors.primaryText}
             />

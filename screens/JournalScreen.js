@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import FloatingActionButton from '../components/FloatingActionButton';
 import ModalComponent from '../components/ModalComponent';
-import sortByDate from '../util/sortByDate';
 import Colors from '../constants/Colors';
-import PageElement from '../components/PageElement';
 import PageEditor from '../components/PageEditor';
 import * as Storage from '../util/storage';
 import STORAGE_CONSTS from '../util/storageConsts';
@@ -14,6 +11,8 @@ import { getAllStatic } from '../models/BaseModel';
 import { Page } from '../models/Page';
 import mLogger from '../util/mLogger';
 import CalendarView from '../components/CalendarView';
+import PageListView from '../components/PageListView';
+import PageFlatView from '../components/PageFlatView';
 
 export default class JournalScreen extends Component {
   constructor(props) {
@@ -27,7 +26,7 @@ export default class JournalScreen extends Component {
       imageModalVisible: false,
       currentPage: null,
       listView: false,
-      pageView: false,
+      flatView: false,
       calendarView: true,
       hideEmoji: false,
       currentMonth: 0,
@@ -122,47 +121,36 @@ export default class JournalScreen extends Component {
     }
   };
 
-  onScrollEnd(e) {
-    let contentOffset = e.nativeEvent.contentOffset;
-    let viewSize = e.nativeEvent.layoutMeasurement;
-    let pageNum = Math.floor(contentOffset.x / viewSize.width);
-    // TODO current page here
-  }
-
   render() {
-    const viewMode = this.state.listView ? {} : { flexDirection: 'row' };
     return (
       <GestureRecognizer
         style={{ flex: 1 }}
         onSwipeRight={() => this.onSwipe(this.DIRECTIONS.RIGHT)}
         onSwipeLeft={() => this.onSwipe(this.DIRECTIONS.LEFT)}
         config={this.config}>
-        {!this.state.calendarView && (
-          <ScrollView
-            style={{ ...styles.container, ...viewMode }}
-            pagingEnabled={!this.state.listView}
-            onMomentumScrollEnd={this.onScrollEnd}
-            horizontal={!this.state.listView}>
-            {this.state.pages
-              .concat(this.state.accomplishments)
-              .sort(sortByDate)
-              .reverse()
-              .map(page => {
-                return (
-                  <PageElement
-                    key={page._id}
-                    fullPage={!this.state.listView}
-                    page={page}
-                    emoji={!this.state.hideEmoji}
-                    toEdit={() =>
-                      this.setState({ ...this.state, ...{ editedPage: page, modalVisible: true } })
-                    }
-                    deletePage={() => this.deletePage(page)}
-                    openImages={() => this.openImages(page)}
-                  />
-                );
-              })}
-          </ScrollView>
+        {this.state.listView && (
+          <PageListView
+            edit={page =>
+              this.setState({ ...this.state, ...{ editedPage: page, modalVisible: true } })
+            }
+            accomplishments={this.state.accomplishments}
+            pages={this.state.pages}
+            hideEmoji={this.state.hideEmoji}
+            deletePage={page => this.deletePage(page)}
+            openImages={page => this.openImages(page)}
+          />
+        )}
+        {this.state.flatView && (
+          <PageFlatView
+            edit={page =>
+              this.setState({ ...this.state, ...{ editedPage: page, modalVisible: true } })
+            }
+            accomplishments={this.state.accomplishments}
+            pages={this.state.pages}
+            hideEmoji={this.state.hideEmoji}
+            deletePage={page => this.deletePage(page)}
+            openImages={page => this.openImages(page)}
+          />
         )}
         {this.state.calendarView && <CalendarView date={this.state.calendarDate} />}
         <FloatingActionButton
@@ -170,10 +158,35 @@ export default class JournalScreen extends Component {
         />
         <FloatingActionButton
           isLeft={true}
-          iconName={this.state.listView ? 'apps' : 'list'}
-          pressFunction={() =>
-            this.setState({ ...this.state, ...{ listView: !this.state.listView } })
-          }
+          iconName="menu"
+          subButtons={[
+            {
+              icon: 'apps',
+              fn: () =>
+                this.setState({
+                  ...this.state,
+                  ...{ flatView: true, listView: false, calendarView: false },
+                }),
+            },
+            {
+              icon: 'list',
+              fn: () =>
+                this.setState({
+                  ...this.state,
+                  ...{ flatView: false, listView: true, calendarView: false },
+                }),
+            },
+            {
+              icon: 'calendar',
+              fn: () => {
+                console.log('clicccck')
+                this.setState({
+                  ...this.state,
+                  ...{ flatView: false, listView: false, calendarView: true },
+                })
+              }
+            },
+          ]}
         />
         <ModalComponent
           closeModal={() =>
@@ -208,11 +221,3 @@ JournalScreen.navigationOptions = {
     fontWeight: 'normal',
   },
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 15,
-    backgroundColor: Colors.white,
-  },
-});

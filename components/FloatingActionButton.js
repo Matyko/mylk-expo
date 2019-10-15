@@ -1,21 +1,70 @@
-import { Platform, TouchableOpacity } from 'react-native';
+import { Platform, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useState } from 'react';
 import Colors from '../constants/Colors';
 
-export default function FloatingActionButton({ iconName, pressFunction, isLeft }) {
+function useForceUpdate() {
+  const [value, setState] = useState(true);
+  return () => setState(!value);
+}
+
+let open = false;
+
+export default function FloatingActionButton({ iconName, pressFunction, isLeft, subButtons }) {
   const prefix = Platform.OS === 'ios' ? 'ios-' : 'md-';
-  const icon = iconName ? prefix + iconName : `${prefix}add`;
+  const icon = open ? prefix + 'close' : iconName ? prefix + iconName : `${prefix}add`;
   const position = isLeft ? { left: 10 } : { right: 10 };
+  const forceUpdate = useForceUpdate();
+
+  const mainButton = () => {
+    if (subButtons && subButtons.length) {
+      open = !open;
+    }
+    if (pressFunction) {
+      pressFunction();
+    }
+    forceUpdate();
+  };
+
+  const subButtonTap = (event, fn) => {
+    event.stopPropagation();
+    fn();
+    open = false;
+    forceUpdate();
+  };
 
   return (
-    <TouchableOpacity style={{ ...styling, ...position }} onPress={() => pressFunction()}>
-      <Ionicons name={icon} size={25} color={Colors.primaryText} onPress={() => pressFunction()} />
-    </TouchableOpacity>
+    <View style={{ ...styling, ...position }}>
+      <View style={mainButtonStyle}>
+        <TouchableOpacity onPress={() => pressFunction()}>
+          <Ionicons name={icon} size={25} color={Colors.primaryText} onPress={() => mainButton()} />
+        </TouchableOpacity>
+      </View>
+      {subButtons && !!subButtons.length && open && (
+        <View style={[hidden, { transform: [{ translateY: -60 * subButtons.length }] }]}>
+          {subButtons.map(button => (
+            <View key={button.icon} style={hiddenButton}>
+              <TouchableOpacity onPress={event => subButtonTap(event, button.fn)}>
+                <Ionicons name={prefix + button.icon} size={25} color={Colors.primaryText} />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
   );
 }
 
 const styling = {
+  marginTop: 8,
+  marginBottom: 8,
+  marginLeft: 15,
+  marginRight: 15,
+  bottom: 10,
+  position: 'absolute',
+};
+
+const mainButtonStyle = {
   flexDirection: 'row',
   shadowColor: '#000',
   shadowOffset: {
@@ -26,10 +75,6 @@ const styling = {
   shadowRadius: 2,
   elevation: 2,
   padding: 10,
-  marginTop: 8,
-  marginBottom: 8,
-  marginLeft: 15,
-  marginRight: 15,
   flex: 1,
   alignItems: 'center',
   justifyContent: 'center',
@@ -37,6 +82,25 @@ const styling = {
   borderRadius: 60,
   width: 50,
   height: 50,
+};
+
+const hidden = {
+  flexDirection: 'column',
+  flex: 1,
+  top: -10,
+  left: 0,
+  alignItems: 'center',
+  backgroundColor: Colors.transparent,
   position: 'absolute',
-  bottom: 10,
+  zIndex: 2,
+};
+
+const hiddenButton = {
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: Colors.primaryBackground,
+  borderRadius: 60,
+  width: 50,
+  height: 50,
+  margin: 5,
 };

@@ -59,7 +59,7 @@ export default class PageElement extends Component {
         {this.state.editable && (
           <View style={styles.bottom}>
             <Ionicons
-              name={Platform.OS === 'ios' ? 'ios-close-circle' : 'md-close-circle'}
+              name={Platform.OS === 'ios' ? 'ios-trash' : 'md-trash'}
               size={35}
               color={Colors.primaryBackground}
               style={styles.icon}
