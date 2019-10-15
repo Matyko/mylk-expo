@@ -23,7 +23,9 @@ export default function CalendarView(props) {
   const firstDate = new Date(props.date);
   const background = hexToRgb(Colors.primaryBackground);
   const today = new Date().getDate();
-  const thisMonth = new Date().getFullYear() === props.date.getFullYear() && new Date().getMonth() === props.date.getMonth();
+  const thisMonth =
+    new Date().getFullYear() === props.date.getFullYear() &&
+    new Date().getMonth() === props.date.getMonth();
   firstDate.setDate(1);
   const firstDay = firstDate.getDay();
   const daysInMonth = new Date(props.date.getFullYear(), props.date.getMonth() + 1, 0).getDate();
@@ -45,7 +47,8 @@ export default function CalendarView(props) {
                 key={j}
                 style={[
                   styles.cell,
-                  date === today && thisMonth || props.filterDate && date === props.filterDate.getDate()
+                  (date === today && thisMonth) ||
+                  (props.filterDate && date === props.filterDate.getDate())
                     ? {
                         backgroundColor: `rgba(${background.r},${background.g},${background.b},0.5)`,
                       }
