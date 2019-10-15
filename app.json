@@ -24,6 +24,7 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.matyaskrista.mylk",
       "supportsTablet": true
     },
     "android": {
