@@ -1,6 +1,8 @@
 /* eslint-disable no-return-await */
 import * as Permissions from 'expo-permissions';
 import { Notifications } from 'expo';
+import * as Storage from './storage';
+import STORAGE_CONSTS from './storageConsts';
 
 export default class NotificationManager {
   static async sendNotificationImmediately({ title, body }) {
@@ -32,10 +34,15 @@ export default class NotificationManager {
   }
 
   static async createNotification({ title, body, time }) {
-    if (time) {
-      return await this.scheduleNotification({ title, body, time });
+    const enabled = (await Storage.getItem(STORAGE_CONSTS.NOTIFICATIONS)) || false;
+    if (enabled) {
+      if (time) {
+        return await this.scheduleNotification({ title, body, time });
+      }
+      return await this.sendNotificationImmediately({ title, body });
+    } else {
+      return null;
     }
-    return await this.sendNotificationImmediately({ title, body });
   }
 
   static async cancelNotification(notificationId) {

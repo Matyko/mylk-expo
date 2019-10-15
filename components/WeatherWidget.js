@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { Platform, Text, View, ActivityIndicator } from 'react-native';
+import { Platform, Text, View, ActivityIndicator, Animated, TouchableOpacity } from 'react-native';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 import { Ionicons } from '@expo/vector-icons';
 import mLogger from '../util/mLogger';
 import WEATHER_CONSTS from '../util/weatherConsts';
+import * as Storage from '../util/storage';
+import STORAGE_CONSTS from '../util/storageConsts';
+import Colors from '../constants/Colors';
 
 export default class WeatherWidget extends Component {
   constructor(props) {
@@ -19,10 +22,16 @@ export default class WeatherWidget extends Component {
       temp: 0,
     };
     this.prefix = Platform.OS === 'ios' ? 'ios-' : 'md-';
+    this.animVal = new Animated.Value(0);
   }
 
-  componentWillMount() {
-    this._getLocationAsync();
+  async componentDidMount() {
+    const enabled = (await Storage.getItem(STORAGE_CONSTS.WEATHER)) || false;
+    if (enabled) {
+      this._getLocationAsync();
+    } else {
+      this.setState({ ...this.state, ...{ loading: false } });
+    }
   }
 
   _getLocationAsync = async () => {
@@ -63,17 +72,46 @@ export default class WeatherWidget extends Component {
     }
   };
 
+  async toggle() {
+    if (this.state.isOpen) {
+      await this.setState({ ...this.state, ...{ isOpen: false } });
+      Animated.spring(this.animVal, {
+        toValue: 0,
+      }).start();
+    } else {
+      await this.setState({ ...this.state, ...{ isOpen: true } });
+      Animated.spring(this.animVal, {
+        toValue: 1,
+      }).start();
+    }
+  }
+
   render() {
+    const style = [
+      {
+        maxHeight: this.animVal.interpolate({ inputRange: [0, 1], outputRange: [0.01, 60] }),
+      },
+    ];
     return (
-      <View>
-        {this.state.loading && <ActivityIndicator />}
-        {!this.state.loading && (
-          <View>
-            <Ionicons name={this.prefix + this.state.icon} size={40} color={this.state.color} />
-            {this.state.name && <Text style={textStyle}>{this.state.temp}°C {this.state.name}</Text>}
-          </View>
-        )}
-      </View>
+      <TouchableOpacity onPress={() => this.toggle()}>
+        <View>
+          {this.state.loading && <ActivityIndicator />}
+          {!this.state.loading && (
+            <View
+              style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <Ionicons name={this.prefix + this.state.icon} size={40} color={this.state.color} />
+              </View>
+              {!!this.state.name && (
+                <Animated.View style={[{ overflow: 'hidden' }, style]}>
+                  <Text style={textStyle}>{this.state.name}</Text>
+                  <Text style={textStyle}>{this.state.temp}°C</Text>
+                </Animated.View>
+              )}
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
     );
   }
 }
@@ -82,4 +120,7 @@ const textStyle = {
   fontWeight: 'bold',
   letterSpacing: 1,
   textTransform: 'uppercase',
+  marginTop: 5,
+  color: Colors.light,
+  textAlign: 'center',
 };

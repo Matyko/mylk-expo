@@ -7,7 +7,9 @@ const STORAGE_CONSTS = {
   EMAIL: 'email',
   USER_ID: 'user_id',
   SYNC: 'sync',
-  HIDE_EMOJI: 'hide_emoji'
+  HIDE_EMOJI: 'hide_emoji',
+  WEATHER: 'weather',
+  NOTIFICATIONS: 'notifications',
 };
 
 export default STORAGE_CONSTS;

@@ -25,6 +25,8 @@ export default class SettingsScreen extends Component {
       passCode: null,
       syncData: true,
       hideEmoji: false,
+      weather: false,
+      notifications: false,
     };
   }
 
@@ -32,7 +34,12 @@ export default class SettingsScreen extends Component {
     const passCode = await SecureStore.getItemAsync(STORAGE_CONSTS.PASSCODE);
     const syncData = (await Storage.getItem(STORAGE_CONSTS.SYNC)) || false;
     const hideEmoji = (await Storage.getItem(STORAGE_CONSTS.HIDE_EMOJI)) || false;
-    await this.setState({ ...this.state, ...{ hasPassCode: !!passCode, passCode, syncData, hideEmoji } });
+    const weather = (await Storage.getItem(STORAGE_CONSTS.WEATHER)) || false;
+    const notifications = (await Storage.getItem(STORAGE_CONSTS.NOTIFICATIONS)) || false;
+    await this.setState({
+      ...this.state,
+      ...{ hasPassCode: !!passCode, passCode, syncData, hideEmoji, weather, notifications },
+    });
     this.forceUpdate();
   }
 
@@ -47,6 +54,18 @@ export default class SettingsScreen extends Component {
   async setEmoji() {
     await Storage.setItem(STORAGE_CONSTS.HIDE_EMOJI, !this.state.hideEmoji);
     await this.setState({ ...this.state, ...{ hideEmoji: !this.state.hideEmoji } });
+    this.forceUpdate();
+  }
+
+  async setNotifications() {
+    await Storage.setItem(STORAGE_CONSTS.NOTIFICATIONS, !this.state.notifications);
+    await this.setState({ ...this.state, ...{ notifications: !this.state.notifications } });
+    this.forceUpdate();
+  }
+
+  async setWeather() {
+    await Storage.setItem(STORAGE_CONSTS.WEATHER, !this.state.weather);
+    await this.setState({ ...this.state, ...{ weather: !this.state.weather } });
     this.forceUpdate();
   }
 
@@ -95,12 +114,14 @@ export default class SettingsScreen extends Component {
           <View style={styles.settingsContent}>
             <View style={styles.settingsSection}>
               <Text style={styles.settingsSectionTitle}>Security</Text>
+              {/* Passcode */}
               <View style={styles.settingsElement}>
                 <Text style={styles.settingsTitle}>Set passcode for login</Text>
                 <View style={styles.functionality}>
                   <Switch value={this.state.hasPassCode} onValueChange={e => this.setPassCode(e)} />
                 </View>
               </View>
+              {/* Cloud sync */}
               <View style={styles.settingsElement}>
                 <Text style={styles.settingsTitle}>Sync data to cloud</Text>
                 <View style={styles.functionality}>
@@ -115,13 +136,29 @@ export default class SettingsScreen extends Component {
               {/*</TouchableOpacity>*/}
             </View>
             <View style={styles.settingsSection}>
-              <Text style={styles.settingsSectionTitle}>Personal</Text>
+              <Text style={styles.settingsSectionTitle}>App settings</Text>
+              {/* Notifications */}
+              <View style={styles.settingsElement}>
+                <Text style={styles.settingsTitle}>Reminder notifications</Text>
+                <View style={styles.functionality}>
+                  <Switch value={this.state.notifications} onValueChange={e => this.setNotifications(e)} />
+                </View>
+              </View>
+              {/* Weather */}
+              <View style={styles.settingsElement}>
+                <Text style={styles.settingsTitle}>Weather info</Text>
+                <View style={styles.functionality}>
+                  <Switch value={this.state.weather} onValueChange={e => this.setWeather(e)} />
+                </View>
+              </View>
+              {/* Auto-emoji */}
               <View style={styles.settingsElement}>
                 <Text style={styles.settingsTitle}>Auto emoji</Text>
                 <View style={styles.functionality}>
                   <Switch value={!this.state.hideEmoji} onValueChange={e => this.setEmoji(e)} />
                 </View>
               </View>
+              {/* Logout */}
               <TouchableOpacity
                 style={{ ...styles.settingsElement, ...styles.touchableSetting }}
                 onPress={() => this.logOut()}>
