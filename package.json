@@ -6,7 +6,11 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "lint": "eslint ./ --fix"
+  },
+  "eslintConfig": {
+    "extends": "expo"
   },
   "jest": {
     "preset": "jest-expo"
@@ -31,18 +35,25 @@
     "react-native-image-zoom-viewer": "^2.2.26",
     "react-native-swipe-gestures": "^1.0.4",
     "react-native-web": "^0.11.4",
-    "react-navigation": "^3.11.0"
+    "react-navigation": "^3.11.0",
+    "expo-location": "~6.0.0"
   },
   "devDependencies": {
     "babel-preset-expo": "^6.0.0",
+    "eslint": "^6.5.1",
+    "eslint-config-expo": "^6.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.16.0",
+    "eslint-plugin-react-hooks": "^1.7.0",
     "expo-camera": "^6.0.0",
     "expo-permissions": "latest",
     "expo-secure-store": "^6.0.0",
     "jest-expo": "^34.0.0",
-    "react-native-datepicker": "^1.7.2",
+    "node-emoji": "latest",
+    "prettier": "^1.18.2",
     "react-native-elements": "^1.2.0",
-    "react-native-emoji": "^1.8.0",
-    "react-native-webview": "^7.4.0"
+    "react-native-emoji": "^1.8.0"
   },
   "private": true
 }

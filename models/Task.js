@@ -1,57 +1,95 @@
-import formatDate from "../util/formatDate";
-import NotificationManager from "../util/NotificationManager"
-import parseDate from "../util/parseDate";
-import {BaseModel} from "./BaseModel";
-import STORAGE_CONSTS from "../util/storageConsts";
+import NotificationManager from '../util/NotificationManager';
+import { BaseModel } from './BaseModel';
+import STORAGE_CONSTS from '../util/storageConsts';
+import mLogger from '../util/mLogger';
 
 export class Task extends BaseModel {
-    constructor({title, date, created_at, isFullDay, repeats, id, notificationId}) {
-        super({title, date, created_at, id, type: STORAGE_CONSTS.TASKS});
-        this._notificationId = notificationId || null;
-        this.isFullDay = isFullDay;
-        this.repeats = repeats;
-        this._notificationManager = new NotificationManager();
-        if (this.repeats) {
-            this._handleRepeat()
-        }
+  constructor({
+    title,
+    text,
+    timeStamp,
+    created_at,
+    repeats,
+    id,
+    _id,
+    notificationId,
+    _notificationId,
+    checked,
+    finishedDay,
+    humanizedDate,
+    _emojis,
+    emojis,
+  } = {}) {
+    super({
+      finishedDay,
+      humanizedDate,
+      title,
+      text,
+      timeStamp,
+      created_at,
+      id,
+      _id,
+      _emojis,
+      emojis,
+      type: STORAGE_CONSTS.TASKS,
+      classType: Task,
+    });
+    this._notificationId = notificationId || _notificationId || null;
+    this.repeats = repeats || false;
+    this.checked = checked || false;
+    if (this.repeats) {
+      this._handleRepeat();
     }
+  }
 
-    async createNotification() {
-        this._notificationId = await this._notificationManager.createNotification({
-            title: 'Mylk task reminder',
-            body: this.title,
-            time: parseDate(this.date) + (this.isFullDay ? 25200000 : 0),
-            repeat: this.repeats
-        });
-        return this._notificationId;
+  async createNotification() {
+    if (new Date().getTime() < this.timeStamp) {
+      this._notificationId = await NotificationManager.createNotification({
+        title: 'Mylk task reminder',
+        body: this.title,
+        time: this.timeStamp,
+        repeat: this.repeats,
+      });
+      mLogger(`notification created with id: ${this._notificationId}`);
+      return this._notificationId;
     }
+    return null;
+  }
 
-    async cancelNotification() {
-        await this._notificationManager.cancelNotification(this._notificationId);
+  async cancelNotification() {
+    if (this._notificationId) {
+      await NotificationManager.cancelNotification(this._notificationId);
     }
+    this._notificationId = null;
+  }
 
-    _handleRepeat() {
-        const dates = this.date.split(' ');
-        const date = new Date(dates[0]);
-        const today = new Date(new Date().toDateString());
-        if (date.getTime() < today.getTime()) {
-            switch(this.repeats) {
-                case "day":
-                    date.setDate(today.getDate());
-                    break;
-                case "week":
-                    date.setDate(date.getDate() + 7);
-                    break;
-                case "month":
-                    date.setMonth(date.getMonth() + 1);
-                    break;
-                case "year":
-                    date.setFullYear(date.getFullYear() + 1);
-            }
-            const newDate = formatDate(date);
-            this.date = newDate + (dates[1] ? ' ' + dates[1] : '');
-            this.checked = false;
-        }
+  _handleRepeat() {
+    const oDate = new Date(this.timeStamp);
+    const date = new Date(oDate.toDateString());
+    const today = new Date(new Date().toDateString());
+    if (date.getTime() < today.getTime()) {
+      switch (this.repeats) {
+        case 'day':
+          date.setDate(today.getDate());
+          break;
+        case 'week':
+          date.setDate(date.getDate() + 7);
+          break;
+        case 'month':
+          date.setMonth(date.getMonth() + 1);
+          break;
+        case 'year':
+          date.setFullYear(date.getFullYear() + 1);
+      }
+      date.setHours(oDate.getHours());
+      date.setMinutes(oDate.getMinutes());
+      this.timeStamp = date.getTime();
+      this.checked = false;
     }
+  }
 
+  async remove() {
+    this.cancelNotification();
+    return await this.delete();
+  }
 }

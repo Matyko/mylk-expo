@@ -1,179 +1,225 @@
-import React, { Component } from "react";
-import {CheckBox, Input} from 'react-native-elements';
-import {View, StyleSheet, Picker, Text} from "react-native";
-import DatePicker from "react-native-datepicker";
-import formatDate from "../util/formatDate";
-import Colors from "../constants/Colors";
-import mLogger from "../util/mLogger";
-import FancyButton from "./FancyButton";
-import EmojiAddon from "./EmojiAddon";
+import React, { Component } from 'react';
+import { Input } from 'react-native-elements';
+import { View, StyleSheet, Picker, Text, Animated, Keyboard } from 'react-native';
+import Colors from '../constants/Colors';
+import mLogger from '../util/mLogger';
+import { Task } from '../models/Task';
+import DateTimePicker from './DateTimePicker';
+import FancyButton from './FancyButton';
 
 export default class TaskEditor extends Component {
-    constructor(props) {
-        super(props);
-        if (props.task) {
-            this.state = {
-                mode: props.task.isFullDay ? 'date' : 'datetime',
-                date: props.task.date || formatDate(new Date),
-                title: props.task.title || '',
-                repeats: props.task.repeats || null,
-                errors: {
-                    desc: ''
-                },
-            };
-        } else {
-            this.state = {
-                mode: 'date',
-                date: formatDate(new Date),
-                title: '',
-                repeats: null,
-                errors: {
-                    desc: ''
-                },
-            };
-        }
-    }
+  constructor(props) {
+    super(props);
+    this.state = {
+      date: new Date(),
+      humanizedDate: 'Today',
+      title: (props.task && props.task.title) || '',
+      repeats: (props.task && props.task.repeats) || false,
+      animVal: new Animated.Value(0),
+      isOpen: false,
+      errors: {
+        desc: '',
+      },
+    };
+  }
 
-    changeMode() {
-        const copy = JSON.parse(JSON.stringify(this.state));
-        copy.mode = copy.mode === 'date' ? 'datetime' : 'date';
-        this.setState(copy);
-    }
+  async open() {
+    await this.setState({ ...this.state, ...{ isOpen: true } });
+    Animated.spring(this.state.animVal, {
+      toValue: 1,
+    }).start();
+  }
 
-    setDate(date) {
-        this.setState({...this.state, ...{date: date}});
+  async componentWillReceiveProps(nextProps, nextContext) {
+    const state = {
+      date: (nextProps.task && new Date(+nextProps.task.timeStamp)) || new Date(),
+      title: (nextProps.task && nextProps.task.title) || '',
+      repeats: (nextProps.task && nextProps.task.repeats) || false,
+      humanizedDate: (nextProps.task && nextProps.task.humanizedDate) || 'Today',
+    };
+    await this.setState({ ...this.state, ...state });
+    if (nextProps.task) {
+      this.open();
     }
+  }
 
-    setRepeats() {
-        const repeats = this.state.repeats ? false : 'day';
-        this.setState({...this.state, ...{repeats}})
+  close() {
+    const state = {
+      date: new Date(),
+      title: '',
+      repeats: null,
+      humanizedDate: 'Today',
+      isOpen: false,
+    };
+    this.setState({ ...this.state, ...state });
+    Keyboard.dismiss();
+    Animated.spring(this.state.animVal, {
+      toValue: 0,
+    }).start();
+    this.props.cancel();
+  }
+
+  async setDate(date) {
+    this.setState({ ...this.state, ...{ date } });
+  }
+
+  async saveTask() {
+    const og = this.props.task || {};
+    const task = new Task({
+      ...og,
+      ...{
+        title: this.state.title,
+        timeStamp: this.state.date.getTime(),
+        humanizedDate: this.state.humanizedDate,
+        repeats: this.state.repeats,
+      },
+    });
+
+    await task.cancelNotification();
+    await task.createNotification();
+
+    mLogger(`saving task: ${JSON.stringify(task)}`);
+
+    const tasks = await task.save();
+
+    if (tasks) {
+      await this.props.savedTask(tasks);
+    } else {
+      mLogger(`could not save task: ${task}`);
     }
+    this.close();
+  }
 
-    setText(text) {
-        this.setState({...this.state, ...{title: text}})
-    }
-
-    saveTask() {
-        let task = {
-            title: this.state.title,
-            date: this.state.date,
-            created_at: new Date(),
-            isFullDay: this.state.mode === 'date',
-            repeats: this.state.repeats
-        };
-        if (this.props.task) {
-           task = {...this.props.task, ...task};
-        }
-        mLogger(`saving task: ${task}`);
-        this.props.saveTask(task);
-    }
-
-    render() {
-        const currentDate = formatDate(new Date());
-        return (
-            <View style={styles.container}>
-                <View style={styles.formElement}>
-                    <Text style={styles.label}>Date</Text>
-                    <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
-                        <DatePicker
-                            style={{width: '50%'}}
-                            date={this.state.date}
-                            mode={this.state.mode}
-                            placeholder="select date"
-                            format={`YYYY-MM-DD${this.state.mode === 'datetime' ? ' HH:mm' : ''}`}
-                            minDate={currentDate}
-                            confirmBtnText="Confirm"
-                            cancelBtnText="Cancel"
-                            customStyles={{
-                                dateIcon: {
-                                    position: 'absolute',
-                                    left: 0,
-                                    top: 4,
-                                    marginLeft: 0
-                                },
-                                dateInput: {
-                                    marginLeft: 40,
-                                    flexGrow: 1,
-                                    borderColor: Colors.transparent,
-                                    borderBottomColor: Colors.light,
-                                    color: Colors.black
-                                }
-                            }}
-                            onDateChange={date => this.setDate(date)}
-                        />
-                        <CheckBox
-                            checked={this.state.mode === 'date'}
-                            containerStyle={{backgroundColor: Colors.transparent, borderColor: Colors.transparent}}
-                            checkedColor={Colors.primaryBackground}
-                            onPress={() => this.changeMode()}
-                            title="All day"
-                        />
-                    </View>
-                </View>
-                <View style={styles.formElement}>
-                    <Text style={styles.label}>Task description</Text>
-                    <EmojiAddon
-                        name="pencil">
-                        <Input
-                            placeholder='Enter task description...'
-                            errorMessage={this.state.errors.desc}
-                            value={this.state.title}
-                            onChangeText={text => this.setText(text)}
-                            inputStyle={{color: Colors.black}}
-                        />
-                    </EmojiAddon>
-                </View>
-                <View style={styles.formElement}>
-                    <Text style={styles.label}>Repeats</Text>
-                    <EmojiAddon
-                        name="timer_clock">
-                        <Picker
-                            style={{flexGrow: 1, color: Colors.black}}
-                            selectedValue={this.state.repeats}
-                            onValueChange={repeats => this.setState({...this.state, ...{repeats}})}>
-                            <Picker.Item label="Never" value={null} />
-                            <Picker.Item label="Daily" value="day" />
-                            <Picker.Item label="Weekly" value="week" />
-                            <Picker.Item label="Monthly" value="month" />
-                            <Picker.Item label="Yearly" value="year" />
-                        </Picker>
-                    </EmojiAddon>
-                </View>
-                <View style={styles.lastElement}>
-                    <FancyButton
-                        title="Save"
-                        pressFn={() => this.saveTask()}
-                    />
-                </View>
+  render() {
+    const style = [
+      {
+        maxHeight: this.state.animVal.interpolate({ inputRange: [0, 1], outputRange: [0.01, 60] }),
+      },
+    ];
+    return (
+      <View style={styles.container}>
+        <Animated.View style={[styles.formRow, style]}>
+          {this.state.isOpen && (
+            <View style={[styles.formElement, { flexGrow: 3 }]}>
+              <Text style={styles.label}>Date</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                <DateTimePicker
+                  onDateChange={date => this.setDate(date)}
+                  date={this.state.date}
+                  textColor={Colors.primaryText}
+                  borderColor={Colors.primaryText}
+                  minDate={new Date()}
+                />
+              </View>
             </View>
-        )
-    }
+          )}
+          {this.state.isOpen && (
+            <View style={[styles.formElement, { flexGrow: 2 }]}>
+              <Text style={[styles.label, { marginLeft: 5 }]}>Repeats</Text>
+              <Picker
+                style={{ color: Colors.primaryText, height: 20 }}
+                selectedValue={this.state.repeats}
+                onValueChange={repeats => this.setState({ ...this.state, ...{ repeats } })}>
+                <Picker.Item label="Never" value={null} />
+                <Picker.Item label="Daily" value="day" />
+                <Picker.Item label="Weekly" value="week" />
+                <Picker.Item label="Monthly" value="month" />
+                <Picker.Item label="Yearly" value="year" />
+              </Picker>
+            </View>
+          )}
+        </Animated.View>
+        <View style={styles.formRow}>
+          <View style={[styles.formElement, { padding: 0, marginBottom: 5 }]}>
+            {/*<Text style={styles.label}>Task description</Text>*/}
+            <Input
+              placeholder="Enter task description..."
+              errorMessage={this.state.errors.desc}
+              value={this.state.title}
+              onChangeText={text => this.setState({ ...this.state, ...{ title: text } })}
+              placeholderTextColor={Colors.primaryText}
+              inputContainerStyle={{ borderColor: Colors.primaryText }}
+              inputStyle={{ color: Colors.primaryText }}
+              onFocus={() => this.open()}
+            />
+          </View>
+        </View>
+        <Animated.View style={[styles.formRow, style]}>
+          <Animated.View
+            style={[
+              styles.saveButton,
+              {
+                opacity: this.state.animVal.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.01, 1],
+                }),
+              },
+            ]}>
+            <FancyButton
+              title="SAVE"
+              filled={true}
+              borderColor={Colors.primaryText}
+              backgroundColor={Colors.primaryText}
+              pressFn={() => this.saveTask()}
+              textColor={Colors.primaryBackground}
+            />
+          </Animated.View>
+          <Animated.View
+            style={[
+              styles.saveButton,
+              {
+                opacity: this.state.animVal.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.01, 1],
+                }),
+                paddingLeft: 10,
+              },
+            ]}>
+            <FancyButton
+              title="CANCEL"
+              style={{ width: '100%' }}
+              borderColor={Colors.primaryText}
+              pressFn={() => this.close()}
+              textColor={Colors.primaryText}
+            />
+          </Animated.View>
+        </Animated.View>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: 'column',
-        paddingTop: 10,
-        paddingHorizontal: 20,
-        backgroundColor: Colors.white,
-    },
-    formElement: {
-      flexBasis: 1,
-      flexShrink: 0,
-      flexGrow: 0,
-      marginVertical: 30,
-      width: '100%',
-      minHeight: 30,
-      justifyContent: 'space-between'
-    },
-    lastElement: {
-        flexGrow: 1,
-        justifyContent: 'flex-end',
-        margin: 20
-    },
-    label: {
-        paddingVertical: 5,
-        color: Colors.black
-    }
+  container: {
+    flexDirection: 'column',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: Colors.transparent,
+    opacity: 0.8,
+  },
+  formElement: {
+    flexBasis: 1,
+    flexShrink: 0,
+    flexGrow: 1,
+    padding: 5,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    height: '100%',
+  },
+  formRow: {
+    flexDirection: 'row',
+    flexGrow: 0,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  saveButton: {
+    flexGrow: 1,
+    alignItems: 'center',
+  },
+  label: {
+    alignSelf: 'flex-start',
+    color: Colors.primaryText,
+    marginBottom: 10,
+  },
 });
