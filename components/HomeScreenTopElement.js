@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import React, { Component } from 'react';
 import Colors from '../constants/Colors';
+import WeatherWidget from "./WeatherWidget";
 
 export default class HomeScreenTopElement extends Component {
   constructor(props) {
@@ -25,7 +26,7 @@ export default class HomeScreenTopElement extends Component {
         : dateObj.getMinutes();
     const isNight = +hours > 18;
     const icon = isNight ? (isIOS ? 'ios-moon' : 'md-moon') : isIOS ? 'ios-sunny' : 'md-sunny';
-    return { date, hours, minutes, icon };
+    return { date, hours, minutes, icon, isNight };
   };
 
   componentWillUnmount() {
@@ -42,7 +43,7 @@ export default class HomeScreenTopElement extends Component {
           marginTop: 20,
           marginBottom: 40,
         }}>
-        <Ionicons name={this.state.icon} size={40} color={Colors.primaryBackground} />
+        <WeatherWidget isNight={this.state.isNight}/>
         <Text style={[styles.text, { fontSize: 20, marginVertical: 15 }]}>
           {this.state.hours < 12
             ? 'Good morning!'
