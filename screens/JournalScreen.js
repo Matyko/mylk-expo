@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import GestureRecognizer from 'react-native-swipe-gestures';
+import { View } from 'react-native';
 import FloatingActionButton from '../components/FloatingActionButton';
 import ModalComponent from '../components/ModalComponent';
 import Colors from '../constants/Colors';
@@ -25,13 +25,14 @@ export default class JournalScreen extends Component {
       accomplishments: [],
       imageModalVisible: false,
       currentPage: null,
-      listView: false,
+      listView: true,
       flatView: false,
-      calendarView: true,
+      calendarView: false,
       hideEmoji: false,
       currentMonth: 0,
       calendarDate: new Date(),
       events: [],
+      filterDate: null,
     };
     this.DIRECTIONS = {
       RIGHT: 'RIGHT',
@@ -62,16 +63,20 @@ export default class JournalScreen extends Component {
 
   async getPages() {
     const pages = await getAllStatic(STORAGE_CONSTS.PAGES, Page);
-    const events = pages.filter(e => {
+    const events = this.getEvents(pages);
+    this.setState({
+      ...this.state,
+      ...{ pages, currentPage: pages[0], events },
+    });
+  }
+
+  getEvents(pages) {
+    return pages.filter(e => {
       const date = new Date(e.timeStamp);
       return (
         date.getFullYear() === this.state.calendarDate.getFullYear() &&
         date.getMonth() === this.state.calendarDate.getMonth()
       );
-    });
-    this.setState({
-      ...this.state,
-      ...{ pages, currentPage: pages[0], events },
     });
   }
 
@@ -101,40 +106,55 @@ export default class JournalScreen extends Component {
     }
   }
 
-  onSwipe = gestureName => {
-    if (!this.state.listView) {
-      const currentPageIndex = this.state.pages.indexOf(this.state.currentPage);
-      switch (gestureName) {
-        case this.DIRECTIONS.LEFT:
-          const next = this.state.pages[currentPageIndex + 1];
-          if (next) {
-            this.setState({ ...this.state, ...{ currentPage: next } });
-          }
-          break;
-        case this.DIRECTIONS.RIGHT:
-          const previous = this.state.pages[currentPageIndex - 1];
-          if (previous) {
-            this.setState({ ...this.state, ...{ currentPage: previous } });
-          }
-          break;
-      }
+  hasSameDate(page) {
+    if (this.state.filterDate) {
+      const date = new Date(page.timeStamp);
+      const sameYear = this.state.filterDate.getFullYear() === date.getFullYear();
+      const sameMonth = this.state.filterDate.getMonth() === date.getMonth();
+      const sameDay = this.state.filterDate.getDate() === date.getDate();
+      return sameYear && sameMonth && sameDay;
+    } else {
+      return true;
     }
-  };
+  }
+
+  async handleDatePress(filterDate) {
+    if (this.state.filterDate && this.state.filterDate.getTime() === filterDate.getTime()) {
+      await this.setState({ ...this.state, ...{ filterDate: null } });
+      await this.setState({ ...this.state, ...{ listView: false } });
+    } else {
+      await this.setState({ ...this.state, ...{ filterDate } });
+      await this.setState({ ...this.state, ...{ listView: true } });
+    }
+  }
+
+  async changeCalendarDate(next) {
+    const calendarDate = new Date(this.state.calendarDate);
+    calendarDate.setMonth(calendarDate.getMonth() + (next ? 1 : -1));
+    await this.setState({ ...this.state, ...{ calendarDate } });
+    const events = this.getEvents(this.state.pages);
+    await this.setState({ ...this.state, ...{ events, filterDate: null, listView: false } });
+  }
 
   render() {
     return (
-      <GestureRecognizer
-        style={{ flex: 1 }}
-        onSwipeRight={() => this.onSwipe(this.DIRECTIONS.RIGHT)}
-        onSwipeLeft={() => this.onSwipe(this.DIRECTIONS.LEFT)}
-        config={this.config}>
+      <View style={{ flex: 1 }}>
+        {this.state.calendarView && (
+          <CalendarView
+            date={this.state.calendarDate}
+            events={this.state.events}
+            onDatePress={date => this.handleDatePress(date)}
+            onDateChange={next => this.changeCalendarDate(next)}
+            filterDate={this.state.filterDate}
+          />
+        )}
         {this.state.listView && (
           <PageListView
             edit={page =>
               this.setState({ ...this.state, ...{ editedPage: page, modalVisible: true } })
             }
             accomplishments={this.state.accomplishments}
-            pages={this.state.pages}
+            pages={this.state.pages.filter(e => this.hasSameDate(e))}
             hideEmoji={this.state.hideEmoji}
             deletePage={page => this.deletePage(page)}
             openImages={page => this.openImages(page)}
@@ -152,7 +172,6 @@ export default class JournalScreen extends Component {
             openImages={page => this.openImages(page)}
           />
         )}
-        {this.state.calendarView && <CalendarView date={this.state.calendarDate} />}
         <FloatingActionButton
           pressFunction={() => this.setState({ ...this.state, ...{ modalVisible: true } })}
         />
@@ -165,7 +184,7 @@ export default class JournalScreen extends Component {
               fn: () =>
                 this.setState({
                   ...this.state,
-                  ...{ flatView: true, listView: false, calendarView: false },
+                  ...{ flatView: true, listView: false, calendarView: false, filterDate: null },
                 }),
             },
             {
@@ -173,18 +192,17 @@ export default class JournalScreen extends Component {
               fn: () =>
                 this.setState({
                   ...this.state,
-                  ...{ flatView: false, listView: true, calendarView: false },
+                  ...{ flatView: false, listView: true, calendarView: false, filterDate: null },
                 }),
             },
             {
               icon: 'calendar',
               fn: () => {
-                console.log('clicccck')
                 this.setState({
                   ...this.state,
-                  ...{ flatView: false, listView: false, calendarView: true },
-                })
-              }
+                  ...{ flatView: false, listView: false, calendarView: true, filterDate: null },
+                });
+              },
             },
           ]}
         />
@@ -203,7 +221,7 @@ export default class JournalScreen extends Component {
           modalVisible={this.state.imageModalVisible}>
           <ImageViewer imageUrls={this.state.visibleImages} />
         </ModalComponent>
-      </GestureRecognizer>
+      </View>
     );
   }
 }

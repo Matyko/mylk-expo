@@ -58,7 +58,7 @@ export default class WeatherWidget extends Component {
       const weatherResponse = await fetch(`https://www.metaweather.com/api/location/${woeid}`);
       const weatherJson = await weatherResponse.json();
       const weather = weatherJson.consolidated_weather[0];
-      const temp = weather.the_temp;
+      const temp = parseFloat(weather.the_temp).toFixed(1);
       const { icon, color, name } = WEATHER_CONSTS[weather.weather_state_abbr];
       await this.setState({
         ...this.state,
