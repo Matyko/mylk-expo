@@ -58,7 +58,8 @@ export default function App(props) {
 async function loadResourcesAsync() {
   await Promise.all([
     Asset.loadAsync([
-      require('./assets/video/11.mp4')
+      require('./assets/video/11.mp4'),
+      require('./assets/images/splash.png')
     ]),
     Font.loadAsync({
       ...Ionicons.font,

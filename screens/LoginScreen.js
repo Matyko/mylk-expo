@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
-import { AsyncStorage, KeyboardAvoidingView, StyleSheet, View } from 'react-native';
+import { Animated, AsyncStorage, KeyboardAvoidingView, StyleSheet, View } from 'react-native';
 import { CheckBox, Input } from 'react-native-elements';
 import * as firebase from 'firebase';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as SecureStore from 'expo-secure-store';
+import { Video } from 'expo-av';
 import FancyButton from '../components/FancyButton';
 import mLogger from '../util/mLogger';
 import { StyledText } from '../components/StyledText';
 import Colors from '../constants/Colors';
 import PassCode from '../components/PassCode';
 import STORAGE_CONSTS from '../util/storageConsts';
-import {Video} from "expo-av";
 
 export default class LoginScreen extends Component {
   constructor(props) {
@@ -25,7 +25,15 @@ export default class LoginScreen extends Component {
         desc: '',
       },
       passCodeCheck: false,
+      loaded: false,
     };
+    this.animVal = new Animated.Value(1);
+  }
+
+  animate() {
+    Animated.spring(this.animVal, {
+      toValue: 0,
+    }).start(() => this.setState({ ...this.state, ...{ loaded: true } }));
   }
 
   async componentDidMount() {
@@ -44,12 +52,16 @@ export default class LoginScreen extends Component {
         if (password) this.setState({ ...this.state, ...{ password } });
 
         if (passCode) {
+          this.animate();
           this.setState({ ...this.state, ...{ passCodeCheck: true } });
         } else {
           this.login();
         }
+      } else {
+        this.animate();
       }
     } catch (e) {
+      this.animate();
       mLogger('did not find saved data');
     }
   }
@@ -71,6 +83,7 @@ export default class LoginScreen extends Component {
       .auth()
       .signInWithEmailAndPassword(this.state.email, this.state.password)
       .then(async ({ user }) => {
+        this.animate();
         if (this.state.rememberMe) {
           await SecureStore.setItemAsync(STORAGE_CONSTS.USER_ID, user.uid);
           await AsyncStorage.setItem(STORAGE_CONSTS.EMAIL, this.state.email);
@@ -111,85 +124,100 @@ export default class LoginScreen extends Component {
         {/*  muted={true}*/}
         {/*  resizeMode="cover"*/}
         {/*/>*/}
+        {!this.state.loaded && (
+          <Animated.Image
+            source={require('../assets/images/splash.png')}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              opacity: this.animVal.interpolate({ inputRange: [0, 1], outputRange: [0.01, 1] }),
+            }}
+          />
+        )}
         <LinearGradient
           start={[0, 1]}
           end={[1, 0]}
           colors={[Colors.primaryText, Colors.primaryBackground]}
           style={[styles.backgroundVideo, { opacity: 0.6 }]}
         />
-        <KeyboardAvoidingView behavior="padding" style={styles.container}>
-          <View style={styles.loginContainer}>
-            <View style={styles.logo}>
-              <StyledText style={styles.logoText}>mylk</StyledText>
+        {this.state.loaded && (
+          <KeyboardAvoidingView behavior="padding" style={styles.container}>
+            <View style={styles.loginContainer}>
+              <View style={styles.logo}>
+                <StyledText style={styles.logoText}>mylk</StyledText>
+              </View>
+              {!this.state.passCodeCheck && (
+                <View style={styles.form}>
+                  <View style={styles.formElement}>
+                    <Input
+                      placeholder="Enter email"
+                      errorMessage={this.state.errors.desc}
+                      placeholderTextColor={Colors.white}
+                      inputStyle={styles.input}
+                      inputContainerStyle={{ borderColor: Colors.white }}
+                      value={this.state.email}
+                      onChangeText={email => this.setState({ ...this.state, ...{ email } })}
+                    />
+                  </View>
+                  <View style={styles.formElement}>
+                    <Input
+                      placeholder="Enter password"
+                      errorMessage={this.state.errors.desc}
+                      placeholderTextColor={Colors.white}
+                      inputStyle={styles.input}
+                      inputContainerStyle={{ borderColor: Colors.white }}
+                      secureTextEntry={true}
+                      value={this.state.password}
+                      onChangeText={password => this.setState({ ...this.state, ...{ password } })}
+                    />
+                  </View>
+                  <View style={styles.formElement}>
+                    <CheckBox
+                      checked={this.state.rememberMe}
+                      containerStyle={{
+                        backgroundColor: Colors.transparent,
+                        borderColor: Colors.transparent,
+                      }}
+                      textStyle={{ color: Colors.white }}
+                      checkedColor={Colors.white}
+                      uncheckedColor={Colors.white}
+                      onPress={() => this.rememberMe()}
+                      title="Remember me"
+                    />
+                  </View>
+                </View>
+              )}
+              {!this.state.passCodeCheck && (
+                <View style={styles.lastElement}>
+                  <FancyButton
+                    title="Login"
+                    borderColor={Colors.white}
+                    textColor={Colors.white}
+                    loading={this.state.loading}
+                    pressFn={() => this.login()}
+                  />
+                  <FancyButton
+                    title="Register"
+                    borderColor={Colors.white}
+                    textColor={Colors.white}
+                    loading={this.state.loading}
+                    pressFn={() => this.register()}
+                  />
+                </View>
+              )}
+              {this.state.passCodeCheck && (
+                <PassCode
+                  backgroundColor={Colors.transparent}
+                  passCode={this.state.passCode}
+                  codeEntered={code => this.checkPassCode(code)}
+                />
+              )}
             </View>
-            {!this.state.passCodeCheck && (
-              <View style={styles.form}>
-                <View style={styles.formElement}>
-                  <Input
-                    placeholder="Enter email"
-                    errorMessage={this.state.errors.desc}
-                    placeholderTextColor={Colors.white}
-                    inputStyle={styles.input}
-                    inputContainerStyle={{ borderColor: Colors.white }}
-                    value={this.state.email}
-                    onChangeText={email => this.setState({ ...this.state, ...{ email } })}
-                  />
-                </View>
-                <View style={styles.formElement}>
-                  <Input
-                    placeholder="Enter password"
-                    errorMessage={this.state.errors.desc}
-                    placeholderTextColor={Colors.white}
-                    inputStyle={styles.input}
-                    inputContainerStyle={{ borderColor: Colors.white }}
-                    secureTextEntry={true}
-                    value={this.state.password}
-                    onChangeText={password => this.setState({ ...this.state, ...{ password } })}
-                  />
-                </View>
-                <View style={styles.formElement}>
-                  <CheckBox
-                    checked={this.state.rememberMe}
-                    containerStyle={{
-                      backgroundColor: Colors.transparent,
-                      borderColor: Colors.transparent,
-                    }}
-                    textStyle={{ color: Colors.white }}
-                    checkedColor={Colors.white}
-                    uncheckedColor={Colors.white}
-                    onPress={() => this.rememberMe()}
-                    title="Remember me"
-                  />
-                </View>
-              </View>
-            )}
-            {!this.state.passCodeCheck && (
-              <View style={styles.lastElement}>
-                <FancyButton
-                  title="Login"
-                  borderColor={Colors.white}
-                  textColor={Colors.white}
-                  loading={this.state.loading}
-                  pressFn={() => this.login()}
-                />
-                <FancyButton
-                  title="Register"
-                  borderColor={Colors.white}
-                  textColor={Colors.white}
-                  loading={this.state.loading}
-                  pressFn={() => this.register()}
-                />
-              </View>
-            )}
-            {this.state.passCodeCheck && (
-              <PassCode
-                backgroundColor={Colors.transparent}
-                passCode={this.state.passCode}
-                codeEntered={code => this.checkPassCode(code)}
-              />
-            )}
-          </View>
-        </KeyboardAvoidingView>
+          </KeyboardAvoidingView>
+        )}
       </View>
     );
   }
