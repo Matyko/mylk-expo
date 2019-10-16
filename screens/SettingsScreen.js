@@ -193,7 +193,7 @@ SettingsScreen.navigationOptions = {
   headerTitleStyle: {
     color: Colors.primaryText,
     lineHeight: 79,
-    fontFamily: 'nunito-black',
+    fontFamily: 'laila-bold',
     fontWeight: 'normal',
   },
 };

@@ -4,6 +4,7 @@ import * as Font from 'expo-font';
 import React, { useState } from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { setCustomText, setCustomTextInput } from 'react-native-global-props';
 import firebase from 'firebase';
 import timerFix from './util/timerWarningFix';
 import AppNavigator from './navigation/AppNavigator';
@@ -60,13 +61,21 @@ async function loadResourcesAsync() {
       require('./assets/video/11.mp4')
     ]),
     Font.loadAsync({
-      // This is the font that we are using for our tab bar
       ...Ionicons.font,
-      // We include SpaceMono because we use it in HomeScreen.js. Feel free to
-      // remove this if you are not using it in your app
-      nunito: require('./assets/fonts/Nunito-Regular.ttf'),
+      'nunito-regular': require('./assets/fonts/Nunito-Regular.ttf'),
       'nunito-black': require('./assets/fonts/Nunito-Black.ttf'),
-      'nunito-light': require('./assets/fonts/Nunito-ExtraLight.ttf'),
+      'nunito-extralight': require('./assets/fonts/Nunito-ExtraLight.ttf'),
+      'laila-regular': require('./assets/fonts/Laila-Regular.ttf'),
+      'laila-bold': require('./assets/fonts/Laila-Bold.ttf'),
+      'laila-light': require('./assets/fonts/Laila-Light.ttf'),
+    }).then(() => {
+      const customTextProps = {
+        style: {
+          fontFamily: 'nunito-regular',
+        },
+      };
+      setCustomText(customTextProps);
+      setCustomTextInput(customTextProps);
     }),
   ]);
 }

@@ -120,7 +120,7 @@ export default class LoginScreen extends Component {
         <KeyboardAvoidingView behavior="padding" style={styles.container}>
           <View style={styles.loginContainer}>
             <View style={styles.logo}>
-              <StyledText style={styles.logoText}>Mylk</StyledText>
+              <StyledText style={styles.logoText}>mylk</StyledText>
             </View>
             {!this.state.passCodeCheck && (
               <View style={styles.form}>
