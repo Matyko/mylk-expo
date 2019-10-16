@@ -11,7 +11,6 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "cover",
@@ -24,11 +23,17 @@
       "**/*"
     ],
     "ios": {
+      "icon": "./assets/images/icon.png",
       "bundleIdentifier": "com.matyaskrista.mylk",
       "supportsTablet": true
     },
     "android": {
-      "package": "com.matyaskrista.mylk"
+      "package": "com.matyaskrista.mylk",
+      "icon": "./assets/images/icon.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/android-icon.png",
+        "backgroundColor": "#3dbd94"
+      }
     },
     "description": ""
   }
