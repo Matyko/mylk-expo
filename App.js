@@ -9,6 +9,7 @@ import firebase from 'firebase';
 import timerFix from './util/timerWarningFix';
 import AppNavigator from './navigation/AppNavigator';
 import '@firebase/firestore';
+import mLogger from "./util/mLogger";
 
 const firebaseConfig = {
   apiKey: 'AIzaSyB7hQ1BKUnW77ZbVf3Wh1vxd1luqhOfSlU',
@@ -31,6 +32,8 @@ firebase.auth().onAuthStateChanged(user => {
     auth.loggedIn = true;
   }
 });
+
+mLogger.setConfig({ isVerbose: false });
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
