@@ -104,7 +104,7 @@ export default class TasksScreen extends Component {
           />
         </View>
         <ScrollView
-          style={{ flexGrow: 2, backgroundColor: `rgba(${rgbBG.r},${rgbBG.g},${rgbBG.b},0.6)` }}>
+          style={{ flexGrow: 2 }}>
           {this.state.tasks.sort(sortByDate).map(task => {
             if (!task.checked) {
               return (

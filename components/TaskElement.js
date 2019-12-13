@@ -14,20 +14,30 @@ import GestureRecognizer from 'react-native-swipe-gestures';
 import Emoji from 'react-native-emoji';
 import Colors from '../constants/Colors';
 import getHumanizedData from '../util/formatDate';
+import {shouldThrowAnErrorOutsideOfExpo} from "expo/build/environment/validatorState";
 
 export default function TaskElement({ task, setChecked, deleteTask, toEdit, emoji }) {
+  let deleteVisible = false;
+  const animVal = new Animated.Value(0);
+  const grow = Animated.spring(animVal, { toValue: 1, bounciness: 1 });
+  const shrink = Animated.spring(animVal, { toValue: 0, bounciness: 1 });
+  const prefix = Platform.OS === 'ios' ? 'ios-' : 'md-';
+  const config = {
+    velocityThreshold: 0.3,
+    directionalOffsetThreshold: 30,
+  };
   const DIRECTIONS = {
     RIGHT: 'RIGHT',
     LEFT: 'LEFT',
   };
 
-  const showHidden = () => {
+  const toggleDelete = () => {
     if (deleteVisible) {
-      deleteVisible = false;
       shrink.start();
+      deleteVisible = false;
     } else {
-      deleteVisible = true;
       grow.start();
+      deleteVisible = true;
     }
   };
 
@@ -35,7 +45,7 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit, emoj
     switch (gestureName) {
       case DIRECTIONS.LEFT:
         if (deleteVisible) {
-          showHidden();
+          toggleDelete();
         } else {
           setChecked();
         }
@@ -44,7 +54,7 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit, emoj
         if (task.checked) {
           setChecked();
         } else {
-          showHidden();
+          toggleDelete();
         }
         break;
     }
@@ -59,18 +69,8 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit, emoj
         : null
       : `${prefix}alert`;
   };
-  const animVal = new Animated.Value(0);
-  const grow = Animated.spring(animVal, { toValue: 1, bounciness: 1 });
-  const shrink = Animated.spring(animVal, { toValue: 0, bounciness: 1 });
-  const prefix = Platform.OS === 'ios' ? 'ios-' : 'md-';
+
   const icon = getIcon();
-
-  let deleteVisible = false;
-
-  const config = {
-    velocityThreshold: 0.3,
-    directionalOffsetThreshold: 30,
-  };
 
   return (
     <GestureRecognizer
@@ -78,7 +78,7 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit, emoj
       onSwipeLeft={() => onSwipe(DIRECTIONS.RIGHT)}
       onSwipeRight={() => onSwipe(DIRECTIONS.LEFT)}
       config={config}>
-      <TouchableWithoutFeedback onLongPress={() => showHidden()} onPress={() => toEdit()}>
+      <TouchableWithoutFeedback onLongPress={() => toggleDelete()} onPress={() => toEdit()}>
         <View style={{ ...styles.taskElement, ...{ opacity: task.checked ? 0.6 : 1 } }}>
           <View style={styles.checkBoxContainer}>
             <CheckBox
@@ -130,7 +130,7 @@ export default function TaskElement({ task, setChecked, deleteTask, toEdit, emoj
             <Ionicons
               name={Platform.OS === 'ios' ? 'ios-trash' : 'md-trash'}
               size={30}
-              color={Colors.primaryText}
+              color={Colors.danger}
             />
           </TouchableOpacity>
         </Animated.View>
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 1,
-    padding: 10,
+    padding: 8,
     marginTop: 8,
     marginBottom: 8,
     marginLeft: 15,

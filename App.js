@@ -9,7 +9,8 @@ import firebase from 'firebase';
 import timerFix from './util/timerWarningFix';
 import AppNavigator from './navigation/AppNavigator';
 import '@firebase/firestore';
-import mLogger from "./util/mLogger";
+import mLogger from './util/mLogger';
+import Colors from './constants/Colors';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyB7hQ1BKUnW77ZbVf3Wh1vxd1luqhOfSlU',
@@ -60,10 +61,7 @@ export default function App(props) {
 
 async function loadResourcesAsync() {
   await Promise.all([
-    Asset.loadAsync([
-      require('./assets/video/11.mp4'),
-      require('./assets/images/splash.png')
-    ]),
+    Asset.loadAsync([require('./assets/video/11.mp4'), require('./assets/images/splash.png')]),
     Font.loadAsync({
       ...Ionicons.font,
       'nunito-regular': require('./assets/fonts/Nunito-Regular.ttf'),

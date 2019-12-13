@@ -7,6 +7,7 @@ import HomeScreen from '../screens/HomeScreen';
 import TasksScreen from '../screens/TasksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import JournalScreen from '../screens/JournalScreen';
+import RoutinesScreen from '../screens/RoutinesScreen';
 import Colors from '../constants/Colors';
 
 const config = Platform.select({
@@ -74,6 +75,29 @@ JournalStack.navigationOptions = {
 
 JournalStack.path = '';
 
+const RoutinesStack = createStackNavigator(
+  {
+    Settings: RoutinesScreen,
+  },
+  config
+);
+
+RoutinesStack.navigationOptions = {
+  tabBarLabel: 'Routines',
+  tabBarOptions: {
+    activeTintColor: Colors.primaryBackground,
+    backgroundColor: Colors.white,
+  },
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={Platform.OS === 'ios' ? 'ios-play-circle' : 'md-play-circle'}
+    />
+  ),
+};
+
+RoutinesStack.path = '';
+
 const SettingsStack = createStackNavigator(
   {
     Settings: SettingsScreen,
@@ -96,8 +120,9 @@ SettingsStack.path = '';
 
 const tabNavigator = createBottomTabNavigator({
   HomeStack,
-  LinksStack: TaskStack,
+  TaskStack,
   JournalStack,
+  RoutinesStack,
   SettingsStack,
 });
 

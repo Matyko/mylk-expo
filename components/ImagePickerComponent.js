@@ -100,7 +100,7 @@ export default class ImagePickerComponent extends React.Component {
                     <Ionicons
                       name={Platform.OS === 'ios' ? 'ios-close-circle' : 'md-close-circle'}
                       size={35}
-                      color={Colors.errorBackground}
+                      color={Colors.danger}
                       onPress={() => this._deleteImage(image)}
                     />
                   </View>
